@@ -3,12 +3,17 @@
 @section('title', 'Tambah Berita Baru')
 
 @section('content')
-<div class="bg-white rounded-xl shadow-sm border border-gray-100">
+<div class="bg-white rounded-xl shadow-md border-l-4 border-blue-500">
     <div class="p-6">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-semibold text-gray-800">Tambah Berita Baru</h2>
-            <a href="{{ route('admin.news.index') }}" class="text-sm text-gray-600 hover:text-gray-800 flex items-center">
-                <i class="fas fa-arrow-left mr-1"></i> Kembali ke Daftar Berita
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                    <i class="fas fa-newspaper text-blue-500 mr-3"></i> Tambah Berita Baru
+                </h2>
+                <p class="text-sm text-gray-500 mt-1">Buat konten berita baru untuk ditampilkan di website</p>
+            </div>
+            <a href="{{ route('admin.news.index') }}" class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg transition-all duration-200 flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Daftar
             </a>
         </div>
 
@@ -19,95 +24,137 @@
                 <div class="lg:col-span-2 space-y-6">
                     <!-- Judul Berita -->
                     <div>
-                        <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Judul Berita</label>
+                        <label for="title" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                            <i class="fas fa-heading text-blue-500 mr-2"></i> Judul Berita
+                            <span class="text-red-500 ml-1">*</span>
+                        </label>
                         <input type="text" name="title" id="title" value="{{ old('title') }}" 
-                            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 @error('title') border-red-500 @enderror"
-                            placeholder="Masukkan judul berita" required>
+                            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 @error('title') border-red-500 @enderror"
+                            placeholder="Masukkan judul berita yang menarik" required>
                         @error('title')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            <p class="mt-1 text-sm text-red-600 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i> {{ $message }}
+                            </p>
                         @enderror
                     </div>
 
                     <!-- Konten Berita -->
                     <div>
-                        <label for="content" class="block text-sm font-medium text-gray-700 mb-1">Isi Berita</label>
+                        <label for="content" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                            <i class="fas fa-align-left text-blue-500 mr-2"></i> Isi Berita
+                            <span class="text-red-500 ml-1">*</span>
+                        </label>
                         <textarea name="content" id="content" rows="10" 
-                            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 @error('content') border-red-500 @enderror"
-                            placeholder="Tulis isi berita disini..." required>{{ old('content') }}</textarea>
+                            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 @error('content') border-red-500 @enderror"
+                            placeholder="Tulis isi berita lengkap disini..." required>{{ old('content') }}</textarea>
                         @error('content')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            <p class="mt-1 text-sm text-red-600 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i> {{ $message }}
+                            </p>
                         @enderror
                     </div>
                 </div>
 
                 <div class="space-y-6">
                     <!-- Gambar Utama -->
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Gambar Utama</label>
-                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                            <div class="space-y-1 text-center">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                <div class="flex text-sm text-gray-600">
-                                    <label for="image" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
-                                        <span>Upload file</span>
-                                        <input id="image" name="image" type="file" class="sr-only" onchange="previewImage(this)">
+                    <div class="bg-gradient-to-r from-blue-50 to-white p-5 rounded-lg shadow-sm border border-blue-100">
+                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                            <i class="fas fa-image text-blue-500 mr-2"></i> Gambar Utama
+                            <span class="text-red-500 ml-1">*</span>
+                        </label>
+                        <div class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-blue-200 border-dashed rounded-lg bg-white hover:bg-blue-50 transition-all duration-300">
+                            <div class="space-y-2 text-center">
+                                <i class="fas fa-cloud-upload-alt text-blue-400 text-4xl"></i>
+                                <div class="flex text-sm text-gray-600 justify-center">
+                                    <label for="image" class="relative cursor-pointer bg-blue-50 rounded-md font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-100 py-2 px-3 transition-colors duration-200 focus-within:outline-none">
+                                        <span>Pilih File</span>
+                                        <input id="image" name="image" type="file" class="sr-only" onchange="previewImage(this)" accept="image/*">
                                     </label>
-                                    <p class="pl-1">atau drag and drop</p>
+                                    <p class="pl-2 flex items-center">atau drag & drop</p>
                                 </div>
                                 <p class="text-xs text-gray-500">PNG, JPG, GIF (Maks. 2MB)</p>
                             </div>
                         </div>
-                        <div class="mt-2" id="imagePreview"></div>
+                        <div class="mt-3" id="imagePreview"></div>
                         @error('image')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            <p class="mt-1 text-sm text-red-600 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i> {{ $message }}
+                            </p>
                         @enderror
                     </div>
 
                     <!-- Kategori -->
                     <div>
-                        <label for="kategori_id" class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
-                        <select name="kategori_id" id="kategori_id" 
-                            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 @error('kategori_id') border-red-500 @enderror" required>
-                            <option value="">Pilih Kategori</option>
-                            @foreach($kategoris as $kategori)
-                                <option value="{{ $kategori->id }}" {{ old('kategori_id') == $kategori->id ? 'selected' : '' }}>
-                                    {{ $kategori->nama }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <label for="kategori_id" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                            <i class="fas fa-tag text-blue-500 mr-2"></i> Kategori
+                            <span class="text-red-500 ml-1">*</span>
+                        </label>
+                        <div class="relative">
+                            <select name="kategori_id" id="kategori_id" 
+                                class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 pl-10 @error('kategori_id') border-red-500 @enderror"
+                                required>
+                                <option value="">Pilih Kategori</option>
+                                @foreach($kategoris as $kategori)
+                                    <option value="{{ $kategori->id }}" {{ old('kategori_id') == $kategori->id ? 'selected' : '' }}>
+                                        {{ $kategori->nama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <i class="fas fa-folder text-gray-400"></i>
+                            </div>
+                        </div>
                         @error('kategori_id')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            <p class="mt-1 text-sm text-red-600 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i> {{ $message }}
+                            </p>
                         @enderror
                     </div>
 
                     <!-- Penulis -->
                     <div>
-                        <label for="author" class="block text-sm font-medium text-gray-700 mb-1">Penulis</label>
-                        <input type="text" name="author" id="author" value="{{ old('author', auth('admin')->user()->name) }}" 
-                            class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 @error('author') border-red-500 @enderror"
-                            placeholder="Nama penulis" required>
+                        <label for="author" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                            <i class="fas fa-user-edit text-blue-500 mr-2"></i> Penulis
+                            <span class="text-red-500 ml-1">*</span>
+                        </label>
+                        <div class="relative">
+                            <input type="text" name="author" id="author" value="{{ old('author', auth('admin')->user()->name) }}" 
+                                class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 pl-10 @error('author') border-red-500 @enderror"
+                                placeholder="Nama penulis" required>
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <i class="fas fa-user text-gray-400"></i>
+                            </div>
+                        </div>
                         @error('author')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            <p class="mt-1 text-sm text-red-600 flex items-center">
+                                <i class="fas fa-exclamation-circle mr-1"></i> {{ $message }}
+                            </p>
                         @enderror
                     </div>
 
                     <!-- Status Publikasi -->
-                    <div class="flex items-center">
-                        <input type="checkbox" name="is_published" id="is_published" value="1" 
-                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            {{ old('is_published') ? 'checked' : '' }}>
-                        <label for="is_published" class="ml-2 block text-sm text-gray-700">
-                            Publikasikan sekarang
-                        </label>
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <label for="is_published" class="text-sm font-medium text-gray-700 flex items-center">
+                                <i class="fas fa-globe text-blue-500 mr-2"></i> Status Publikasi
+                            </label>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="is_published" id="is_published" value="1" class="sr-only peer" {{ old('is_published') ? 'checked' : '' }}>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                <span class="ml-3 text-sm font-medium text-gray-700">{{ old('is_published') ? 'Publikasikan' : 'Draft' }}</span>
+                            </label>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">
+                            <i class="fas fa-info-circle mr-1"></i> Berita yang dipublikasikan akan langsung tampil di website
+                        </p>
                     </div>
 
                     <!-- Tombol Simpan -->
-                    <div class="pt-4">
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-save mr-2"></i> Simpan Berita
+                    <div class="pt-6">
+                        <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1">
+                            <i class="fas fa-paper-plane mr-2"></i> Publikasikan Berita
                         </button>
+                        <p class="text-center text-xs text-gray-500 mt-2">Pastikan semua data sudah terisi dengan benar</p>
                     </div>
                 </div>
             </div>
@@ -117,29 +164,79 @@
 
 @push('scripts')
 <script>
-    // Preview gambar sebelum upload
+    // Toggle status publikasi label
+    document.getElementById('is_published').addEventListener('change', function() {
+        const statusLabel = this.nextElementSibling.nextElementSibling;
+        statusLabel.textContent = this.checked ? 'Publikasikan' : 'Draft';
+    });
+
+    // Preview gambar sebelum upload dengan animasi
     function previewImage(input) {
         const preview = document.getElementById('imagePreview');
         preview.innerHTML = '';
         
         if (input.files && input.files[0]) {
+            // Tampilkan loading spinner
+            const loading = document.createElement('div');
+            loading.className = 'flex items-center justify-center py-3';
+            loading.innerHTML = '<i class="fas fa-spinner fa-spin text-blue-500 text-xl"></i><span class="ml-2 text-sm text-gray-600">Memproses gambar...</span>';
+            preview.appendChild(loading);
+            
             const reader = new FileReader();
             
             reader.onload = function(e) {
+                // Hapus loading spinner
+                preview.innerHTML = '';
+                
+                // Buat container untuk gambar
+                const container = document.createElement('div');
+                container.className = 'relative bg-gray-100 rounded-lg overflow-hidden border border-gray-200';
+                
+                // Buat gambar preview
                 const img = document.createElement('img');
                 img.src = e.target.result;
-                img.className = 'mt-2 w-full h-48 object-cover rounded-lg';
-                preview.appendChild(img);
+                img.className = 'w-full h-48 object-cover rounded-lg transition-opacity duration-300';
+                img.style.opacity = '0';
+                
+                // Buat tombol hapus
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-md hover:bg-red-600 transition-colors';
+                removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                removeBtn.onclick = function() {
+                    container.remove();
+                    document.getElementById('image').value = '';
+                };
+                
+                // Tambahkan elemen ke container
+                container.appendChild(img);
+                container.appendChild(removeBtn);
+                preview.appendChild(container);
+                
+                // Animasi fade in
+                setTimeout(() => {
+                    img.style.opacity = '1';
+                }, 100);
             }
             
             reader.readAsDataURL(input.files[0]);
         }
     }
 
-    // Inisialisasi text editor
+    // Inisialisasi text editor dengan konfigurasi yang lebih baik
     ClassicEditor
         .create(document.querySelector('#content'), {
-            toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'blockQuote', 'insertTable', 'mediaEmbed', '|', 'undo', 'redo'],
+            toolbar: {
+                items: [
+                    'heading', '|', 
+                    'bold', 'italic', 'underline', 'strikethrough', '|',
+                    'link', 'bulletedList', 'numberedList', '|',
+                    'outdent', 'indent', '|',
+                    'blockQuote', 'insertTable', 'mediaEmbed', '|',
+                    'undo', 'redo'
+                ],
+                shouldNotGroupWhenFull: true
+            },
             heading: {
                 options: [
                     { model: 'paragraph', title: 'Paragraf', class: 'ck-heading_paragraph' },
@@ -148,9 +245,21 @@
                     { model: 'heading3', view: 'h4', title: 'Heading 3', class: 'ck-heading_heading3' }
                 ]
             },
+            placeholder: 'Tulis konten berita lengkap di sini...',
+            table: {
+                contentToolbar: [ 'tableColumn', 'tableRow', 'mergeTableCells' ]
+            },
+        })
+        .then(editor => {
+            console.log('Editor initialized', editor);
+            // Tambahkan kelas untuk styling yang lebih baik
+            const editorElement = document.querySelector('.ck-editor');
+            if (editorElement) {
+                editorElement.classList.add('mt-1');
+            }
         })
         .catch(error => {
-            console.error(error);
+            console.error('Editor initialization error:', error);
         });
 </script>
 @endpush

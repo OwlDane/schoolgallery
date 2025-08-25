@@ -5,47 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Admin Login - Galeri Sekolah</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        .bg-auth {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .bg-auth-pattern {
+            background-color: #f9fafb;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%233b82f6' fill-opacity='0.05'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3Cpath d='M6 5V0H5v5H0v1h5v94h1V6h94V5H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
         .card-shadow {
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
         }
-        .password-toggle {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #6b7280;
+        .input-focus-effect {
+            transition: all 0.3s ease;
         }
-        .password-toggle:hover {
-            color: #1e40af;
+        .input-focus-effect:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .btn-primary {
+            background-image: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        .logo-pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
         }
     </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-auth-pattern">
     <div class="min-h-screen flex items-center justify-center p-4">
         <div class="w-full max-w-md">
             <!-- Logo Sekolah -->
             <div class="text-center mb-8">
-                <div class="mx-auto w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg mb-4">
-                    <i class="fas fa-school text-3xl text-blue-600"></i>
+                <div class="mx-auto w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-lg mb-4 logo-pulse">
+                    <i class="fas fa-school text-3xl text-white"></i>
                 </div>
-                <h1 class="text-2xl font-bold text-gray-800">Galeri Sekolah</h1>
-                <p class="mt-1 text-gray-600">Sistem Manajemen Konten Sekolah</p>
+                <h1 class="text-3xl font-bold text-gray-800">Galeri Sekolah</h1>
+                <p class="mt-2 text-gray-600">Sistem Manajemen Konten Sekolah</p>
             </div>
 
             <!-- Card Login -->
-            <div class="bg-white rounded-xl p-8 shadow-lg">
-                <div class="text-center mb-6">
+            <div class="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+                <div class="text-center mb-8">
                     <h2 class="text-2xl font-bold text-gray-800">Masuk ke Dashboard</h2>
-                    <p class="text-gray-500 mt-2">Silakan masukkan kredensial Anda</p>
+                    <div class="h-1 w-16 bg-blue-500 mx-auto mt-2 rounded-full"></div>
                 </div>
+
 
                 @if($errors->any())
                     <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded">
@@ -114,15 +142,17 @@
                     <!-- Remember Me & Forgot Password -->
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
-                            <input id="remember" name="remember" type="checkbox" 
-                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                            <label for="remember" class="ml-2 block text-sm text-gray-700">
+                            <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                                <input type="checkbox" name="remember" id="remember" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-gray-300 appearance-none cursor-pointer transition-transform duration-200 ease-in-out checked:right-0 checked:border-blue-500 checked:bg-blue-500"/>
+                                <label for="remember" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-200 cursor-pointer"></label>
+                            </div>
+                            <label for="remember" class="text-sm font-medium text-gray-700 cursor-pointer select-none">
                                 Ingat saya
                             </label>
                         </div>
                         <div class="text-sm">
-                            <a href="{{ route('admin.password.request') }}" class="font-medium text-blue-600 hover:text-blue-500">
-                                Lupa password?
+                            <a href="{{ route('admin.password.request') }}" class="font-medium text-blue-600 hover:text-blue-500 transition-colors flex items-center">
+                                <i class="fas fa-key mr-1 text-xs"></i> Lupa password?
                             </a>
                         </div>
                     </div>
@@ -130,16 +160,30 @@
                     <!-- Submit Button -->
                     <div>
                         <button type="submit" 
-                            class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
-                            <i class="fas fa-sign-in-alt mr-2"></i> Masuk
+                            class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-md text-sm font-medium text-white btn-primary">
+                            <i class="fas fa-sign-in-alt mr-2"></i> Masuk ke Dashboard
                         </button>
                     </div>
+                    
+                    <style>
+                        .toggle-checkbox:checked + .toggle-label {
+                            background-color: #dbeafe;
+                        }
+                    </style>
                 </form>
             </div>
 
             <!-- Copyright -->
             <div class="mt-8 text-center text-sm text-gray-500">
-                <p> &copy; {{ date('Y') }} Galeri Sekolah. All rights reserved.</p>
+                <p class="flex items-center justify-center">
+                    <i class="fas fa-shield-alt text-blue-500 mr-2"></i>
+                    &copy; {{ date('Y') }} Galeri Sekolah. All rights reserved.
+                </p>
+                <div class="mt-2 flex justify-center space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-blue-500 transition-colors"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-blue-500 transition-colors"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-blue-500 transition-colors"><i class="fab fa-twitter"></i></a>
+                </div>
             </div>
         </div>
     </div>
