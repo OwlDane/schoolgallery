@@ -1,4 +1,4 @@
-@extends('admin.layouts.master')
+@extends('admin.layouts.app')
 
 @section('title', 'Dashboard')
 
@@ -79,33 +79,33 @@
         </div>
         <div class="divide-y divide-gray-100">
             @forelse($recentBerita as $berita)
-            <a href="{{ route('admin.news.edit', $berita->id) }}" class="block hover:bg-gray-50 transition-colors duration-150 p-4">
-                <div class="flex items-start">
-                    <div class="flex-shrink-0 h-16 w-16 rounded-lg bg-gray-100 overflow-hidden">
-                        @if($berita->gambar)
-                            <img src="{{ asset('storage/' . $berita->gambar) }}" alt="{{ $berita->judul }}" class="h-full w-full object-cover">
-                        @else
-                            <div class="h-full w-full bg-gray-200 flex items-center justify-center text-gray-400">
-                                <i class="fas fa-image"></i>
+                <a href="{{ route('admin.news.edit', $berita->id) }}" class="block hover:bg-gray-50 transition-colors duration-150 p-4">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-16 w-16 rounded-lg bg-gray-100 overflow-hidden">
+                            @if($berita->gambar)
+                                <img src="{{ asset('storage/' . $berita->gambar) }}" alt="{{ $berita->judul }}" class="h-full w-full object-cover">
+                            @else
+                                <div class="h-full w-full bg-gray-200 flex items-center justify-center text-gray-400">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <h4 class="text-sm font-medium text-gray-900 line-clamp-1">{{ $berita->judul }}</h4>
+                            <p class="mt-1 text-xs text-gray-500 line-clamp-2">{{ Str::limit(strip_tags($berita->isi), 100) }}</p>
+                            <div class="mt-2 flex items-center text-xs text-gray-400">
+                                <span>{{ $berita->created_at->diffForHumans() }}</span>
+                                <span class="mx-2">•</span>
+                                <span>{{ $berita->kategori->nama ?? 'Tanpa Kategori' }}</span>
                             </div>
-                        @endif
-                    </div>
-                    <div class="ml-4 flex-1">
-                        <h4 class="text-sm font-medium text-gray-900 line-clamp-1">{{ $berita->judul }}</h4>
-                        <p class="mt-1 text-xs text-gray-500 line-clamp-2">{{ Str::limit(strip_tags($berita->isi), 100) }}</p>
-                        <div class="mt-2 flex items-center text-xs text-gray-400">
-                            <span>{{ $berita->created_at->diffForHumans() }}</span>
-                            <span class="mx-2">•</span>
-                            <span>{{ $berita->kategori->nama ?? 'Tanpa Kategori' }}</span>
                         </div>
                     </div>
-                </div>
-            </a>
+                </a>
             @empty
-            <div class="p-6 text-center text-gray-500">
-                <i class="fas fa-inbox text-3xl text-gray-300 mb-2"></i>
-                <p>Belum ada berita</p>
-            </div>
+                <div class="p-6 text-center text-gray-500">
+                    <i class="fas fa-inbox text-3xl text-gray-300 mb-2"></i>
+                    <p>Belum ada berita</p>
+                </div>
             @endforelse
         </div>
     </div>
@@ -117,41 +117,34 @@
         </div>
         <div class="divide-y divide-gray-100">
             @forelse($recentActivities as $activity)
-            <div class="p-4 hover:bg-gray-50 transition-colors duration-150">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <div class="h-10 w-10 rounded-full bg-{{ $activity['color'] }}-100 text-{{ $activity['color'] }}-600 flex items-center justify-center">
-                            <i class="fas fa-{{ $activity['icon'] }}"></i>
+                <div class="p-4 hover:bg-gray-50 transition-colors duration-150">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <div class="h-10 w-10 rounded-full bg-{{ $activity['color'] }}-100 text-{{ $activity['color'] }}-600 flex items-center justify-center">
+                                <i class="fas fa-{{ $activity['icon'] }}"></i>
+                            </div>
                         </div>
-                    </div>
-                    <div class="ml-4">
-                        <div class="text-sm text-gray-900">{{ $activity['description'] }}</div>
-                        <div class="mt-1 flex items-center text-xs text-gray-500">
-                            <i class="far fa-clock mr-1"></i>
-                            <span>{{ $activity['time'] }}</span>
+                        <div class="ml-4">
+                            <div class="text-sm text-gray-900">{{ $activity['description'] }}</div>
+                            <div class="mt-1 flex items-center text-xs text-gray-500">
+                                <i class="far fa-clock mr-1"></i>
+                                <span>{{ $activity['time'] }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
             @empty
-            <div class="p-6 text-center text-gray-500">
-                <i class="fas fa-history text-3xl text-gray-300 mb-2"></i>
-                <p>Belum ada aktivitas</p>
-            </div>
+                <div class="p-6 text-center text-gray-500">
+                    <i class="fas fa-history text-3xl text-gray-300 mb-2"></i>
+                    <p>Belum ada aktivitas</p>
+                </div>
             @endforelse
         </div>
-@endsection
-                    </div>
-                </div>
-            </div>
-            <div class="mt-4">
-                <a href="{{ route('admin.news.index') }}" class="text-sm font-medium text-blue-600 hover:text-blue-500">
-                    Kelola Berita <span aria-hidden="true">→</span>
-                </a>
-            </div>
-        </div>
     </div>
+</div>
 
+<!-- Tambahan Statistik -->
+<div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Galeri Card -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-md">
         <div class="p-6">
@@ -194,6 +187,7 @@
         </div>
     </div>
 
+    <!-- Admin Card -->
     <div class="bg-white rounded-lg shadow p-6">
         <div class="flex items-center">
             <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
@@ -208,7 +202,8 @@
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- Recent News & Galleries -->
+<div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Recent News -->
     <div class="bg-white rounded-lg shadow">
         <div class="p-6 border-b">

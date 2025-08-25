@@ -16,6 +16,11 @@ Route::get('/news/{slug}', [HomeController::class, 'newsDetail'])->name('news.de
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 
+// Alias login untuk default Laravel
+Route::get('/login', function () {
+    return redirect()->route('admin.login');
+})->name('login');
+
 // Admin Routes
 Route::prefix('admin')->name('admin.')->group(function () {
 

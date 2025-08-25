@@ -3,62 +3,57 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Gallery;
 use App\Models\News;
-use App\Models\SchoolProfile;
+use App\Models\Gallery;
 use App\Models\Admin;
-use Carbon\Carbon;
+use App\Models\SchoolProfile;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // Data Statistik
-        $totalBerita = News::count();
-        $totalGaleri = Gallery::count();
+        // Statistik
+        $stats = [
+            'total_galleries'   => Gallery::count(),
+            'published_galleries' => Gallery::where('is_published', true)->count(),
+            'total_admins'      => Admin::count(),
+            'active_admins'     => Admin::where('is_active', true)->count(),
+        ];
+
+        // Untuk cards di atas
+        $totalBerita    = News::count();
+        $totalGaleri    = Gallery::count();
+        $totalPengunjung = DB::table('visits')->whereMonth('created_at', now()->month)->count() ?? 0;
+
+        // Data terbaru
+        $recentNews      = News::latest()->take(5)->get();
+        $recentGalleries = Gallery::latest()->take(6)->get();
+        $recentBerita    = News::latest()->take(3)->get(); // buat section "Berita Terbaru"
         
-        // Data Berita Terbaru
-        $recentBerita = News::with('kategori')
-            ->latest()
-            ->take(5)
-            ->get();
-            
-        // Data Aktivitas Terbaru (contoh statis, bisa diganti dengan model Activity jika ada)
+        // Dummy aktivitas (atau ambil dari tabel activity_log kalau ada)
         $recentActivities = [
             [
-                'icon' => 'user-plus',
+                'description' => 'Admin login',
+                'icon' => 'sign-in-alt',
                 'color' => 'blue',
-                'description' => 'Admin baru ditambahkan',
-                'time' => 'Beberapa menit yang lalu'
-            ],
-            [
-                'icon' => 'newspaper',
-                'color' => 'green',
-                'description' => 'Berita "Penerimaan Siswa Baru 2023" dipublikasikan',
-                'time' => '1 jam yang lalu'
-            ],
-            [
-                'icon' => 'images',
-                'color' => 'purple',
-                'description' => 'Galeri "Kegiatan Pramuka" ditambahkan',
-                'time' => '3 jam yang lalu'
-            ],
-            [
-                'icon' => 'user-edit',
-                'color' => 'yellow',
-                'description' => 'Profil sekolah diperbarui',
-                'time' => 'Kemarin'
+                'time' => now()->diffForHumans(),
             ]
         ];
 
-        return view('admin.dashboard', [
-            'totalBerita' => $totalBerita,
-            'totalGaleri' => $totalGaleri,
-            'totalPengunjung' => 1248, // Contoh data, bisa diganti dengan data asli
-            'recentBerita' => $recentBerita,
-            'recentActivities' => $recentActivities,
-            'schoolProfile' => SchoolProfile::first(),
-            'activeAdmins' => Admin::where('is_active', true)->count()
-        ]);
+        // Profil sekolah
+        $schoolProfile = SchoolProfile::first();
+
+        return view('admin.dashboard', compact(
+            'stats',
+            'totalBerita',
+            'totalGaleri',
+            'totalPengunjung',
+            'recentNews',
+            'recentGalleries',
+            'recentBerita',
+            'recentActivities',
+            'schoolProfile'
+        ));
     }
 }
