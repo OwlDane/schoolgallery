@@ -29,7 +29,7 @@
             <form action="{{ route('news') }}" method="GET" class="flex flex-col md:flex-row gap-4 justify-center">
                 <div class="relative flex-grow max-w-3xl">
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari berita..." 
-                           class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-12">
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-12">
                     <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                 </div>
                 <button type="submit" class="btn-hover bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg flex items-center justify-center">
@@ -88,26 +88,6 @@
                     {{ $news->withQueryString()->links() }}
                 </div>
             @endif
-        </div>
-    </section>
-
-    <!-- Newsletter Section -->
-    <section class="py-16 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex flex-col md:flex-row items-center justify-between">
-                <div class="md:w-1/2 mb-8 md:mb-0" data-aos="fade-right">
-                    <h2 class="text-3xl font-bold mb-4">Dapatkan Berita Terbaru</h2>
-                    <p class="text-blue-100 mb-6">Berlangganan newsletter kami untuk mendapatkan informasi terbaru tentang kegiatan sekolah dan pengumuman penting.</p>
-                </div>
-                <div class="md:w-1/2" data-aos="fade-left">
-                    <form class="flex flex-col sm:flex-row gap-4">
-                        <input type="email" placeholder="Alamat email Anda" class="flex-grow px-4 py-3 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400">
-                        <button type="submit" class="btn-hover bg-yellow-500 hover:bg-yellow-400 text-blue-900 px-6 py-3 rounded-lg font-semibold shadow-lg flex items-center justify-center whitespace-nowrap">
-                            <i class="fas fa-paper-plane mr-2"></i> Berlangganan
-                        </button>
-                    </form>
-                </div>
-            </div>
         </div>
     </section>
 @endsection
