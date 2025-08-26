@@ -10,13 +10,13 @@ class SchoolProfileSeeder extends Seeder
     public function run(): void
     {
         SchoolProfile::create([
-            'school_name' => 'SMA Negeri 1 Jakarta',
-            'address' => 'Jl. Pendidikan No. 123, Jakarta Pusat',
-            'phone' => '021-12345678',
-            'email' => 'info@sman1jakarta.sch.id',
-            'description' => 'Sekolah unggulan yang mengutamakan prestasi akademik dan karakter siswa.',
-            'vision' => 'Menjadi sekolah terdepan dalam menghasilkan lulusan yang berkarakter, berprestasi, dan siap menghadapi tantangan global.',
-            'mission' => 'Menyelenggarakan pendidikan berkualitas dengan mengintegrasikan teknologi modern dan nilai-nilai karakter.',
+            'school_name' => 'SMKN 4 Bogor',
+            'address' => 'Jl. Raya Tajur No. 1, Kota Bogor',
+            'phone' => '0251-8321374',
+            'email' => 'info@smkn4bogor.sch.id',
+            'description' => 'Sekolah Menengah Kejuruan Negeri 4 Bogor yang berfokus pada pengembangan kompetensi kejuruan dan karakter siswa.',
+            'vision' => 'Menjadi sekolah kejuruan unggulan yang menghasilkan lulusan berkompeten, berkarakter, dan siap kerja di era global.',
+            'mission' => 'Menyelenggarakan pendidikan kejuruan yang berkualitas dengan mengedepankan penguasaan teknologi dan kewirausahaan,',
             'operational_hours' => 'Senin - Jumat: 07:00 - 15:00 WIB',
         ]);
     }

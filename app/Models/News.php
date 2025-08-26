@@ -46,9 +46,9 @@ class News extends Model
         return $query->where('is_published', true);
     }
 
-    protected static function boot()
+    protected static function booted()
     {
-        parent::boot();
+        parent::booted();
 
         static::creating(function ($news) {
             if (empty($news->slug)) {
