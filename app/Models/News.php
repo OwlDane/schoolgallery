@@ -20,25 +20,28 @@ class News extends Model
         'is_published',
         'published_at',
         'admin_id',
-        'kategori_id', // pastikan ada kolom ini di tabel news
+        'news_category_id',
     ];
 
-    protected function casts(): array
+    protected $casts = [
+        'is_published' => 'boolean',
+        'published_at' => 'datetime',
+    ];
+
+    /**
+     * Get the category that owns the news.
+     */
+    public function category()
     {
-        return [
-            'is_published' => 'boolean',
-            'published_at' => 'datetime',
-        ];
+        return $this->belongsTo(NewsCategory::class, 'news_category_id');
     }
 
+    /**
+     * Get the admin that owns the news.
+     */
     public function admin()
     {
         return $this->belongsTo(Admin::class);
-    }
-
-    public function kategori()
-    {
-        return $this->belongsTo(Kategori::class);
     }
 
     public function scopePublished($query)
@@ -48,17 +51,12 @@ class News extends Model
 
     protected static function booted()
     {
-        parent::booted();
-
-        static::creating(function ($news) {
-            if (empty($news->slug)) {
-                $news->slug = Str::slug($news->title);
+        static::saving(function ($news) {
+            if (!$news->slug) {
+                $news->slug = Str::slug($news->title) . '-' . time();
             }
-        });
-
-        static::updating(function ($news) {
-            if ($news->isDirty('title')) {
-                $news->slug = Str::slug($news->title);
+            if ($news->isDirty('is_published') && $news->is_published && !$news->published_at) {
+                $news->published_at = now();
             }
         });
     }
