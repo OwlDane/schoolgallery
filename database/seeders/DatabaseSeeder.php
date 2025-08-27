@@ -14,17 +14,21 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
-
+        // Hapus data lama
+        \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        
+        // Jalankan seeder dengan urutan yang benar
         $this->call([
-            AdminSeeder::class,
-            SchoolProfileSeeder::class,
-            KategoriSeeder::class,
+            AdminSeeder::class,          // Buat admin terlebih dahulu
+            KategoriSeeder::class,       // Buat kategori gallery
+            NewsCategorySeeder::class,   // Buat kategori berita
+            SchoolProfileSeeder::class,  // Terakhir buat profil sekolah
         ]);
+        
+        \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        
+        $this->command->info('Database telah diisi dengan data contoh!');
+        $this->command->info('Email admin: admin@sekolah.com');
+        $this->command->info('Password admin: password123');
     }
 }

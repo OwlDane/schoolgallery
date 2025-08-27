@@ -113,8 +113,9 @@
 
             <!-- Content -->
             <main class="flex-1 p-6 overflow-y-auto">
+                {{-- Notifikasi Global --}}
                 @if(session('success'))
-                    <div class="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-lg shadow-sm mb-6 flex items-center">
+                    <div class="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-lg shadow-sm mb-6 flex items-center transition duration-300 ease-in-out">
                         <i class="fas fa-check-circle text-green-500 mr-3"></i>
                         <div>
                             <p class="font-medium">Berhasil!</p>
@@ -127,7 +128,7 @@
                 @endif
 
                 @if(session('error'))
-                    <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-sm mb-6 flex items-center">
+                    <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-sm mb-6 flex items-center transition duration-300 ease-in-out">
                         <i class="fas fa-exclamation-circle text-red-500 mr-3"></i>
                         <div>
                             <p class="font-medium">Error!</p>
@@ -153,10 +154,12 @@
             sidebar.classList.toggle('lg:translate-x-0');
         });
 
-        // Close notification alerts
+        // Close notification alerts with fade-out effect
         document.querySelectorAll('.bg-green-50 button, .bg-red-50 button').forEach(button => {
             button.addEventListener('click', function() {
-                this.closest('div[class*="bg-"]').style.display = 'none';
+                const alertBox = this.closest('div[class*="bg-"]');
+                alertBox.style.opacity = '0';
+                setTimeout(() => alertBox.remove(), 300);
             });
         });
     </script>

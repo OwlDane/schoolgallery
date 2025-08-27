@@ -13,36 +13,46 @@ class KategoriSeeder extends Seeder
      */
     public function run(): void
     {
+        // Nonaktifkan foreign key check sementara
+        \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        
+        // Hapus semua kategori yang ada
+        Kategori::truncate();
+
         $kategoris = [
             [
-                'nama' => 'Berita Sekolah',
-                'deskripsi' => 'Berita seputar kegiatan sekolah',
-                'is_active' => true
+                'id' => 1,
+                'nama' => 'Kegiatan Sekolah',
+                'slug' => 'kegiatan-sekolah',
+                'deskripsi' => 'Berbagai kegiatan yang dilakukan di sekolah',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now()
             ],
             [
-                'nama' => 'Pengumuman',
-                'deskripsi' => 'Pengumuman resmi dari sekolah',
-                'is_active' => true
+                'id' => 2,
+                'nama' => 'Fasilitas Sekolah',
+                'slug' => 'fasilitas-sekolah',
+                'deskripsi' => 'Fasilitas yang tersedia di sekolah',
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now()
             ],
             [
-                'nama' => 'Kegiatan Siswa',
-                'deskripsi' => 'Berbagai kegiatan ekstrakurikuler siswa',
-                'is_active' => true
-            ],
-            [
+                'id' => 3,
                 'nama' => 'Prestasi',
+                'slug' => 'prestasi',
                 'deskripsi' => 'Prestasi yang diraih oleh siswa dan sekolah',
-                'is_active' => true
-            ],
-            [
-                'nama' => 'Artikel Pendidikan',
-                'deskripsi' => 'Artikel seputar dunia pendidikan',
-                'is_active' => true
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now()
             ]
         ];
 
-        foreach ($kategoris as $kategori) {
-            Kategori::create($kategori);
-        }
+        // Gunakan insert untuk menghindari mass assignment
+        \DB::table('kategoris')->insert($kategoris);
+        
+        // Aktifkan kembali foreign key check
+        \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }

@@ -9,7 +9,10 @@
         <p class="text-gray-600 mt-1">Unggah foto baru ke galeri sekolah</p>
     </div>
 
-    <form action="{{ route('admin.galleries.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.galleries.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        @if(request()->has('kategori'))
+            <input type="hidden" name="kategori" value="{{ request('kategori') }}">
+        @endif
         @csrf
 
         @if($errors->any())
@@ -32,6 +35,18 @@
             <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
             <textarea name="description" id="description" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('description') }}</textarea>
             <p class="text-sm text-gray-500 mt-1">Deskripsi singkat tentang foto (opsional)</p>
+        </div>
+
+        <div class="mb-6">
+            <label for="kategori_id" class="block text-sm font-medium text-gray-700 mb-1">Kategori <span class="text-red-600">*</span></label>
+            <select name="kategori_id" id="kategori_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                <option value="">-- Pilih Kategori --</option>
+                @foreach($kategoris as $kategori)
+                    <option value="{{ $kategori->id }}" {{ old('kategori_id') == $kategori->id ? 'selected' : '' }}>
+                        {{ $kategori->nama }}
+                    </option>
+                @endforeach
+            </select>
         </div>
 
         <div class="mb-6">
@@ -61,9 +76,15 @@
         </div>
 
         <div class="flex justify-between">
-            <a href="{{ route('admin.galleries.index') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
-                <i class="fas fa-arrow-left mr-1"></i> Kembali
-            </a>
+            @if(request()->has('kategori'))
+                <a href="{{ route('admin.galleries.kategori', request('kategori')) }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                    <i class="fas fa-arrow-left mr-1"></i> Kembali ke {{ App\Models\Kategori::where('slug', request('kategori'))->first()->nama ?? 'Kategori' }}
+                </a>
+            @else
+                <a href="{{ route('admin.galleries.index') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                    <i class="fas fa-arrow-left mr-1"></i> Kembali ke Semua Galeri
+                </a>
+            @endif
             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                 <i class="fas fa-save mr-1"></i> Simpan Foto
             </button>
@@ -85,5 +106,6 @@
         }
     });
 </script>
+
 @endpush
 @endsection

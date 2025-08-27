@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\News;
-use App\Models\Kategori;
+use App\Models\NewsCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -14,7 +14,7 @@ class NewsController extends Controller
     // Get all published news with pagination
     public function index(Request $request)
     {
-        $query = News::with(['admin', 'kategori'])->latest();
+        $query = News::with(['admin', 'category'])->latest();
 
         // Filter by search query
         if ($request->has('search')) {
@@ -27,7 +27,7 @@ class NewsController extends Controller
 
         // Filter by category
         if ($request->has('category_id')) {
-            $query->where('kategori_id', $request->category_id);
+            $query->where('news_category_id', $request->category_id);
         }
 
         // Filter by published status
@@ -49,7 +49,7 @@ class NewsController extends Controller
     // Get single news by slug
     public function show($slug)
     {
-        $news = News::with(['admin', 'kategori'])
+        $news = News::with(['admin', 'category'])
             ->where('slug', $slug)
             ->first();
 
@@ -76,7 +76,7 @@ class NewsController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'author' => 'required|string|max:255',
             'is_published' => 'boolean',
-            'kategori_id' => 'required|exists:kategoris,id',
+            'news_category_id' => 'required|exists:news_categories,id',
         ]);
 
         // Handle image upload
@@ -93,13 +93,16 @@ class NewsController extends Controller
             $validated['published_at'] = now();
         }
 
+        // Set admin_id to the authenticated admin
+        $validated['admin_id'] = $request->user()->id;
+
         // Create news
         $news = News::create($validated);
 
         return response()->json([
             'success' => true,
             'message' => 'News created successfully',
-            'data' => $news,
+            'data' => $news->load('category'),
         ], 201);
     }
 
@@ -122,7 +125,7 @@ class NewsController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'author' => 'sometimes|string|max:255',
             'is_published' => 'boolean',
-            'kategori_id' => 'sometimes|exists:kategoris,id',
+            'news_category_id' => 'sometimes|exists:news_categories,id',
         ]);
 
         // Handle image update
@@ -141,7 +144,7 @@ class NewsController extends Controller
         }
 
         // Set published_at if published
-        if ($request->has('is_published') && $request->boolean('is_published') && !$news->is_published) {
+        if ($request->has('is_published') && $request->boolean('is_published') && !$news->published_at) {
             $validated['published_at'] = now();
         }
 
@@ -150,7 +153,7 @@ class NewsController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'News updated successfully',
-            'data' => $news,
+            'data' => $news->load('category'),
         ]);
     }
 
@@ -179,10 +182,12 @@ class NewsController extends Controller
         ]);
     }
 
-    // Get all categories
+    // Get all news categories
     public function categories()
     {
-        $categories = Kategori::all();
+        $categories = NewsCategory::active()
+            ->ordered()
+            ->get();
         
         return response()->json([
             'success' => true,

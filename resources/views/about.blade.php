@@ -180,57 +180,6 @@
         </div>
     </section>
 
-    <!-- Team Section -->
-    <section class="py-16 bg-white">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="text-center mb-12" data-aos="fade-up">
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">Tim Pengajar</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">Tenaga pendidik profesional yang berdedikasi untuk mengembangkan potensi siswa</p>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300" data-aos="fade-up" data-aos-delay="0">
-                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
-                         alt="Kepala Sekolah" class="w-full h-64 object-cover">
-                    <div class="p-6 text-center">
-                        <h3 class="text-xl font-bold mb-1 text-gray-800">Dr. Siti Rahayu</h3>
-                        <p class="text-blue-600 font-medium mb-3">Kepala Sekolah</p>
-                        <p class="text-gray-600 text-sm">Berpengalaman lebih dari 20 tahun di bidang pendidikan dengan gelar Doktor Manajemen Pendidikan</p>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300" data-aos="fade-up" data-aos-delay="100">
-                    <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
-                         alt="Wakil Kepala Sekolah" class="w-full h-64 object-cover">
-                    <div class="p-6 text-center">
-                        <h3 class="text-xl font-bold mb-1 text-gray-800">Budi Santoso, M.Pd</h3>
-                        <p class="text-blue-600 font-medium mb-3">Wakil Kepala Sekolah</p>
-                        <p class="text-gray-600 text-sm">Spesialis kurikulum dengan pengalaman mengajar selama 15 tahun di berbagai jenjang pendidikan</p>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300" data-aos="fade-up" data-aos-delay="200">
-                    <img src="https://images.unsplash.com/photo-1580894732444-8ecded7900cd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
-                         alt="Guru Matematika" class="w-full h-64 object-cover">
-                    <div class="p-6 text-center">
-                        <h3 class="text-xl font-bold mb-1 text-gray-800">Ani Wijaya, S.Pd</h3>
-                        <p class="text-blue-600 font-medium mb-3">Guru Matematika</p>
-                        <p class="text-gray-600 text-sm">Lulusan terbaik dari Universitas Pendidikan Indonesia dengan berbagai penghargaan di bidang pengajaran</p>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300" data-aos="fade-up" data-aos-delay="300">
-                    <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
-                         alt="Guru Bahasa Inggris" class="w-full h-64 object-cover">
-                    <div class="p-6 text-center">
-                        <h3 class="text-xl font-bold mb-1 text-gray-800">Ahmad Fauzi, M.A.</h3>
-                        <p class="text-blue-600 font-medium mb-3">Guru Bahasa Inggris</p>
-                        <p class="text-gray-600 text-sm">Berpengalaman mengajar di luar negeri dengan sertifikasi internasional dalam pengajaran bahasa</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Call to Action -->
     <section class="py-16 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">

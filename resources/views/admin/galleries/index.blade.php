@@ -5,23 +5,40 @@
 @section('content')
 <div class="bg-white rounded-lg shadow-sm p-6">
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-semibold text-gray-800">Daftar Galeri Foto</h2>
-        <a href="{{ route('admin.galleries.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+        <h2 class="text-xl font-semibold text-gray-800">
+            @if($kategoriSlug)
+                Galeri {{ $kategoris->where('slug', $kategoriSlug)->first()->nama ?? '' }}
+            @else
+                Daftar Galeri Foto
+            @endif
+        </h2>
+        <a href="{{ route('admin.galleries.create', $kategoriSlug ? ['kategori' => $kategoriSlug] : []) }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
             <i class="fas fa-plus mr-2"></i> Tambah Foto
         </a>
     </div>
 
-    @if(session('success'))
-        <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
-            <p>{{ session('success') }}</p>
+    <!-- Kategori Navigasi -->
+    <div class="mb-6">
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('admin.galleries.index') }}" 
+               class="px-4 py-2 rounded-full text-sm font-medium {{ !$kategoriSlug ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                Semua Kategori
+            </a>
+            @foreach($kategoris as $kategori)
+                <a href="{{ route('admin.galleries.kategori', $kategori->slug) }}" 
+                   class="px-4 py-2 rounded-full text-sm font-medium {{ $kategoriSlug == $kategori->slug ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                    {{ $kategori->nama }}
+                </a>
+            @endforeach
         </div>
-    @endif
+    </div>
+
 
     @if($galleries->isEmpty())
         <div class="text-center py-8">
             <i class="fas fa-images text-gray-300 text-5xl mb-4"></i>
             <p class="text-gray-500">Belum ada foto dalam galeri</p>
-            <a href="{{ route('admin.galleries.create') }}" class="mt-4 inline-block text-blue-600 hover:text-blue-800">
+            <a href="{{ route('admin.galleries.create', $kategoriSlug ? ['kategori' => $kategoriSlug] : []) }}" class="mt-4 inline-block text-blue-600 hover:text-blue-800">
                 <i class="fas fa-plus mr-1"></i> Tambah foto sekarang
             </a>
         </div>
@@ -39,14 +56,19 @@
                     </div>
                     <div class="p-4">
                         <h3 class="font-semibold text-gray-800 mb-2">{{ $gallery->title }}</h3>
+                        @if($gallery->kategori)
+                            <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mb-2">
+                                {{ $gallery->kategori->nama }}
+                            </span>
+                        @endif
                         <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ $gallery->description ?? 'Tidak ada deskripsi' }}</p>
                         <div class="flex justify-between items-center text-sm text-gray-500">
                             <span><i class="fas fa-user mr-1"></i> {{ $gallery->admin->name ?? 'Admin' }}</span>
                             <span><i class="fas fa-calendar mr-1"></i> {{ $gallery->created_at->format('d M Y') }}</span>
                         </div>
                         <div class="mt-4 flex justify-between">
-                            <a href="{{ route('admin.galleries.edit', $gallery) }}" class="text-blue-600 hover:text-blue-800">
-                                <i class="fas fa-edit mr-1"></i> Edit
+                            <a href="{{ route('admin.galleries.edit', array_merge([$gallery], $kategoriSlug ? ['kategori' => $kategoriSlug] : [])) }}" class="text-blue-600 hover:text-blue-900">
+                                <i class="fas fa-edit"></i>
                             </a>
                             <form action="{{ route('admin.galleries.destroy', $gallery) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus foto ini?');">
                                 @csrf
