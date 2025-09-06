@@ -60,9 +60,8 @@
                     <div class="bg-gradient-to-r from-blue-50 to-white p-5 rounded-lg shadow-sm border border-blue-100">
                         <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
                             <i class="fas fa-image text-blue-500 mr-2"></i> Gambar Utama
-                            <span class="text-red-500 ml-1">*</span>
                         </label>
-                        <div class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-blue-200 border-dashed rounded-lg bg-white hover:bg-blue-50 transition-all duration-300">
+                        <div id="dropZone" class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-blue-200 border-dashed rounded-lg bg-white hover:bg-blue-50 transition-all duration-300 cursor-pointer">
                             <div class="space-y-2 text-center">
                                 <i class="fas fa-cloud-upload-alt text-blue-400 text-4xl"></i>
                                 <div class="flex text-sm text-gray-600 justify-center">
@@ -72,7 +71,7 @@
                                     </label>
                                     <p class="pl-2 flex items-center">atau drag & drop</p>
                                 </div>
-                                <p class="text-xs text-gray-500">PNG, JPG, GIF (Maks. 2MB)</p>
+                                <p class="text-xs text-gray-500">PNG, JPG, GIF, WEBP (Maks. 5MB)</p>
                             </div>
                         </div>
                         <div class="mt-3" id="imagePreview"></div>
@@ -85,18 +84,18 @@
 
                     <!-- Kategori -->
                     <div>
-                        <label for="kategori_id" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                        <label for="news_category_id" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                             <i class="fas fa-tag text-blue-500 mr-2"></i> Kategori
                             <span class="text-red-500 ml-1">*</span>
                         </label>
                         <div class="relative">
-                            <select name="kategori_id" id="kategori_id" 
-                                class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 pl-10 @error('kategori_id') border-red-500 @enderror"
+                            <select name="news_category_id" id="news_category_id" 
+                                class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 pl-10 @error('news_category_id') border-red-500 @enderror"
                                 required>
                                 <option value="">Pilih Kategori</option>
-                                @foreach($kategoris as $kategori)
-                                    <option value="{{ $kategori->id }}" {{ old('kategori_id') == $kategori->id ? 'selected' : '' }}>
-                                        {{ $kategori->nama }}
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" {{ old('news_category_id') == $category->id ? 'selected' : '' }}>
+                                        {{ $category->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -104,7 +103,7 @@
                                 <i class="fas fa-folder text-gray-400"></i>
                             </div>
                         </div>
-                        @error('kategori_id')
+                        @error('news_category_id')
                             <p class="mt-1 text-sm text-red-600 flex items-center">
                                 <i class="fas fa-exclamation-circle mr-1"></i> {{ $message }}
                             </p>
@@ -170,12 +169,76 @@
         statusLabel.textContent = this.checked ? 'Publikasikan' : 'Draft';
     });
 
+    // Drag and Drop functionality
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('image');
+
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    // Highlight drop zone when item is dragged over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, unhighlight, false);
+    });
+
+    // Handle dropped files
+    dropZone.addEventListener('drop', handleDrop, false);
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function highlight(e) {
+        dropZone.classList.add('border-blue-400', 'bg-blue-50');
+        dropZone.classList.remove('border-blue-200');
+    }
+
+    function unhighlight(e) {
+        dropZone.classList.remove('border-blue-400', 'bg-blue-50');
+        dropZone.classList.add('border-blue-200');
+    }
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+
+        if (files.length > 0) {
+            fileInput.files = files;
+            previewImage(fileInput);
+        }
+    }
+
     // Preview gambar sebelum upload dengan animasi
     function previewImage(input) {
         const preview = document.getElementById('imagePreview');
         preview.innerHTML = '';
         
         if (input.files && input.files[0]) {
+            const file = input.files[0];
+            
+            // Validasi ukuran file (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Ukuran file terlalu besar. Maksimal 5MB.');
+                input.value = '';
+                return;
+            }
+            
+            // Validasi tipe file
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Tipe file tidak didukung. Gunakan JPG, PNG, GIF, atau WEBP.');
+                input.value = '';
+                return;
+            }
+            
             // Tampilkan loading spinner
             const loading = document.createElement('div');
             loading.className = 'flex items-center justify-center py-3';
@@ -208,9 +271,15 @@
                     document.getElementById('image').value = '';
                 };
                 
+                // Buat info file
+                const fileInfo = document.createElement('div');
+                fileInfo.className = 'absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded';
+                fileInfo.innerHTML = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
+                
                 // Tambahkan elemen ke container
                 container.appendChild(img);
                 container.appendChild(removeBtn);
+                container.appendChild(fileInfo);
                 preview.appendChild(container);
                 
                 // Animasi fade in
@@ -219,7 +288,7 @@
                 }, 100);
             }
             
-            reader.readAsDataURL(input.files[0]);
+            reader.readAsDataURL(file);
         }
     }
 

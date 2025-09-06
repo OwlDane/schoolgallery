@@ -114,7 +114,7 @@
             <!-- Content -->
             <main class="flex-1 p-6 overflow-y-auto">
                 {{-- Notifikasi Global --}}
-                @if(session('success'))
+                <!-- @if(session('success'))
                     <div class="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-lg shadow-sm mb-6 flex items-center transition duration-300 ease-in-out">
                         <i class="fas fa-check-circle text-green-500 mr-3"></i>
                         <div>
@@ -125,7 +125,7 @@
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
-                @endif
+                @endif -->
 
                 @if(session('error'))
                     <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-sm mb-6 flex items-center transition duration-300 ease-in-out">

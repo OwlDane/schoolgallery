@@ -105,7 +105,7 @@
                     </div>
                 @endif
 
-                <form class="space-y-6" method="POST" action="{{ route('admin.login') }}">
+                <form class="space-y-6" method="POST" action="{{ route('admin.login.submit') }}">
                     @csrf
                     
                     <!-- Email Input -->

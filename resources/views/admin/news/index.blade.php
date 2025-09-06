@@ -68,8 +68,8 @@
                 <div class="flex space-x-2">
                     <select id="categoryFilter" class="block w-full md:w-auto px-3 py-2 border border-blue-400 rounded-lg bg-blue-100 bg-opacity-20 text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50">
                         <option value="">Semua Kategori</option>
-                        @foreach(\App\Models\Kategori::all() as $kategori)
-                            <option value="{{ $kategori->nama }}">{{ $kategori->nama }}</option>
+                        @foreach(\App\Models\NewsCategory::active()->ordered()->get() as $category)
+                            <option value="{{ $category->name }}">{{ $category->name }}</option>
                         @endforeach
                     </select>
                     <select id="statusFilter" class="block w-full md:w-auto px-3 py-2 border border-blue-400 rounded-lg bg-blue-100 bg-opacity-20 text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50">
@@ -126,7 +126,7 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 shadow-sm">
-                            <i class="fas fa-tag mr-1"></i> {{ $item->kategori->nama ?? 'Tanpa Kategori' }}
+                            <i class="fas fa-tag mr-1"></i> {{ $item->newsCategory->name ?? 'Tanpa Kategori' }}
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -154,6 +154,13 @@
                             <a href="{{ route('admin.news.edit', $item->id) }}" class="bg-blue-100 text-blue-600 hover:bg-blue-200 p-2 rounded-lg transition duration-150" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
+                            <form action="{{ route('admin.news.toggle-publish', $item->id) }}" method="POST" class="inline">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="bg-{{ $item->is_published ? 'yellow' : 'green' }}-100 text-{{ $item->is_published ? 'yellow' : 'green' }}-600 hover:bg-{{ $item->is_published ? 'yellow' : 'green' }}-200 p-2 rounded-lg transition duration-150" title="{{ $item->is_published ? 'Unpublish' : 'Publish' }}">
+                                    <i class="fas fa-{{ $item->is_published ? 'eye-slash' : 'eye' }}"></i>
+                                </button>
+                            </form>
                             <form action="{{ route('admin.news.destroy', $item->id) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus berita ini?')">
                                 @csrf
                                 @method('DELETE')

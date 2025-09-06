@@ -40,7 +40,7 @@ class GalleryController extends Controller
         $request->validate([
             'title'        => 'required|string|max:255',
             'description'  => 'nullable|string',
-            'image'        => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image'        => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'is_published' => 'boolean',
             'kategori_id'  => 'required|exists:kategoris,id',
         ]);
@@ -79,7 +79,7 @@ class GalleryController extends Controller
         $request->validate([
             'title'        => 'required|string|max:255',
             'description'  => 'nullable|string',
-            'image'        => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image'        => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'is_published' => 'boolean',
             'kategori_id'  => 'required|exists:kategoris,id',
         ]);
@@ -122,5 +122,26 @@ class GalleryController extends Controller
 
         return redirect()->route('admin.galleries.index')
             ->with('success', 'Galeri berhasil dihapus.');
+    }
+
+    public function togglePublish(Gallery $gallery)
+    {
+        $gallery->update([
+            'is_published' => !$gallery->is_published
+        ]);
+
+        $status = $gallery->is_published ? 'dipublikasikan' : 'disembunyikan';
+        return redirect()->back()->with('success', "Galeri berhasil {$status}.");
+    }
+
+    public function removeImage(Gallery $gallery)
+    {
+        if ($gallery->image) {
+            Storage::disk('public')->delete($gallery->image);
+            $gallery->update(['image' => null]);
+            return redirect()->back()->with('success', 'Gambar berhasil dihapus.');
+        }
+
+        return redirect()->back()->with('error', 'Tidak ada gambar untuk dihapus.');
     }
 }

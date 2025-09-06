@@ -16,7 +16,7 @@ class Gallery extends Model
         'image',
         'is_published',
         'admin_id',
-        'kategori_id', // pastikan ada kolom ini di tabel galleries
+        'kategori_id',
     ];
 
     protected function casts(): array
@@ -39,5 +39,15 @@ class Gallery extends Model
     public function scopePublished($query)
     {
         return $query->where('is_published', true);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_published', true);
+    }
+
+    public function scopeByCategory($query, $categoryId)
+    {
+        return $query->where('kategori_id', $categoryId);
     }
 }

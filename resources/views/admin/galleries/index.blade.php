@@ -66,15 +66,24 @@
                             <span><i class="fas fa-user mr-1"></i> {{ $gallery->admin->name ?? 'Admin' }}</span>
                             <span><i class="fas fa-calendar mr-1"></i> {{ $gallery->created_at->format('d M Y') }}</span>
                         </div>
-                        <div class="mt-4 flex justify-between">
-                            <a href="{{ route('admin.galleries.edit', array_merge([$gallery], $kategoriSlug ? ['kategori' => $kategoriSlug] : [])) }}" class="text-blue-600 hover:text-blue-900">
-                                <i class="fas fa-edit"></i>
-                            </a>
+                        <div class="mt-4 flex justify-between items-center">
+                            <div class="flex space-x-2">
+                                <a href="{{ route('admin.galleries.edit', array_merge([$gallery], $kategoriSlug ? ['kategori' => $kategoriSlug] : [])) }}" class="text-blue-600 hover:text-blue-900" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ route('admin.galleries.toggle-publish', $gallery) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="text-{{ $gallery->is_published ? 'yellow' : 'green' }}-600 hover:text-{{ $gallery->is_published ? 'yellow' : 'green' }}-800" title="{{ $gallery->is_published ? 'Unpublish' : 'Publish' }}">
+                                        <i class="fas fa-{{ $gallery->is_published ? 'eye-slash' : 'eye' }}"></i>
+                                    </button>
+                                </form>
+                            </div>
                             <form action="{{ route('admin.galleries.destroy', $gallery) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus foto ini?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-800">
-                                    <i class="fas fa-trash mr-1"></i> Hapus
+                                <button type="submit" class="text-red-600 hover:text-red-800" title="Hapus">
+                                    <i class="fas fa-trash"></i>
                                 </button>
                             </form>
                         </div>

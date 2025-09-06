@@ -24,7 +24,7 @@ class KategoriSeeder extends Seeder
                 'id' => 1,
                 'nama' => 'Kegiatan Sekolah',
                 'slug' => 'kegiatan-sekolah',
-                'deskripsi' => 'Berbagai kegiatan yang dilakukan di sekolah',
+                'deskripsi' => 'Dokumentasi event (MPLS, upacara, pentas seni, classmeeting)',
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now()
@@ -33,7 +33,7 @@ class KategoriSeeder extends Seeder
                 'id' => 2,
                 'nama' => 'Fasilitas Sekolah',
                 'slug' => 'fasilitas-sekolah',
-                'deskripsi' => 'Fasilitas yang tersedia di sekolah',
+                'deskripsi' => 'Foto ruang kelas, lab, perpustakaan, lapangan dll',
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now()
@@ -42,7 +42,7 @@ class KategoriSeeder extends Seeder
                 'id' => 3,
                 'nama' => 'Prestasi',
                 'slug' => 'prestasi',
-                'deskripsi' => 'Prestasi yang diraih oleh siswa dan sekolah',
+                'deskripsi' => 'Dokumentasi lomba, piala, kegiatan juara',
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now()

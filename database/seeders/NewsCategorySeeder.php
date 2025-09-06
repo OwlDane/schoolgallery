@@ -17,28 +17,23 @@ class NewsCategorySeeder extends Seeder
         $categories = [
             [
                 'name' => 'Pengumuman',
-                'description' => 'Berisi pengumuman resmi sekolah seperti jadwal ujian, libur, dan penerimaan siswa baru',
+                'description' => 'Info resmi sekolah (libur, ujian, daftar ulang, dsb.)',
                 'order' => 1,
             ],
             [
-                'name' => 'Event & Acara',
-                'description' => 'Kegiatan dan acara sekolah seperti MPLS, pentas seni, dan bazar',
+                'name' => 'Kegiatan Sekolah',
+                'description' => 'Berita kegiatan harian/agenda (MPLS, Classmeet, LDKS, dsb.)',
                 'order' => 2,
             ],
             [
-                'name' => 'Artikel & Edukasi',
-                'description' => 'Artikel pendidikan, tips belajar, motivasi, dan cerita inspiratif',
+                'name' => 'Prestasi',
+                'description' => 'Liputan siswa/guru juara lomba, penghargaan sekolah',
                 'order' => 3,
             ],
             [
-                'name' => 'Kesehatan & Lingkungan',
-                'description' => 'Informasi seputar kesehatan, tips hidup sehat, dan kegiatan pelestarian lingkungan',
+                'name' => 'Artikel / Edukasi',
+                'description' => 'Tulisan guru/siswa (tips belajar, karya tulis, artikel pendidikan)',
                 'order' => 4,
-            ],
-            [
-                'name' => 'Berita Alumni',
-                'description' => 'Aktivitas, prestasi, dan kabar terbaru dari para alumni',
-                'order' => 5,
             ]
         ];
 

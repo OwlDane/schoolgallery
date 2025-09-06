@@ -18,7 +18,7 @@
             </a>
         </div>
 
-        <form action="{{ route('admin.news.update', $berita->id) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.news.update', $news->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             
@@ -31,9 +31,9 @@
                             <span class="text-red-500 ml-1">*</span>
                         </label>
                         <div class="relative">
-                            <input type="text" name="title" id="title" value="{{ old('title', $berita->title) }}" 
+                            <input type="text" name="title" id="title" 
                                 class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 @error('title') border-red-500 @enderror pl-10"
-                                placeholder="Masukkan judul berita" required>
+                                placeholder="Masukkan judul berita" value="{{ old('title', $news->title) }}" required>
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i class="fas fa-pen text-gray-400"></i>
                             </div>
@@ -53,7 +53,7 @@
                         </label>
                         <textarea name="content" id="content" rows="10" 
                             class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 @error('content') border-red-500 @enderror"
-                            placeholder="Tulis isi berita disini..." required>{{ old('content', $berita->content) }}</textarea>
+                            placeholder="Tulis isi berita disini..." required>{{ old('content', $news->content) }}</textarea>
                         @error('content')
                             <p class="mt-1 text-sm text-red-600 flex items-center">
                                 <i class="fas fa-exclamation-circle mr-1"></i> {{ $message }}
@@ -70,10 +70,10 @@
                             <span class="text-red-500 ml-1">*</span>
                         </label>
                         
-                        @if($berita->image)
+                        @if($news->image)
                             <div class="mb-4">
                                 <div class="relative group">
-                                    <img src="{{ asset('storage/' . $berita->image) }}" alt="{{ $berita->title }}" class="w-full h-48 object-cover rounded-lg mb-2 shadow-sm group-hover:opacity-90 transition duration-200">
+                                    <img src="{{ asset('storage/' . $news->image) }}" alt="{{ $news->title }}" class="w-full h-48 object-cover rounded-lg mb-2 shadow-sm group-hover:opacity-90 transition duration-200">
                                     <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-200">
                                         <span class="bg-black bg-opacity-50 text-white px-3 py-1 rounded-lg text-sm">Gambar saat ini</span>
                                     </div>
@@ -87,17 +87,17 @@
                             </div>
                         @endif
                         
-                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-blue-200 border-dashed rounded-md hover:bg-blue-50 transition duration-200">
+                        <div id="dropZone" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-blue-200 border-dashed rounded-md hover:bg-blue-50 transition duration-200 cursor-pointer">
                             <div class="space-y-1 text-center">
                                 <i class="fas fa-cloud-upload-alt text-blue-400 text-4xl mb-3"></i>
                                 <div class="flex flex-col text-sm text-gray-600">
                                     <label for="image" class="relative cursor-pointer bg-blue-500 text-white py-2 px-4 rounded-md font-medium hover:bg-blue-600 transition duration-200 mx-auto mb-2">
                                         <i class="fas fa-file-image mr-1"></i> Pilih File
-                                        <input id="image" name="image" type="file" class="sr-only" onchange="previewImage(this, 'imagePreview')">
+                                        <input id="image" name="image" type="file" class="sr-only" onchange="previewImage(this, 'imagePreview')" accept="image/*">
                                     </label>
                                     <p class="text-gray-500">atau drag and drop file disini</p>
                                 </div>
-                                <p class="text-xs text-gray-500 mt-2">Format: PNG, JPG, GIF (Maksimal 2MB)</p>
+                                <p class="text-xs text-gray-500 mt-2">Format: PNG, JPG, GIF, WEBP (Maksimal 5MB)</p>
                             </div>
                         </div>
                         <div class="mt-2" id="imagePreview"></div>
@@ -110,17 +110,17 @@
 
                     <!-- Kategori -->
                     <div>
-                        <label for="kategori_id" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                        <label for="news_category_id" class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                             <i class="fas fa-tag text-blue-500 mr-1"></i> Kategori
                             <span class="text-red-500 ml-1">*</span>
                         </label>
                         <div class="relative">
-                            <select name="kategori_id" id="kategori_id" 
-                                class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 @error('kategori_id') border-red-500 @enderror pl-10 appearance-none" required>
+                            <select name="news_category_id" id="news_category_id" 
+                                class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 @error('news_category_id') border-red-500 @enderror pl-10 appearance-none" required>
                                 <option value="">Pilih Kategori</option>
-                                @foreach($kategoris as $kategori)
-                                    <option value="{{ $kategori->id }}" {{ old('kategori_id', $berita->kategori_id) == $kategori->id ? 'selected' : '' }}>
-                                        {{ $kategori->nama }}
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" {{ old('news_category_id', $news->news_category_id) == $category->id ? 'selected' : '' }}>
+                                        {{ $category->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -131,7 +131,7 @@
                                 <i class="fas fa-chevron-down text-gray-400"></i>
                             </div>
                         </div>
-                        @error('kategori_id')
+                        @error('news_category_id')
                             <p class="mt-1 text-sm text-red-600 flex items-center">
                                 <i class="fas fa-exclamation-circle mr-1"></i> {{ $message }}
                             </p>
@@ -145,7 +145,7 @@
                             <span class="text-red-500 ml-1">*</span>
                         </label>
                         <div class="relative">
-                            <input type="text" name="author" id="author" value="{{ old('author', $berita->author) }}" 
+                            <input type="text" name="author" id="author" value="{{ old('author', $news->author) }}" 
                                 class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 @error('author') border-red-500 @enderror pl-10"
                                 placeholder="Nama penulis" required>
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -168,14 +168,14 @@
                             <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
                                 <input type="checkbox" name="is_published" id="is_published" value="1" 
                                     class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
-                                    {{ old('is_published', $berita->is_published) ? 'checked' : '' }}>
+                                    {{ old('is_published', $news->is_published) ? 'checked' : '' }}>
                                 <label for="is_published" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"></label>
                             </div>
                             <label for="is_published" class="text-sm text-gray-700" id="publish-status-label">
-                                {{ old('is_published', $berita->is_published) ? 'Dipublikasikan' : 'Draft' }}
+                                {{ old('is_published', $news->is_published) ? 'Dipublikasikan' : 'Draft' }}
                             </label>
-                            <span class="ml-2 text-xs {{ old('is_published', $berita->is_published) ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }} px-2 py-1 rounded-full" id="status-badge">
-                                {{ old('is_published', $berita->is_published) ? 'Live' : 'Tersimpan' }}
+                            <span class="ml-2 text-xs {{ old('is_published', $news->is_published) ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }} px-2 py-1 rounded-full" id="status-badge">
+                                {{ old('is_published', $news->is_published) ? 'Live' : 'Tersimpan' }}
                             </span>
                         </div>
                     </div>
@@ -246,12 +246,76 @@
         });
     });
 
+    // Drag and Drop functionality
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('image');
+
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    // Highlight drop zone when item is dragged over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, unhighlight, false);
+    });
+
+    // Handle dropped files
+    dropZone.addEventListener('drop', handleDrop, false);
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function highlight(e) {
+        dropZone.classList.add('border-blue-400', 'bg-blue-50');
+        dropZone.classList.remove('border-blue-200');
+    }
+
+    function unhighlight(e) {
+        dropZone.classList.remove('border-blue-400', 'bg-blue-50');
+        dropZone.classList.add('border-blue-200');
+    }
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+
+        if (files.length > 0) {
+            fileInput.files = files;
+            previewImage(fileInput, 'imagePreview');
+        }
+    }
+
     // Preview gambar sebelum upload dengan animasi
     function previewImage(input, previewId) {
         const preview = document.getElementById(previewId);
         preview.innerHTML = '';
         
         if (input.files && input.files[0]) {
+            const file = input.files[0];
+            
+            // Validasi ukuran file (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Ukuran file terlalu besar. Maksimal 5MB.');
+                input.value = '';
+                return;
+            }
+            
+            // Validasi tipe file
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Tipe file tidak didukung. Gunakan JPG, PNG, GIF, atau WEBP.');
+                input.value = '';
+                return;
+            }
+            
             // Tambahkan loading spinner
             const spinner = document.createElement('div');
             spinner.className = 'flex justify-center items-center my-4';
@@ -288,18 +352,18 @@
                 // Tambahkan info file
                 const fileInfo = document.createElement('div');
                 fileInfo.className = 'text-xs text-gray-500 mt-2 flex items-center justify-between';
-                const fileName = input.files[0].name;
-                const fileSize = Math.round(input.files[0].size / 1024); // KB
+                const fileName = file.name;
+                const fileSize = (file.size / 1024 / 1024).toFixed(2); // MB
                 fileInfo.innerHTML = `
                     <span class="flex items-center"><i class="fas fa-file-image text-blue-400 mr-1"></i> ${fileName}</span>
-                    <span>${fileSize} KB</span>
+                    <span>${fileSize} MB</span>
                 `;
                 container.appendChild(fileInfo);
                 
                 preview.appendChild(container);
             }
             
-            reader.readAsDataURL(input.files[0]);
+            reader.readAsDataURL(file);
         }
     }
 

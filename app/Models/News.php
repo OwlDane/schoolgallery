@@ -31,7 +31,15 @@ class News extends Model
     /**
      * Get the category that owns the news.
      */
-    public function category()
+    public function newsCategory()
+    {
+        return $this->belongsTo(NewsCategory::class, 'news_category_id');
+    }
+
+    /**
+     * Get the category that owns the news (alias for backward compatibility).
+     */
+    public function kategori()
     {
         return $this->belongsTo(NewsCategory::class, 'news_category_id');
     }

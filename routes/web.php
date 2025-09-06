@@ -55,18 +55,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('galleries/{gallery}/edit', [GalleryController::class, 'edit'])->name('galleries.edit');
         Route::put('galleries/{gallery}', [GalleryController::class, 'update'])->name('galleries.update');
         Route::delete('galleries/{gallery}', [GalleryController::class, 'destroy'])->name('galleries.destroy');
+        Route::patch('galleries/{gallery}/toggle-publish', [GalleryController::class, 'togglePublish'])->name('galleries.toggle-publish');
+        Route::delete('galleries/{gallery}/remove-image', [GalleryController::class, 'removeImage'])->name('galleries.remove-image');
 
         // News Management
         Route::resource('news', NewsController::class);
+        Route::patch('news/{news}/toggle-publish', [NewsController::class, 'togglePublish'])->name('news.toggle-publish');
+        Route::delete('news/{news}/remove-image', [NewsController::class, 'removeImage'])->name('news.remove-image');
 
         // School Profile Management
         Route::get('/school-profile', [SchoolProfileController::class, 'edit'])->name('school-profile.edit');
         Route::put('/school-profile', [SchoolProfileController::class, 'update'])->name('school-profile.update');
     });
 
-    // Tambahan: penegasan admin.dashboard
-    Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-        // Route admin lainnya bisa ditambahkan di sini
-    });
 });

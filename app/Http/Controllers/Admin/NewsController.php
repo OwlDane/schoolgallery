@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\News;
-use App\Models\Kategori;
+use App\Models\NewsCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,7 +12,7 @@ class NewsController extends Controller
 {
     public function index()
     {
-        $news = News::with(['admin', 'kategori'])
+        $news = News::with(['admin', 'newsCategory'])
             ->latest()
             ->paginate(10);
             
@@ -21,8 +21,8 @@ class NewsController extends Controller
 
     public function create()
     {
-        $kategoris = Kategori::all();
-        return view('admin.news.create', compact('kategoris'));
+        $categories = NewsCategory::active()->ordered()->get();
+        return view('admin.news.create', compact('categories'));
     }
 
     public function store(Request $request)
@@ -30,10 +30,10 @@ class NewsController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'author' => 'required|string|max:255',
             'is_published' => 'boolean',
-            'kategori_id' => 'required|exists:kategoris,id',
+            'news_category_id' => 'required|exists:news_categories,id',
         ]);
 
         $data = [
@@ -41,7 +41,7 @@ class NewsController extends Controller
             'content' => $request->content,
             'author' => $request->author,
             'is_published' => $request->boolean('is_published'),
-            'kategori_id' => $request->kategori_id,
+            'news_category_id' => $request->news_category_id,
             'admin_id' => auth('admin')->id(),
         ];
 
@@ -65,8 +65,8 @@ class NewsController extends Controller
 
     public function edit(News $news)
     {
-        $kategoris = Kategori::all();
-        return view('admin.news.edit', compact('news', 'kategoris'));
+        $categories = NewsCategory::active()->ordered()->get();
+        return view('admin.news.edit', compact('news', 'categories'));
     }
 
     public function update(Request $request, News $news)
@@ -74,9 +74,10 @@ class NewsController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'author' => 'required|string|max:255',
             'is_published' => 'boolean',
+            'news_category_id' => 'required|exists:news_categories,id',
         ]);
 
         $data = [
@@ -84,6 +85,7 @@ class NewsController extends Controller
             'content' => $request->content,
             'author' => $request->author,
             'is_published' => $request->boolean('is_published'),
+            'news_category_id' => $request->news_category_id,
         ];
 
         if ($request->boolean('is_published') && !$news->is_published) {
@@ -111,5 +113,27 @@ class NewsController extends Controller
         $news->delete();
 
         return redirect()->route('admin.news.index')->with('success', 'News deleted successfully.');
+    }
+
+    public function togglePublish(News $news)
+    {
+        $news->update([
+            'is_published' => !$news->is_published,
+            'published_at' => !$news->is_published ? now() : null
+        ]);
+
+        $status = $news->is_published ? 'published' : 'unpublished';
+        return redirect()->route('admin.news.index')->with('success', "News {$status} successfully.");
+    }
+
+    public function removeImage(News $news)
+    {
+        if ($news->image) {
+            Storage::disk('public')->delete($news->image);
+            $news->update(['image' => null]);
+            return redirect()->back()->with('success', 'Image removed successfully.');
+        }
+
+        return redirect()->back()->with('error', 'No image to remove.');
     }
 }
