@@ -1,4 +1,4 @@
-🏫 School Gallery
+# 🏫 School Gallery
 
 <div align="center">
 
@@ -364,14 +364,6 @@ Kontribusi sangat diterima! Silakan ikuti langkah berikut:
 ## 📄 License
 
 Proyek ini dilisensikan di bawah [MIT License](LICENSE) - lihat file LICENSE untuk detail.
-
----
-
-## 👥 Tim Pengembang
-
-- **Developer:** [Your Name](https://github.com/yourusername)
-- **Design:** [Designer Name](https://github.com/designer)
-- **Documentation:** [Writer Name](https://github.com/writer)
 
 ---
 
