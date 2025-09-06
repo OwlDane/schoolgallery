@@ -14,7 +14,7 @@ class NewsController extends Controller
     // Get all published news with pagination
     public function index(Request $request)
     {
-        $query = News::with(['admin', 'category'])->latest();
+        $query = News::with(['admin', 'newsCategory'])->latest();
 
         // Filter by search query
         if ($request->has('search')) {
@@ -49,7 +49,7 @@ class NewsController extends Controller
     // Get single news by slug
     public function show($slug)
     {
-        $news = News::with(['admin', 'category'])
+        $news = News::with(['admin', 'newsCategory'])
             ->where('slug', $slug)
             ->first();
 
@@ -102,7 +102,7 @@ class NewsController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'News created successfully',
-            'data' => $news->load('category'),
+            'data' => $news->load('newsCategory'),
         ], 201);
     }
 
@@ -153,7 +153,7 @@ class NewsController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'News updated successfully',
-            'data' => $news->load('category'),
+            'data' => $news->load('newsCategory'),
         ]);
     }
 

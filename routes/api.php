@@ -18,6 +18,7 @@ Route::prefix('v1')->group(function () {
     
     // News - Public routes
     Route::get('/news', [NewsController::class, 'index']);
+    Route::get('/news/categories', [NewsController::class, 'categories']);
     Route::get('/news/{slug}', [NewsController::class, 'show']);
     
     // News - Protected routes (admin only)
@@ -26,9 +27,6 @@ Route::prefix('v1')->group(function () {
         Route::put('/news/{id}', [NewsController::class, 'update']);
         Route::delete('/news/{id}', [NewsController::class, 'destroy']);
     });
-    
-    // News Categories
-    Route::get('/news/categories', [NewsController::class, 'categories']);
     
     // Admin Authentication
     Route::prefix('admin')->group(function () {

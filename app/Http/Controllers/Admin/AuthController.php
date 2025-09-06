@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
@@ -21,6 +22,21 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::guard('admin')->attempt($credentials)) {
+            $admin = Auth::guard('admin')->user();
+            
+            // Log aktivitas login
+            ActivityLog::log(
+                'login',
+                'Login ke sistem admin',
+                $admin->id,
+                null,
+                [
+                    'login_time' => now()->toDateTimeString(),
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent()
+                ]
+            );
+            
             return redirect()->route('admin.dashboard');
         }
 
@@ -31,6 +47,23 @@ class AuthController extends Controller
 
     public function logout()
     {
+        $admin = Auth::guard('admin')->user();
+        
+        // Log aktivitas logout
+        if ($admin) {
+            ActivityLog::log(
+                'logout',
+                'Logout dari sistem admin',
+                $admin->id,
+                null,
+                [
+                    'logout_time' => now()->toDateTimeString(),
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent()
+                ]
+            );
+        }
+        
         Auth::guard('admin')->logout();
         return redirect()->route('admin.login');
     }

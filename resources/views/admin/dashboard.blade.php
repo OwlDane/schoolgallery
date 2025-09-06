@@ -47,11 +47,11 @@
                 <i class="fas fa-newspaper text-2xl"></i>
             </div>
         </div>
-        <div class="mt-4 pt-3 border-t border-gray-100">
-            <a href="{{ route('admin.news.index') }}" class="text-xs text-blue-600 hover:text-blue-800 flex items-center">
-                Lihat Detail <i class="fas fa-arrow-right ml-1"></i>
-            </a>
-        </div>
+                <div class="mt-4 pt-3 border-t border-gray-100">
+                    <a href="{{ route('admin.statistics.detail', 'news') }}" class="text-xs text-blue-600 hover:text-blue-800 flex items-center">
+                        Lihat Detail <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
     </div>
 
     <!-- Total Galeri -->
@@ -71,11 +71,11 @@
                 <i class="fas fa-images text-2xl"></i>
             </div>
         </div>
-        <div class="mt-4 pt-3 border-t border-gray-100">
-            <a href="{{ route('admin.galleries.index') }}" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center">
-                Lihat Detail <i class="fas fa-arrow-right ml-1"></i>
-            </a>
-        </div>
+                <div class="mt-4 pt-3 border-t border-gray-100">
+                    <a href="{{ route('admin.statistics.detail', 'galleries') }}" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center">
+                        Lihat Detail <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
     </div>
 
     <!-- Total Kunjungan -->
@@ -95,11 +95,11 @@
                 <i class="fas fa-users text-2xl"></i>
             </div>
         </div>
-        <div class="mt-4 pt-3 border-t border-gray-100">
-            <a href="#" class="text-xs text-green-600 hover:text-green-800 flex items-center">
-                Lihat Detail <i class="fas fa-arrow-right ml-1"></i>
-            </a>
-        </div>
+                <div class="mt-4 pt-3 border-t border-gray-100">
+                    <a href="{{ route('admin.statistics.detail', 'visitors') }}" class="text-xs text-green-600 hover:text-green-800 flex items-center">
+                        Lihat Detail <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
     </div>
 </div>
 
@@ -289,8 +289,8 @@
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-gray-100">
-                    <a href="{{ route('admin.admins.index') }}" class="text-xs text-yellow-600 hover:text-yellow-800 flex items-center">
-                        Kelola Admin <i class="fas fa-arrow-right ml-1"></i>
+                    <a href="{{ route('admin.statistics.detail', 'admins') }}" class="text-xs text-yellow-600 hover:text-yellow-800 flex items-center">
+                        Lihat Detail <i class="fas fa-arrow-right ml-1"></i>
                     </a>
                 </div>
             </div>
@@ -386,7 +386,7 @@
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-blue-200">
-                    <a href="#" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                    <a href="{{ route('admin.statistics.detail', 'visitors') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
                         <i class="fas fa-chart-line mr-2"></i> Lihat Detail
                     </a>
                 </div>

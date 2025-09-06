@@ -47,6 +47,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        
+        // Statistics Detail (Super Admin Only)
+        Route::middleware('admin.role:super_admin')->group(function () {
+            Route::get('/statistics/{type}', [DashboardController::class, 'statisticsDetail'])->name('statistics.detail');
+        });
 
         // Gallery Management
         Route::get('galleries', [GalleryController::class, 'index'])->name('galleries.index');

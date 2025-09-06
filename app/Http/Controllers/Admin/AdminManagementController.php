@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -31,7 +32,7 @@ class AdminManagementController extends Controller
             'role' => 'required|in:super_admin,admin',
         ]);
 
-        Admin::create([
+        $admin = Admin::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -39,6 +40,9 @@ class AdminManagementController extends Controller
             'is_active' => true,
             'email_verified_at' => now(),
         ]);
+
+        // Log aktivitas
+        $this->logActivity('create', $admin);
 
         return redirect()->route('admin.admins.index')->with('success', 'Admin berhasil ditambahkan.');
     }
@@ -64,6 +68,9 @@ class AdminManagementController extends Controller
             'is_active' => $request->has('is_active'),
         ]);
 
+        // Log aktivitas
+        $this->logActivity('update', $admin);
+
         return redirect()->route('admin.admins.index')->with('success', 'Admin berhasil diperbarui.');
     }
 
@@ -74,18 +81,79 @@ class AdminManagementController extends Controller
             return back()->with('error', 'Anda tidak dapat menghapus akun sendiri.');
         }
 
+        // Log aktivitas sebelum menghapus
+        $this->logActivity('delete', $admin);
+
         $admin->delete();
         return redirect()->route('admin.admins.index')->with('success', 'Admin berhasil dihapus.');
     }
 
     public function resetPassword(Admin $admin)
     {
-        // Generate new password
-        $newPassword = Str::random(8);
+        // Generate new password dengan format yang lebih mudah diingat
+        $newPassword = $this->generateSecurePassword();
+        
+        // Update password
         $admin->update([
             'password' => Hash::make($newPassword),
         ]);
 
-        return back()->with('success', 'Password berhasil direset. Password baru: ' . $newPassword);
+        // Log aktivitas (jika ada ActivityLog model)
+        $this->logActivity('reset_password', $admin);
+
+        return back()->with('success', [
+            'title' => 'Password Berhasil Direset!',
+            'message' => 'Password untuk admin ' . $admin->name . ' telah berhasil direset.',
+            'new_password' => $newPassword,
+            'admin_name' => $admin->name,
+            'admin_email' => $admin->email
+        ]);
+    }
+
+    private function generateSecurePassword()
+    {
+        // Generate password dengan format: 2 huruf besar + 2 huruf kecil + 2 angka + 2 simbol
+        $uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $lowercase = 'abcdefghijklmnopqrstuvwxyz';
+        $numbers = '0123456789';
+        $symbols = '!@#$%^&*';
+        
+        $password = '';
+        $password .= $uppercase[rand(0, strlen($uppercase) - 1)];
+        $password .= $uppercase[rand(0, strlen($uppercase) - 1)];
+        $password .= $lowercase[rand(0, strlen($lowercase) - 1)];
+        $password .= $lowercase[rand(0, strlen($lowercase) - 1)];
+        $password .= $numbers[rand(0, strlen($numbers) - 1)];
+        $password .= $numbers[rand(0, strlen($numbers) - 1)];
+        $password .= $symbols[rand(0, strlen($symbols) - 1)];
+        $password .= $symbols[rand(0, strlen($symbols) - 1)];
+        
+        // Shuffle the password
+        return str_shuffle($password);
+    }
+
+    private function logActivity($action, $admin)
+    {
+        // Simpan aktivitas ke ActivityLog
+        $currentAdmin = auth('admin')->user();
+        
+        $descriptions = [
+            'reset_password' => 'Reset password untuk admin ' . $admin->name,
+            'create' => 'Membuat admin baru: ' . $admin->name,
+            'update' => 'Memperbarui data admin: ' . $admin->name,
+            'delete' => 'Menghapus admin: ' . $admin->name,
+        ];
+        
+        ActivityLog::log(
+            $action,
+            $descriptions[$action] ?? 'Melakukan aksi pada admin: ' . $admin->name,
+            $currentAdmin->id,
+            $admin,
+            [
+                'target_admin_name' => $admin->name,
+                'target_admin_email' => $admin->email,
+                'performed_by' => $currentAdmin->name
+            ]
+        );
     }
 }
