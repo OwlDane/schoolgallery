@@ -270,16 +270,17 @@
             </div>
         </div>
 
-        <!-- Admin Card -->
+        @if(Auth::guard('admin')->user()->role === 'super_admin')
+        <!-- Admin Card (Super Admin Only) -->
         <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 border-b-4 border-yellow-500">
             <div class="p-6">
                 <div class="flex items-center justify-between">
                     <div>
                         <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wider">Admin</h3>
                         <div class="mt-2 flex items-baseline">
-                            <p class="text-3xl font-bold text-gray-900">{{ $stats['total_admins'] }}</p>
+                            <p class="text-3xl font-bold text-gray-900">{{ $stats['total_admins'] ?? 0 }}</p>
                             <span class="ml-2 text-xs font-medium text-yellow-600 bg-yellow-100 py-0.5 px-1.5 rounded-full flex items-center">
-                                {{ $stats['active_admins'] }} aktif
+                                {{ $stats['active_admins'] ?? 0 }} aktif
                             </span>
                         </div>
                     </div>
@@ -288,16 +289,111 @@
                     </div>
                 </div>
                 <div class="mt-4 pt-3 border-t border-gray-100">
-                    <a href="#" class="text-xs text-yellow-600 hover:text-yellow-800 flex items-center">
+                    <a href="{{ route('admin.admins.index') }}" class="text-xs text-yellow-600 hover:text-yellow-800 flex items-center">
                         Kelola Admin <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        @else
+        <!-- Kontak & Sosial Media Card (Admin Biasa) -->
+        <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 border-b-4 border-yellow-500">
+            <div class="p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wider">Kontak & Sosial</h3>
+                        <div class="mt-2">
+                            <p class="text-lg font-bold text-gray-900">Sosial Media</p>
+                            <p class="text-xs text-gray-500 mt-1">Facebook, Instagram, Twitter</p>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-full bg-yellow-500 bg-opacity-10 text-yellow-600">
+                        <i class="fas fa-share-alt text-2xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-gray-100">
+                    <a href="{{ route('admin.school-profile.edit') }}" class="text-xs text-yellow-600 hover:text-yellow-800 flex items-center">
+                        Kelola Kontak <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        @endif
+    </div>
+</div>
+
+@if(Auth::guard('admin')->user()->role === 'super_admin')
+<!-- Super Admin Section -->
+<div class="mt-8">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-crown text-red-500 mr-2"></i> Super Admin Panel
+    </h3>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Admin Management Card -->
+        <div class="bg-gradient-to-r from-red-50 to-red-100 rounded-xl shadow-md overflow-hidden border border-red-200">
+            <div class="p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-red-800">Manajemen Admin</h3>
+                        <p class="text-sm text-red-600 mt-1">Kelola akun admin dan izin akses</p>
+                        <div class="mt-3 flex items-center space-x-4">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-red-700">{{ $stats['total_admins'] ?? 0 }}</div>
+                                <div class="text-xs text-red-600">Total Admin</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-green-700">{{ $stats['active_admins'] ?? 0 }}</div>
+                                <div class="text-xs text-green-600">Aktif</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-full bg-red-500 bg-opacity-20 text-red-600">
+                        <i class="fas fa-users-cog text-2xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-red-200">
+                    <a href="{{ route('admin.admins.index') }}" class="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors">
+                        <i class="fas fa-cog mr-2"></i> Kelola Admin
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Statistics Card -->
+        <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl shadow-md overflow-hidden border border-blue-200">
+            <div class="p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold text-blue-800">Statistik Sistem</h3>
+                        <p class="text-sm text-blue-600 mt-1">Pantau performa website secara menyeluruh</p>
+                        <div class="mt-3 space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-blue-700">Total Kunjungan:</span>
+                                <span class="font-semibold text-blue-800">{{ $totalPengunjung ?? '1.2K' }}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-blue-700">Berita Dipublikasi:</span>
+                                <span class="font-semibold text-blue-800">{{ $totalBerita ?? 0 }}</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-blue-700">Galeri Aktif:</span>
+                                <span class="font-semibold text-blue-800">{{ $totalGaleri ?? 0 }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-full bg-blue-500 bg-opacity-20 text-blue-600">
+                        <i class="fas fa-chart-bar text-2xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-blue-200">
+                    <a href="#" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-chart-line mr-2"></i> Lihat Detail
                     </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
-            </div>
-        </div>
-    </div>
-</div>
+@endif
+
 @endsection

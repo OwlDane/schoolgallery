@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\SchoolProfileController;
+use App\Http\Controllers\Admin\AdminManagementController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -63,9 +64,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('news/{news}/toggle-publish', [NewsController::class, 'togglePublish'])->name('news.toggle-publish');
         Route::delete('news/{news}/remove-image', [NewsController::class, 'removeImage'])->name('news.remove-image');
 
-        // School Profile Management
-        Route::get('/school-profile', [SchoolProfileController::class, 'edit'])->name('school-profile.edit');
-        Route::put('/school-profile', [SchoolProfileController::class, 'update'])->name('school-profile.update');
+        // School Profile Management (Super Admin Only)
+        Route::middleware('admin.role:super_admin')->group(function () {
+            Route::get('/school-profile', [SchoolProfileController::class, 'edit'])->name('school-profile.edit');
+            Route::put('/school-profile', [SchoolProfileController::class, 'update'])->name('school-profile.update');
+        });
+
+        // Admin Management (Super Admin Only)
+        Route::middleware('admin.role:super_admin')->group(function () {
+            Route::resource('admins', AdminManagementController::class);
+            Route::post('admins/{admin}/reset-password', [AdminManagementController::class, 'resetPassword'])->name('admins.reset-password');
+        });
     });
 
 });
