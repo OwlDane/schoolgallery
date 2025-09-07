@@ -7,6 +7,8 @@ use App\Models\Admin;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AdminPasswordReseted;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 
@@ -14,7 +16,7 @@ class AdminManagementController extends Controller
 {
     public function index()
     {
-        $admins = Admin::all();
+        $admins = Admin::where('role', '!=', 'super_admin')->get();
         return view('admin.admins.index', compact('admins'));
     }
 
@@ -35,9 +37,9 @@ class AdminManagementController extends Controller
         $admin = Admin::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => $request->password,
             'role' => $request->role,
-            'is_active' => true,
+            'is_active' => $request->has('is_active'),
             'email_verified_at' => now(),
         ]);
 
@@ -88,6 +90,20 @@ class AdminManagementController extends Controller
         return redirect()->route('admin.admins.index')->with('success', 'Admin berhasil dihapus.');
     }
 
+    public function toggleActive(Admin $admin)
+    {
+        if ($admin->id === auth('admin')->id()) {
+            return back()->with('error', 'Anda tidak dapat mengubah status akun sendiri.');
+        }
+
+        $admin->is_active = !$admin->is_active;
+        $admin->save();
+
+        $this->logActivity('update', $admin);
+
+        return back()->with('success', 'Status akun ' . $admin->name . ' diubah menjadi ' . ($admin->is_active ? 'Aktif' : 'Nonaktif') . '.');
+    }
+
     public function resetPassword(Admin $admin)
     {
         // Generate new password dengan format yang lebih mudah diingat
@@ -95,19 +111,25 @@ class AdminManagementController extends Controller
         
         // Update password
         $admin->update([
-            'password' => Hash::make($newPassword),
+            'password' => $newPassword,
         ]);
 
         // Log aktivitas (jika ada ActivityLog model)
         $this->logActivity('reset_password', $admin);
 
-        return back()->with('success', [
-            'title' => 'Password Berhasil Direset!',
-            'message' => 'Password untuk admin ' . $admin->name . ' telah berhasil direset.',
-            'new_password' => $newPassword,
-            'admin_name' => $admin->name,
-            'admin_email' => $admin->email
-        ]);
+        // Kirim email ke admin yang direset
+        try {
+            Mail::to($admin->email)->send(new AdminPasswordReseted($admin, $newPassword));
+        } catch (\Throwable $e) {
+            // Abaikan kegagalan email agar UX tetap lanjut
+        }
+
+        return back()
+            ->with('success', 'Password untuk admin ' . $admin->name . ' berhasil direset.')
+            ->with('success_title', 'Password Berhasil Direset!')
+            ->with('new_password', $newPassword)
+            ->with('reset_admin_name', $admin->name)
+            ->with('reset_admin_email', $admin->email);
     }
 
     private function generateSecurePassword()

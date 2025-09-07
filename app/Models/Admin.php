@@ -23,6 +23,7 @@ class Admin extends Authenticatable implements CanResetPasswordContract
         'name',
         'email',
         'password',
+        'role',
         'is_active',
         'email_verified_at'
     ];

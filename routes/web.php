@@ -9,16 +9,18 @@ use App\Http\Controllers\Admin\AdminManagementController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
-// Public Routes
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/gallery', [HomeController::class, 'gallery'])->name('gallery');
-Route::get('/gallery/category/{category}', [HomeController::class, 'galleryByCategory'])->name('gallery.category');
-Route::get('/gallery/{id}', [HomeController::class, 'galleryDetail'])->name('gallery.detail');
-Route::get('/gallery/download/{id}', [HomeController::class, 'download'])->name('gallery.download');
-Route::get('/news', [HomeController::class, 'news'])->name('news');
-Route::get('/news/{slug}', [HomeController::class, 'newsDetail'])->name('news.detail');
-Route::get('/about', [HomeController::class, 'about'])->name('about');
-Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
+// Public Routes (tracked visits)
+Route::middleware('track.visits')->group(function () {
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/gallery', [HomeController::class, 'gallery'])->name('gallery');
+    Route::get('/gallery/category/{category}', [HomeController::class, 'galleryByCategory'])->name('gallery.category');
+    Route::get('/gallery/{id}', [HomeController::class, 'galleryDetail'])->name('gallery.detail');
+    Route::get('/gallery/download/{id}', [HomeController::class, 'download'])->name('gallery.download');
+    Route::get('/news', [HomeController::class, 'news'])->name('news');
+    Route::get('/news/{slug}', [HomeController::class, 'newsDetail'])->name('news.detail');
+    Route::get('/about', [HomeController::class, 'about'])->name('about');
+    Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
+});
 
 // Alias login untuk default Laravel
 Route::get('/login', function () {
@@ -79,6 +81,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::middleware('admin.role:super_admin')->group(function () {
             Route::resource('admins', AdminManagementController::class);
             Route::post('admins/{admin}/reset-password', [AdminManagementController::class, 'resetPassword'])->name('admins.reset-password');
+            Route::patch('admins/{admin}/toggle-active', [AdminManagementController::class, 'toggleActive'])->name('admins.toggle-active');
         });
     });
 

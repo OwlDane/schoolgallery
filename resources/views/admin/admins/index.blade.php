@@ -21,47 +21,7 @@
 
 <!-- Alert Messages -->
 @if(session('success'))
-    @if(is_array(session('success')))
-        <!-- Password Reset Success -->
-        <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg">
-            <div class="flex items-start">
-                <i class="fas fa-check-circle mr-3 mt-1 text-green-500"></i>
-                <div class="flex-1">
-                    <h4 class="font-semibold text-lg mb-2">{{ session('success')['title'] }}</h4>
-                    <p class="mb-3">{{ session('success')['message'] }}</p>
-                    
-                    <!-- Password Display -->
-                    <div class="bg-white border border-green-300 rounded-lg p-4 mb-3">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-gray-600 mb-1">Password Baru:</p>
-                                <div class="flex items-center">
-                                    <code id="newPassword" class="bg-gray-100 px-3 py-2 rounded font-mono text-lg font-bold text-gray-800">{{ session('success')['new_password'] }}</code>
-                                    <button onclick="copyPassword()" class="ml-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-sm transition-colors">
-                                        <i class="fas fa-copy mr-1"></i> Copy
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Admin Info -->
-                    <div class="bg-green-50 border border-green-200 rounded-lg p-3">
-                        <p class="text-sm"><strong>Admin:</strong> {{ session('success')['admin_name'] }}</p>
-                        <p class="text-sm"><strong>Email:</strong> {{ session('success')['admin_email'] }}</p>
-                    </div>
-                    
-                    <div class="mt-3 text-sm text-green-600">
-                        <i class="fas fa-exclamation-triangle mr-1"></i>
-                        <strong>Penting:</strong> Simpan password ini dengan aman. Password tidak akan ditampilkan lagi.
-                    </div>
-                </div>
-                <button type="button" class="ml-4 text-green-500 hover:text-green-700" onclick="this.parentElement.parentElement.style.display='none'">
-                    <i class="fas fa-times text-lg"></i>
-                </button>
-            </div>
-        </div>
-    @else
+    @if(!is_array(session('success')))
         <!-- Regular Success -->
         <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg flex items-center">
             <i class="fas fa-check-circle mr-2"></i>
@@ -140,13 +100,21 @@
                     <i class="fas fa-edit mr-1"></i> Edit
                 </a>
 
-                <!-- Reset Password Button -->
-                <form action="{{ route('admin.admins.reset-password', $admin) }}" method="POST" class="flex-1">
+                <!-- Reset Password Link -> redirect to edit page -->
+                <a href="{{ route('admin.admins.edit', $admin) }}#reset" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center">
+                    <i class="fas fa-key mr-1"></i> Reset
+                </a>
+
+                <!-- Toggle Active Button -->
+                @if($admin->id !== auth('admin')->id())
+                <form action="{{ route('admin.admins.toggle-active', $admin) }}" method="POST" class="flex-1">
                     @csrf
-                    <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center" onclick="return confirm('Reset password admin ini?')">
-                        <i class="fas fa-key mr-1"></i> Reset
+                    @method('PATCH')
+                    <button type="submit" class="w-full {{ $admin->is_active ? 'bg-gray-500 hover:bg-gray-600' : 'bg-green-600 hover:bg-green-700' }} text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center" onclick="return confirm('Ubah status aktif admin ini?')">
+                        <i class="fas {{ $admin->is_active ? 'fa-user-slash' : 'fa-user-check' }} mr-1"></i> {{ $admin->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                     </button>
                 </form>
+                @endif
 
                 <!-- Delete Button (if not current user) -->
                 @if($admin->id !== auth('admin')->id())
@@ -190,16 +158,13 @@
         Ringkasan Admin
     </h3>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="bg-blue-50 rounded-lg p-4 text-center">
-            <div class="text-2xl font-bold text-blue-600">{{ $admins->count() }}</div>
-            <div class="text-sm text-blue-800">Total Admin</div>
-        </div>
+        
         <div class="bg-green-50 rounded-lg p-4 text-center">
             <div class="text-2xl font-bold text-green-600">{{ $admins->where('is_active', true)->count() }}</div>
             <div class="text-sm text-green-800">Admin Aktif</div>
         </div>
         <div class="bg-red-50 rounded-lg p-4 text-center">
-            <div class="text-2xl font-bold text-red-600">{{ $admins->where('role', 'super_admin')->count() }}</div>
+            <div class="text-2xl font-bold text-red-600">1</div>
             <div class="text-sm text-red-800">Super Admin</div>
         </div>
         <div class="bg-purple-50 rounded-lg p-4 text-center">

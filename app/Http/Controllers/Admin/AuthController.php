@@ -23,6 +23,13 @@ class AuthController extends Controller
 
         if (Auth::guard('admin')->attempt($credentials)) {
             $admin = Auth::guard('admin')->user();
+
+            if (!$admin->is_active) {
+                Auth::guard('admin')->logout();
+                return back()->withErrors([
+                    'email' => 'Akun Anda tidak aktif. Silakan hubungi administrator.',
+                ]);
+            }
             
             // Log aktivitas login
             ActivityLog::log(

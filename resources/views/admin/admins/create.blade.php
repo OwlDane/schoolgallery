@@ -69,6 +69,16 @@
                             @enderror
                         </div>
                         
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" 
+                                       {{ old('is_active', true) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="is_active">
+                                    Aktif
+                                </label>
+                            </div>
+                        </div>
+                        
                         <div class="d-flex justify-content-between">
                             <a href="{{ route('admin.admins.index') }}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Kembali
