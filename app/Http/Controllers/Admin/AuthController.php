@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
+use App\Models\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Password;
@@ -20,6 +21,18 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
+
+        // Handle legacy plaintext passwords by upgrading them to bcrypt
+        $legacyAdmin = Admin::where('email', $credentials['email'] ?? '')->first();
+        if ($legacyAdmin) {
+            $passwordValue = (string) ($legacyAdmin->password ?? '');
+            $isBcrypt = str_starts_with($passwordValue, '$2y$');
+
+            if (!$isBcrypt && hash_equals($passwordValue, (string) ($credentials['password'] ?? ''))) {
+                $legacyAdmin->password = Hash::make($credentials['password']);
+                $legacyAdmin->save();
+            }
+        }
 
         if (Auth::guard('admin')->attempt($credentials)) {
             $admin = Auth::guard('admin')->user();
