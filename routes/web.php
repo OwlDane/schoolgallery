@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\SchoolProfileController;
 use App\Http\Controllers\Admin\AdminManagementController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -83,6 +84,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('admins/{admin}/reset-password', [AdminManagementController::class, 'resetPassword'])->name('admins.reset-password');
             Route::patch('admins/{admin}/toggle-active', [AdminManagementController::class, 'toggleActive'])->name('admins.toggle-active');
         });
+
+        // Reports & Export
+        Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::post('reports/export-visitor-stats', [ReportController::class, 'exportVisitorStats'])->name('reports.export-visitor-stats');
+        Route::post('reports/export-content-stats', [ReportController::class, 'exportContentStats'])->name('reports.export-content-stats');
+        Route::post('reports/export-admin-activity', [ReportController::class, 'exportAdminActivity'])->name('reports.export-admin-activity');
     });
 
 });

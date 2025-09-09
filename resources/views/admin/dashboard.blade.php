@@ -10,9 +10,15 @@
             <h1 class="text-2xl font-bold text-gray-800">Selamat Datang, {{ Auth::user()->name }}! <span class="animate-pulse">👋</span></h1>
             <p class="text-gray-600 mt-1">Ringkasan aktivitas dan statistik terbaru</p>
         </div>
-        <div class="text-sm bg-white px-4 py-2 rounded-lg shadow-sm flex items-center">
-            <i class="far fa-calendar-alt text-blue-500 mr-2"></i>
-            {{ now()->translatedFormat('l, d F Y') }}
+        <div class="flex items-center space-x-3">
+            <a href="{{ route('admin.reports.index') }}" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow-sm hover:bg-green-700 transition-colors flex items-center">
+                <i class="fas fa-chart-line mr-2"></i>
+                Laporan & Export
+            </a>
+            <div class="text-sm bg-white px-4 py-2 rounded-lg shadow-sm flex items-center">
+                <i class="far fa-calendar-alt text-blue-500 mr-2"></i>
+                {{ now()->translatedFormat('l, d F Y') }}
+            </div>
         </div>
     </div>
     <div class="mt-6 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg">
