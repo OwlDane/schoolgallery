@@ -88,8 +88,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Reports & Export
         Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
         Route::post('reports/export-visitor-stats', [ReportController::class, 'exportVisitorStats'])->name('reports.export-visitor-stats');
+        Route::get('reports/export-visitor-stats', [ReportController::class, 'exportVisitorStats'])->name('reports.export-visitor-stats.quick');
         Route::post('reports/export-content-stats', [ReportController::class, 'exportContentStats'])->name('reports.export-content-stats');
+        Route::get('reports/export-content-stats', [ReportController::class, 'exportContentStats'])->name('reports.export-content-stats.quick');
         Route::post('reports/export-admin-activity', [ReportController::class, 'exportAdminActivity'])->name('reports.export-admin-activity');
+        Route::get('reports/export-admin-activity', [ReportController::class, 'exportAdminActivity'])->name('reports.export-admin-activity.quick');
     });
 
 });

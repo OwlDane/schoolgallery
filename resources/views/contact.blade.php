@@ -88,12 +88,19 @@
                 
                 <div class="lg:w-1/2" data-aos="fade-left">
                     <div class="bg-white rounded-xl overflow-hidden shadow-lg h-full">
-                        <div class="bg-blue-600/20 flex items-center justify-center h-[400px]">
-                            <div class="text-center p-4">
-                                <i class="fas fa-map-marker-alt text-4xl text-blue-400 mb-2"></i>
-                                <p class="text-gray-700">Lokasi Sekolah</p>
+                        @if($schoolProfile->map_embed)
+                            <div class="h-[400px]">
+                                {!! $schoolProfile->map_embed !!}
                             </div>
-                        </div>
+                        @else
+                            <div class="bg-blue-600/20 flex items-center justify-center h-[400px]">
+                                <div class="text-center p-4">
+                                    <i class="fas fa-map-marker-alt text-4xl text-blue-400 mb-2"></i>
+                                    <p class="text-gray-700">Lokasi Sekolah</p>
+                                    <p class="text-sm text-gray-500 mt-2">Silakan tambahkan embed Google Maps di pengaturan admin</p>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

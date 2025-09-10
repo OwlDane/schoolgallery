@@ -168,7 +168,7 @@
     <div class="bg-white rounded-lg shadow-sm p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Aksi Cepat</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <a href="{{ route('admin.reports.export-visitor-stats') }}?start_date={{ now()->subMonth()->format('Y-m-d') }}&end_date={{ now()->format('Y-m-d') }}&format=pdf" 
+            <a href="{{ route('admin.reports.export-visitor-stats.quick') }}?start_date={{ now()->subMonth()->format('Y-m-d') }}&end_date={{ now()->format('Y-m-d') }}&format=pdf" 
                class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
                 <i class="fas fa-chart-line text-blue-600 mr-3"></i>
                 <div>
@@ -177,7 +177,7 @@
                 </div>
             </a>
 
-            <a href="{{ route('admin.reports.export-content-stats') }}?start_date={{ now()->subMonth()->format('Y-m-d') }}&end_date={{ now()->format('Y-m-d') }}&format=excel" 
+            <a href="{{ route('admin.reports.export-content-stats.quick') }}?start_date={{ now()->subMonth()->format('Y-m-d') }}&end_date={{ now()->format('Y-m-d') }}&format=excel" 
                class="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                 <i class="fas fa-file-excel text-green-600 mr-3"></i>
                 <div>
@@ -186,7 +186,7 @@
                 </div>
             </a>
 
-            <a href="{{ route('admin.reports.export-admin-activity') }}?start_date={{ now()->subWeek()->format('Y-m-d') }}&end_date={{ now()->format('Y-m-d') }}&format=pdf" 
+            <a href="{{ route('admin.reports.export-admin-activity.quick') }}?start_date={{ now()->subWeek()->format('Y-m-d') }}&end_date={{ now()->format('Y-m-d') }}&format=pdf" 
                class="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
                 <i class="fas fa-user-cog text-purple-600 mr-3"></i>
                 <div>
