@@ -101,25 +101,26 @@
 
             @if($relatedGalleries->isNotEmpty())
                 <div class="mt-12">
-                    <h3 class="text-2xl font-bold text-gray-900 mb-6">Galeri Lainnya</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        @foreach($relatedGalleries as $related)
-                            <div class="group relative overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-                                <div class="aspect-w-4 aspect-h-3">
-                                    <img src="{{ asset('storage/' . $related->image) }}" alt="{{ $related->title }}"
-                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                </div>
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                                    <div>
-                                        <h4 class="text-white font-semibold text-lg">{{ $related->title }}</h4>
-                                        <p class="text-gray-200 text-sm">{{ $related->created_at->format('d M Y') }}</p>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-2xl font-bold text-gray-900">Galeri Lainnya</h3>
+                        <a href="{{ route('gallery') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium">Lihat lainnya</a>
+                    </div>
+                    <div class="overflow-x-auto scrollbar-thin">
+                        <div class="flex gap-4 snap-x snap-mandatory">
+                            @foreach($relatedGalleries as $related)
+                                <a href="{{ route('gallery.detail', $related->id) }}" class="group block snap-start shrink-0 w-64">
+                                    <div class="relative overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-all">
+                                        <div class="w-full" style="aspect-ratio: 16 / 9;">
+                                            <img src="{{ asset('storage/' . $related->image) }}" alt="{{ $related->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                        </div>
+                                        <div class="p-3">
+                                            <h4 class="text-gray-800 font-semibold text-sm line-clamp-2">{{ $related->title }}</h4>
+                                            <p class="text-gray-500 text-xs mt-1">{{ $related->created_at->format('d M Y') }}</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <a href="{{ route('gallery.detail', $related->id) }}" class="absolute inset-0 z-10">
-                                    <span class="sr-only">Lihat {{ $related->title }}</span>
                                 </a>
-                            </div>
-                        @endforeach
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             @endif

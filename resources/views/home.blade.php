@@ -155,63 +155,41 @@
             </div>
             
             @if($featuredGalleries->count() > 0)
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                    @foreach($featuredGalleries as $index => $gallery)
-                        <div class="{{ $index === 0 ? 'md:col-span-2 md:row-span-2' : '' }} overflow-hidden rounded-xl shadow-lg card-hover card-shine transition-all duration-500 group" data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
-                            <div class="relative h-full image-hover">
-                                <div class="card-shine-effect absolute inset-0 z-0"></div>
-                                <div class="skeleton skeleton-image w-full h-full"></div>
-                                <div class="content-loading opacity-0 transition-opacity duration-500">
-                                    @if($gallery->image)
-                                        <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}" 
-                                             class="w-full h-full object-cover transition-transform duration-700 absolute top-0 left-0">
-                                    @else
-                                        @php
-                                            $placeholderImages = [
-                                                'https://images.unsplash.com/photo-1588072432836-e10032774350?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-                                                'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-                                                'https://images.unsplash.com/photo-1509062522246-3755977927d7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-                                                'https://images.unsplash.com/photo-1627556704302-624286467c65?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
-                                            ];
-                                        @endphp
-                                        <img src="{{ $placeholderImages[$index % count($placeholderImages)] }}" alt="{{ $gallery->title }}" 
-                                             class="w-full h-full object-cover transition-transform duration-700 absolute top-0 left-0">
-                                    @endif
-                                </div>
-                                <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-70"></div>
-                                <div class="absolute top-4 left-4">
-                                    <span class="bg-indigo-600/80 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full shadow-lg">
-                                        <i class="fas fa-images mr-1"></i> {{ rand(5, 20) }} Foto
-                                    </span>
-                                </div>
-                                <div class="absolute bottom-0 left-0 right-0 p-5 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                                    <div class="skeleton skeleton-text w-3/4 mb-2 bg-gray-300/30"></div>
-                                    <div class="skeleton skeleton-text w-full bg-gray-300/30"></div>
-                                    <div class="content-loading opacity-0 transition-opacity duration-500">
-                                        <h4 class="text-white font-bold text-lg mb-2 text-shadow">{{ $gallery->title }}</h4>
-                                        <p class="text-gray-200 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">{{ Str::limit($gallery->description, 60) }}</p>
-                                        <div class="mt-3 pt-3 border-t border-white/20 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                            <span class="text-gray-300 text-xs">
-                                                <i class="far fa-calendar-alt mr-1"></i> {{ \Carbon\Carbon::parse($gallery->created_at)->format('d M Y') }}
-                                            </span>
-                                            <span class="text-white text-xs font-medium bg-white/20 px-2 py-1 rounded backdrop-blur-sm">
-                                                Lihat Detail <i class="fas fa-arrow-right ml-1"></i>
-                                            </span>
-                                        </div>
+                <div class="overflow-x-auto">
+                    <div class="flex gap-5 md:grid md:grid-cols-4 md:gap-6">
+                        @foreach($featuredGalleries as $index => $gallery)
+                            <a href="{{ route('gallery.detail', $gallery->id) }}" class="group block w-72 md:w-auto flex-shrink-0 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow card-shine" data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
+                                <div class="card-shine-effect"></div>
+                                <div class="relative">
+                                    <div class="w-full" style="aspect-ratio: 16 / 9;">
+                                        @if($gallery->image)
+                                            <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                                        @else
+                                            @php
+                                                $placeholderImages = [
+                                                    'https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&w=1000&q=80',
+                                                    'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1000&q=80',
+                                                    'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1000&q=80',
+                                                    'https://images.unsplash.com/photo-1627556704302-624286467c65?auto=format&fit=crop&w=1000&q=80'
+                                                ];
+                                            @endphp
+                                            <img src="{{ $placeholderImages[$index % count($placeholderImages)] }}" alt="{{ $gallery->title }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                                        @endif
+                                    </div>
+                                    <div class="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
+                                        <h4 class="text-white font-semibold text-base line-clamp-1">{{ $gallery->title }}</h4>
+                                        <p class="text-gray-200 text-xs">{{ \Carbon\Carbon::parse($gallery->created_at)->format('d M Y') }}</p>
                                     </div>
                                 </div>
-                                <a href="{{ route('gallery.detail', $gallery->id) }}" class="absolute inset-0 z-10">
-                                    <span class="sr-only">Lihat detail {{ $gallery->title }}</span>
-                                </a>
-                            </div>
-                        </div>
-                    @endforeach
+                            </a>
+                        @endforeach
+                    </div>
                 </div>
-                
-                <div class="text-center mt-12" data-aos="fade-up" data-aos-delay="300">
-                    <a href="{{ route('gallery') }}" class="btn-hover inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg shadow-md">
+
+                <div class="text-center mt-10" data-aos="fade-up" data-aos-delay="300">
+                    <a href="{{ route('gallery') }}" class="inline-flex items-center px-5 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700">
                         <i class="fas fa-images mr-2"></i>
-                        <span>Jelajahi Semua Galeri</span>
+                        <span>Lihat Semua Galeri</span>
                     </a>
                 </div>
             @else

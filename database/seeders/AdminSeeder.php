@@ -11,8 +11,8 @@ class AdminSeeder extends Seeder
 {
     public function run(): void
     {
-        // Hapus admin yang sudah ada dengan email yang sama
-        Admin::where('email', 'admin@sekolah.com')->delete();
+        // Hapus admin yang sudah ada dengan email yang sama (force delete karena model pakai SoftDeletes)
+        Admin::withTrashed()->where('email', 'admin@sekolah.com')->forceDelete();
 
         // Buat admin baru
         Admin::create([

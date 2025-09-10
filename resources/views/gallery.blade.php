@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @push('styles')
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" />
 <style>
     .toast {
         position: fixed;
@@ -34,7 +33,9 @@
         flex-direction: column;
     }
     .gallery-item .image-container {
-        height: 200px; /* Tinggi tetap untuk semua gambar */
+        /* Samakan rasio semua thumbnail tanpa mengubah file asli */
+        aspect-ratio: 16 / 9; /* 16:9 agar mirip tampilan admin */
+        height: auto;
         overflow: hidden;
         position: relative;
     }
@@ -180,14 +181,14 @@
                     @foreach($galleries as $gallery)
                         <div class="gallery-item bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100"
                              data-aos="fade-up" data-aos-delay="{{ $loop->index % 4 * 100 }}">
-                            <div class="image-container">
+                            <a href="{{ route('gallery.detail', $gallery->id) }}" class="block image-container focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-none">
                                 @if($gallery->image)
                                     <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}">
                                 @else
                                     <img src="https://images.unsplash.com/photo-1588072432836-e10032774350?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
                                          alt="{{ $gallery->title }}">
                                 @endif
-                            </div>
+                            </a>
                             <div class="p-4">
                                 <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2">{{ $gallery->title }}</h3>
                                 <div class="flex items-center justify-between text-sm text-gray-500 mb-3">
@@ -200,9 +201,7 @@
                                     @endif
                                 </div>
                                 <div class="flex justify-between items-center">
-                                    <a href="{{ asset('storage/' . $gallery->image) }}" 
-                                       data-lightbox="gallery" 
-                                       data-title="{{ $gallery->title }}" 
+                                    <a href="{{ route('gallery.detail', $gallery->id) }}" 
                                        class="text-blue-600 hover:text-blue-800 text-sm font-medium">
                                         <i class="far fa-eye mr-1"></i> Lihat
                                     </a>
@@ -321,15 +320,7 @@
         </div>
     </section>
 @push('scripts')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
 <script>
-    lightbox.option({
-        'resizeDuration': 200,
-        'wrapAround': true,
-        'showImageNumberLabel': true,
-        'alwaysShowNavOnTouchDevices': true
-    });
-
     // Auto-hide toast messages after 5 seconds
     document.addEventListener('DOMContentLoaded', function() {
         const toast = document.querySelector('.toast');
