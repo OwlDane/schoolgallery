@@ -21,19 +21,53 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
+        // Cari admin berdasarkan email
+        $candidate = Admin::where('email', $credentials['email'] ?? '')->first();
 
-        // Handle legacy plaintext passwords by upgrading them to bcrypt
-        $legacyAdmin = Admin::where('email', $credentials['email'] ?? '')->first();
-        if ($legacyAdmin) {
-            $passwordValue = (string) ($legacyAdmin->password ?? '');
-            $isBcrypt = str_starts_with($passwordValue, '$2y$');
+        if ($candidate) {
+            $storedPassword = (string) ($candidate->password ?? '');
+            $isBcrypt = str_starts_with($storedPassword, '$2y$');
 
-            if (!$isBcrypt && hash_equals($passwordValue, (string) ($credentials['password'] ?? ''))) {
-                $legacyAdmin->password = Hash::make($credentials['password']);
-                $legacyAdmin->save();
+            // Jika password di DB masih plaintext, jangan panggil attempt() dulu
+            if (!$isBcrypt) {
+                if (hash_equals($storedPassword, (string) ($credentials['password'] ?? ''))) {
+                    // Upgrade ke bcrypt lalu login manual
+                    $candidate->password = Hash::make($credentials['password']);
+                    $candidate->save();
+
+                    Auth::guard('admin')->login($candidate);
+
+                    $admin = Auth::guard('admin')->user();
+                    if (!$admin->is_active) {
+                        Auth::guard('admin')->logout();
+                        return back()->withErrors([
+                            'email' => 'Akun Anda tidak aktif. Silakan hubungi administrator.',
+                        ]);
+                    }
+
+                    ActivityLog::log(
+                        'login',
+                        'Login ke sistem admin',
+                        $admin->id,
+                        null,
+                        [
+                            'login_time' => now()->toDateTimeString(),
+                            'ip_address' => $request->ip(),
+                            'user_agent' => $request->userAgent()
+                        ]
+                    );
+
+                    return redirect()->route('admin.dashboard');
+                }
+
+                // Plaintext tapi tidak cocok
+                return back()->withErrors([
+                    'email' => 'Email atau password salah.',
+                ]);
             }
         }
 
+        // Jalur normal untuk password bcrypt
         if (Auth::guard('admin')->attempt($credentials)) {
             $admin = Auth::guard('admin')->user();
 
