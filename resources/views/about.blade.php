@@ -23,6 +23,8 @@
         </div>
     </section>
 
+    
+
     <!-- School Profile Section -->
     <section class="py-16 bg-white">
         <div class="max-w-7xl mx-auto px-4">
@@ -48,7 +50,7 @@
                         @if($schoolProfile->history)
                             {!! $schoolProfile->history !!}
                         @else
-                            <p>{{ $schoolProfile->school_name ?? 'Sekolah Kami' }} didirikan pada tahun 1985 dengan komitmen untuk memberikan pendidikan berkualitas bagi generasi penerus bangsa. Berawal dari sebuah bangunan sederhana dengan beberapa ruang kelas, kini kami telah berkembang menjadi institusi pendidikan yang modern dan terkemuka di daerah ini.</p>
+                            <p>{{ $schoolProfile->school_name ?? 'Sekolah Kami' }} SMK Negeri 4 Kota Bogor merupakan sekolah menengah kejuruan berbasis Teknologi Informasi dan Komunikasi. Sekolah ini didirikan dan dirintis pada tahun 2008 kemudian dibuka pada tahun 2009 yang saat ini terakreditasi A.</p>
                             <p>Selama perjalanannya, sekolah kami telah menghasilkan ribuan lulusan yang sukses di berbagai bidang dan berkontribusi positif bagi masyarakat. Kami terus berinovasi dalam metode pembelajaran dan pengembangan fasilitas untuk menciptakan lingkungan belajar yang optimal.</p>
                         @endif
                     </div>
@@ -99,6 +101,52 @@
         </div>
     </section>
 
+    <!-- Majors / Departments Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Program Keahlian</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Pilihan jurusan yang siap membekali siswa dengan keterampilan sesuai kebutuhan industri</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white rounded-xl p-6 shadow hover:shadow-lg transition-all" data-aos="zoom-in" data-aos-delay="0">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-xl font-bold text-gray-800">PPLG</h3>
+                        <span class="text-blue-600"><i class="fas fa-code"></i></span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Pengembangan Perangkat Lunak dan Gim: fokus pada pemrograman, UI/UX, basis data, dan pembuatan gim.</p>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow hover:shadow-lg transition-all" data-aos="zoom-in" data-aos-delay="100">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-xl font-bold text-gray-800">TJKT</h3>
+                        <span class="text-green-600"><i class="fas fa-network-wired"></i></span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Teknik Jaringan Komputer dan Telekomunikasi: perakitan, administrasi jaringan, server, dan keamanan jaringan.</p>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow hover:shadow-lg transition-all" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-xl font-bold text-gray-800">TPFL</h3>
+                        <span class="text-orange-600"><i class="fas fa-industry"></i></span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Teknik Pengelasan dan Fabrikasi Logam: proses pengelasan, fabrikasi, keselamatan kerja, dan gambar teknik.</p>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow hover:shadow-lg transition-all" data-aos="zoom-in" data-aos-delay="300">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-xl font-bold text-gray-800">TKRO</h3>
+                        <span class="text-red-600"><i class="fas fa-car"></i></span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Teknik Kendaraan Ringan Otomotif: perawatan dan perbaikan sistem mesin, chassis, kelistrikan, dan diagnosa kendaraan.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+
     <!-- Values Section -->
     <section class="py-16 bg-white">
         <div class="max-w-7xl mx-auto px-4">
@@ -134,6 +182,58 @@
             </div>
         </div>
     </section>
+
+     <!-- Team Section -->
+     <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Tim Pengajar</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Tenaga pendidik profesional yang berdedikasi untuk mengembangkan potensi siswa</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300" data-aos="fade-up" data-aos-delay="0">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                         alt="Kepala Sekolah" class="w-full h-64 object-cover">
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-bold mb-1 text-gray-800">Drs. Mulya Murprihartono, M.Si</h3>
+                        <p class="text-blue-600 font-medium mb-3">Kepala Sekolah</p>
+                        <p class="text-gray-600 text-sm">Menjabat sebagai kepala sekolah di SMKN 4 Kota Bogor pada tahun ajaran 2022-2023 dan telah menyampaikan materi mengenai kepemimpinan dan jati diri pada kegiatan di sekolah tersebut. </p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300" data-aos="fade-up" data-aos-delay="100">
+                    <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                         alt="Wakil Kepala Sekolah" class="w-full h-64 object-cover">
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-bold mb-1 text-gray-800">MULYADIH, S.PD</h3>
+                        <p class="text-blue-600 font-medium mb-3">Wakil Kepala Sekolah</p>
+                        <p class="text-gray-600 text-sm">Spesialis kurikulum dengan pengalaman mengajar selama 15 tahun di berbagai jenjang pendidikan</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300" data-aos="fade-up" data-aos-delay="200">
+                    <img src="https://images.unsplash.com/photo-1580894732444-8ecded7900cd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                         alt="Guru Matematika" class="w-full h-64 object-cover">
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-bold mb-1 text-gray-800">Novita Wandasari, S.Pd</h3>
+                        <p class="text-blue-600 font-medium mb-3">Kesiswaan</p>
+                        <p class="text-gray-600 text-sm">Berpengalaman menjadi kaprodi jurusan PPLG di SMK Negeri 4 Kota Bogor</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300" data-aos="fade-up" data-aos-delay="300">
+                    <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                         alt="Guru Bahasa Inggris" class="w-full h-64 object-cover">
+                    <div class="p-6 text-center">
+                        <h3 class="text-xl font-bold mb-1 text-gray-800">Yunita Indrasari, St, M. Kom</h3>
+                        <p class="text-blue-600 font-medium mb-3">Kejuruan TJKT</p>
+                        <p class="text-gray-600 text-sm">Berpengalaman mengajar di bidang jaringan komputer dan telekomunikasi serta mengajar di bidang kewirausahaan</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>  
 
     <!-- Facilities Section -->
     <section class="py-16 bg-gray-50">
