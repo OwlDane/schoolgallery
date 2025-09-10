@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gallery;
+use App\Models\GalleryLike;
+use App\Models\GalleryComment;
 use App\Models\News;
 use App\Models\SchoolProfile;
 use Illuminate\Http\Request;
@@ -23,7 +25,7 @@ class HomeController extends Controller
 
     public function gallery(Request $request)
     {
-        $query = Gallery::published()->latest();
+        $query = Gallery::published()->withCount(['likes', 'comments' => function($q){ $q->where('is_approved', true); }])->latest();
 
         if ($request->has('search')) {
             $query->where('title', 'like', '%' . $request->search . '%');
@@ -51,6 +53,7 @@ class HomeController extends Controller
         $galleries = Gallery::with('kategori')
             ->where('kategori_id', $kategori->id)
             ->published()
+            ->withCount(['likes', 'comments' => function($q){ $q->where('is_approved', true); }])
             ->latest()
             ->paginate(12);
 
@@ -66,7 +69,7 @@ class HomeController extends Controller
 
     public function galleryDetail($id)
     {
-        $gallery = Gallery::published()->findOrFail($id);
+        $gallery = Gallery::published()->with(['likes', 'comments' => function($q){ $q->where('is_approved', true); }])->findOrFail($id);
         $relatedGalleries = Gallery::published()
             ->where('id', '!=', $gallery->id)
             ->latest()
@@ -75,6 +78,58 @@ class HomeController extends Controller
         $schoolProfile = SchoolProfile::getProfile();
 
         return view('gallery-detail', compact('gallery', 'relatedGalleries', 'schoolProfile'));
+    }
+
+    public function likeGallery(Request $request, $id)
+    {
+        $gallery = Gallery::published()->findOrFail($id);
+        $fingerprint = $request->cookie('visitor_fingerprint') ?? $request->ip() . '|' . substr(hash('sha256', (string) $request->userAgent()), 0, 16);
+
+        $existing = GalleryLike::where('gallery_id', $gallery->id)
+            ->where('visitor_fingerprint', $fingerprint)
+            ->first();
+
+        if (!$existing) {
+            GalleryLike::create([
+                'gallery_id' => $gallery->id,
+                'visitor_fingerprint' => $fingerprint,
+                'ip_address' => $request->ip(),
+                'user_agent' => (string) $request->userAgent(),
+            ]);
+        }
+
+        return redirect()->route('gallery.detail', $gallery->id)->with('liked', true);
+    }
+
+    public function unlikeGallery(Request $request, $id)
+    {
+        $gallery = Gallery::published()->findOrFail($id);
+        $fingerprint = $request->cookie('visitor_fingerprint') ?? $request->ip() . '|' . substr(hash('sha256', (string) $request->userAgent()), 0, 16);
+
+        GalleryLike::where('gallery_id', $gallery->id)
+            ->where('visitor_fingerprint', $fingerprint)
+            ->delete();
+
+        return redirect()->route('gallery.detail', $gallery->id)->with('unliked', true);
+    }
+
+    public function commentGallery(Request $request, $id)
+    {
+        $gallery = Gallery::published()->findOrFail($id);
+
+        $validated = $request->validate([
+            'content' => 'required|string|max:2000',
+        ]);
+
+        GalleryComment::create([
+            'gallery_id' => $gallery->id,
+            'name' => 'Guest',
+            'email' => null,
+            'content' => $validated['content'],
+            'is_approved' => true,
+        ]);
+
+        return redirect()->route('gallery.detail', $gallery->id)->with('commented', true);
     }
 
     public function news(Request $request)

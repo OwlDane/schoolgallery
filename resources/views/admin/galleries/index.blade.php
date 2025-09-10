@@ -64,7 +64,11 @@
                         <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ $gallery->description ?? 'Tidak ada deskripsi' }}</p>
                         <div class="flex justify-between items-center text-sm text-gray-500">
                             <span><i class="fas fa-user mr-1"></i> {{ $gallery->admin->name ?? 'Admin' }}</span>
-                            <span><i class="fas fa-calendar mr-1"></i> {{ $gallery->created_at->format('d M Y') }}</span>
+                            <span class="inline-flex items-center gap-3">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-pink-100 text-pink-700"><i class="fas fa-heart mr-1"></i>{{ $gallery->likes()->count() }}</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 text-gray-700"><i class="far fa-comment mr-1"></i>{{ $gallery->comments()->count() }}</span>
+                                <span><i class="fas fa-calendar ml-2 mr-1"></i> {{ $gallery->created_at->format('d M Y') }}</span>
+                            </span>
                         </div>
                         <div class="mt-4 flex justify-between items-center">
                             <div class="flex space-x-2">

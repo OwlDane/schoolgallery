@@ -228,13 +228,17 @@
                 <i class="fas fa-chart-pie text-blue-500 mr-2"></i>
                 Grafik {{ ucfirst($type) }}
             </h3>
-            <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-                <div class="text-center">
-                    <i class="fas fa-chart-pie text-4xl text-gray-400 mb-2"></i>
-                    <p class="text-gray-500">Chart akan ditampilkan di sini</p>
-                    <p class="text-sm text-gray-400">Integrasi dengan Chart.js atau library chart lainnya</p>
+            @if($type === 'news' && isset($data['chart']))
+                <canvas id="newsChart" class="w-full h-64"></canvas>
+            @else
+                <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
+                    <div class="text-center">
+                        <i class="fas fa-chart-pie text-4xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-500">Chart akan ditampilkan di sini</p>
+                        <p class="text-sm text-gray-400">Integrasi dengan Chart.js atau library chart lainnya</p>
+                    </div>
                 </div>
-            </div>
+            @endif
         </div>
 
         <!-- Category Breakdown -->
@@ -302,3 +306,32 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+@if($type === 'news' && isset($data['chart']))
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const ctx = document.getElementById('newsChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: @json($data['chart']['labels']),
+            datasets: [{
+                label: 'Berita Terbit per Bulan',
+                data: @json($data['chart']['series']),
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59,130,246,0.15)',
+                fill: true,
+                tension: 0.35,
+            }]
+        },
+        options: {
+            plugins: { legend: { display: true } },
+            scales: { y: { beginAtZero: true, precision: 0 } }
+        }
+    });
+});
+</script>
+@endif
+@endpush

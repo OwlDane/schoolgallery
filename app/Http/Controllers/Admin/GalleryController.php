@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\GalleryComment;
 use App\Models\Gallery;
 use App\Models\Kategori;
 use Illuminate\Http\Request;

@@ -20,12 +20,9 @@
 
     <!-- Gallery Detail Section -->
     <section class="py-12 bg-white">
-        <div class="max-w-4xl mx-auto px-4">
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
-                <div class="aspect-w-16 aspect-h-9">
-                    <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}" 
-                         class="w-full h-full object-cover">
-                </div>
+        <div class="max-w-3xl mx-auto px-4">
+            <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 mb-8">
+                <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}" class="w-full h-auto">
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-4">
                         <div>
@@ -33,7 +30,28 @@
                                 {{ $gallery->kategori->name ?? 'Umum' }}
                             </span>
                         </div>
-                        <div class="flex space-x-2">
+                        <div class="flex space-x-4 items-center">
+                            @php
+                                $fp = request()->cookie('visitor_fingerprint') ?? request()->ip() . '|' . substr(hash('sha256', (string) request()->userAgent()), 0, 16);
+                                $alreadyLiked = $gallery->likes->firstWhere('visitor_fingerprint', $fp);
+                            @endphp
+                            @if($alreadyLiked)
+                                <form action="{{ route('gallery.unlike', $gallery->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center text-pink-600 hover:text-pink-700">
+                                        <i class="fas fa-heart mr-1"></i>
+                                        <span>Batalkan</span>
+                                    </button>
+                                </form>
+                            @else
+                                <form action="{{ route('gallery.like', $gallery->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center text-gray-500 hover:text-pink-700">
+                                        <i class="far fa-heart mr-1"></i>
+                                        <span>Suka</span>
+                                    </button>
+                                </form>
+                            @endif
                             <a href="{{ asset('storage/' . $gallery->image) }}" 
                                class="text-blue-600 hover:text-blue-800" download>
                                 <i class="fas fa-download"></i> Unduh
@@ -42,10 +60,42 @@
                     </div>
                     <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ $gallery->title }}</h2>
                     @if($gallery->description)
-                        <div class="prose max-w-none text-gray-600">
+                        <div class="prose max-w-none text-gray-700">
                             {!! nl2br(e($gallery->description)) !!}
                         </div>
                     @endif
+                </div>
+            </div>
+
+            <!-- Comments -->
+            <div id="comments" class="mt-10">
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">Komentar</h3>
+
+                <div class="bg-white rounded-xl shadow p-6 mb-6">
+                    <form action="{{ route('gallery.comment', $gallery->id) }}" method="POST" class="space-y-4">
+                        @csrf
+                        <div>
+                            <label class="block text-sm text-gray-700 mb-1">Komentar</label>
+                            <textarea name="content" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"></textarea>
+                        </div>
+                        <div class="text-right">
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Kirim Komentar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="space-y-4">
+                    @forelse($gallery->comments as $comment)
+                        <div class="bg-white rounded-xl shadow p-4">
+                            <div class="flex items-center justify-between mb-1">
+                                <p class="font-semibold text-gray-800">{{ $comment->name }}</p>
+                                <p class="text-xs text-gray-500">{{ $comment->created_at->diffForHumans() }}</p>
+                            </div>
+                            <p class="text-gray-700">{{ $comment->content }}</p>
+                        </div>
+                    @empty
+                        <p class="text-gray-500">Belum ada komentar.</p>
+                    @endforelse
                 </div>
             </div>
 

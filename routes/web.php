@@ -16,6 +16,10 @@ Route::middleware('track.visits')->group(function () {
     Route::get('/gallery', [HomeController::class, 'gallery'])->name('gallery');
     Route::get('/gallery/category/{category}', [HomeController::class, 'galleryByCategory'])->name('gallery.category');
     Route::get('/gallery/{id}', [HomeController::class, 'galleryDetail'])->name('gallery.detail');
+    // Likes & Comments (public)
+    Route::post('/gallery/{id}/like', [HomeController::class, 'likeGallery'])->name('gallery.like');
+    Route::post('/gallery/{id}/unlike', [HomeController::class, 'unlikeGallery'])->name('gallery.unlike');
+    Route::post('/gallery/{id}/comment', [HomeController::class, 'commentGallery'])->name('gallery.comment');
     Route::get('/gallery/download/{id}', [HomeController::class, 'download'])->name('gallery.download');
     Route::get('/news', [HomeController::class, 'news'])->name('news');
     Route::get('/news/{slug}', [HomeController::class, 'newsDetail'])->name('news.detail');
@@ -66,6 +70,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('galleries/{gallery}', [GalleryController::class, 'destroy'])->name('galleries.destroy');
         Route::patch('galleries/{gallery}/toggle-publish', [GalleryController::class, 'togglePublish'])->name('galleries.toggle-publish');
         Route::delete('galleries/{gallery}/remove-image', [GalleryController::class, 'removeImage'])->name('galleries.remove-image');
+
+        // Gallery Comments moderation
+        Route::delete('galleries/comments/{comment}', function(App\Models\GalleryComment $comment){
+            $comment->delete();
+            return back()->with('success', 'Komentar dihapus');
+        })->name('galleries.comments.destroy');
 
         // News Management
         Route::resource('news', NewsController::class);

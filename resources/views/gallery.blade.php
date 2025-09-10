@@ -212,6 +212,30 @@
                                         <i class="fas fa-download mr-1"></i> Unduh
                                     </a>
                                 </div>
+                                <div class="mt-3 flex items-center justify-between text-sm text-gray-600">
+                                    @php
+                                        $fp = request()->cookie('visitor_fingerprint') ?? request()->ip() . '|' . substr(hash('sha256', (string) request()->userAgent()), 0, 16);
+                                        $alreadyLiked = isset($gallery->likes) ? $gallery->likes->firstWhere('visitor_fingerprint', $fp) : null;
+                                    @endphp
+                                    @if($alreadyLiked)
+                                        <form action="{{ route('gallery.unlike', $gallery->id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="inline-flex items-center text-pink-600 hover:text-pink-700">
+                                                <i class="fas fa-heart mr-1"></i>
+                                            </button>
+                                        </form>
+                                    @else
+                                        <form action="{{ route('gallery.like', $gallery->id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="inline-flex items-center text-gray-500 hover:text-pink-700">
+                                                <i class="far fa-heart mr-1"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+                                    <a href="{{ route('gallery.detail', $gallery->id) }}#comments" class="inline-flex items-center">
+                                        <i class="far fa-comment mr-1"></i>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     @endforeach

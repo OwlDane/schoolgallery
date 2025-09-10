@@ -36,6 +36,16 @@ class Gallery extends Model
         return $this->belongsTo(Kategori::class);
     }
 
+    public function likes()
+    {
+        return $this->hasMany(GalleryLike::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(GalleryComment::class)->latest();
+    }
+
     public function scopePublished($query)
     {
         return $query->where('is_published', true);

@@ -266,6 +266,42 @@ class DashboardController extends Controller
                         ->get()
                 ];
                 break;
+            
+            case 'news':
+                $data = [
+                    'total' => \App\Models\News::count(),
+                    'published' => \App\Models\News::where('is_published', true)->count(),
+                    'unpublished' => \App\Models\News::where('is_published', false)->count(),
+                    'this_month' => \App\Models\News::where('is_published', true)->whereMonth('published_at', now()->month)->count(),
+                    'last_month' => \App\Models\News::where('is_published', true)->whereMonth('published_at', now()->subMonth()->month)->count(),
+                    'by_category' => \App\Models\News::select('news_category_id', DB::raw('count(*) as total'))
+                        ->groupBy('news_category_id')
+                        ->with('newsCategory')
+                        ->get(),
+                ];
+
+                // Monthly published counts for last 12 months
+                $monthly = \App\Models\News::where('is_published', true)
+                    ->where('published_at', '>=', now()->startOfMonth()->subMonths(11))
+                    ->selectRaw("DATE_FORMAT(published_at, '%Y-%m') as ym, COUNT(*) as total")
+                    ->groupBy('ym')
+                    ->orderBy('ym')
+                    ->get();
+
+                // Normalize labels for each month in range
+                $labels = [];
+                $series = [];
+                for ($i = 11; $i >= 0; $i--) {
+                    $m = now()->startOfMonth()->subMonths($i);
+                    $key = $m->format('Y-m');
+                    $labels[] = $m->format('M Y');
+                    $series[] = (int) ($monthly->firstWhere('ym', $key)->total ?? 0);
+                }
+                $data['chart'] = [
+                    'labels' => $labels,
+                    'series' => $series,
+                ];
+                break;
                 
             default:
                 abort(404, 'Statistik tidak ditemukan.');
