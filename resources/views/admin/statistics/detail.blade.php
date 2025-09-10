@@ -286,10 +286,6 @@
 
     <!-- Action Buttons -->
     <div class="mt-8 flex justify-center space-x-4">
-        <a href="{{ route('admin.dashboard') }}" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg flex items-center transition-colors">
-            <i class="fas fa-arrow-left mr-2"></i> Kembali ke Dashboard
-        </a>
-        
         @if($type === 'news')
         <a href="{{ route('admin.news.index') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg flex items-center transition-colors">
             <i class="fas fa-newspaper mr-2"></i> Kelola Berita
@@ -300,7 +296,7 @@
         </a>
         @elseif($type === 'admins')
         <a href="{{ route('admin.admins.index') }}" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg flex items-center transition-colors">
-            <i class="fas fa-users mr-2"></i> Kelola Admin
+            <i class="fas a-users mr-2"></i> Kelola Admin
         </a>
         @endif
     </div>
