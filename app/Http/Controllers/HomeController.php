@@ -6,6 +6,8 @@ use App\Models\Gallery;
 use App\Models\GalleryLike;
 use App\Models\GalleryComment;
 use App\Models\News;
+use App\Models\NewsCategory;
+use App\Models\NewsComment;
 use App\Models\SchoolProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -134,7 +136,7 @@ class HomeController extends Controller
 
     public function news(Request $request)
     {
-        $query = News::published()->latest();
+        $query = News::with('newsCategory')->published()->latest();
 
         if ($request->has('search')) {
             $query->where(function ($q) use ($request) {
@@ -143,15 +145,23 @@ class HomeController extends Controller
             });
         }
 
+        if ($request->filled('category')) {
+            $category = NewsCategory::where('slug', $request->category)->first();
+            if ($category) {
+                $query->where('news_category_id', $category->id);
+            }
+        }
+
         $news = $query->paginate(10);
         $schoolProfile = SchoolProfile::getProfile();
+        $categories = NewsCategory::active()->ordered()->get();
 
-        return view('news', compact('news', 'schoolProfile'));
+        return view('news', compact('news', 'schoolProfile', 'categories'));
     }
 
     public function newsDetail($slug)
     {
-        $news = News::where('slug', $slug)->published()->firstOrFail();
+        $news = News::where('slug', $slug)->with(['newsCategory', 'comments'])->published()->firstOrFail();
         $relatedNews = News::published()
             ->where('id', '!=', $news->id)
             ->latest()
@@ -160,6 +170,25 @@ class HomeController extends Controller
         $schoolProfile = SchoolProfile::getProfile();
 
         return view('news-detail', compact('news', 'relatedNews', 'schoolProfile'));
+    }
+
+    public function commentNews(Request $request, $slug)
+    {
+        $news = News::where('slug', $slug)->published()->firstOrFail();
+
+        $validated = $request->validate([
+            'name' => 'nullable|string|max:100',
+            'content' => 'required|string|max:1000',
+        ]);
+
+        NewsComment::create([
+            'news_id' => $news->id,
+            'name' => $validated['name'] ?? 'Pengunjung',
+            'content' => $validated['content'],
+            'is_approved' => true,
+        ]);
+
+        return back()->with('success', 'Komentar terkirim.');
     }
 
     public function about()

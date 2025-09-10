@@ -187,7 +187,24 @@
                 
                 <div class="hidden md:flex items-center space-x-4">
                     <a href="{{ route('home') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all"><i class="fas fa-home mr-2 text-blue-500"></i> Beranda</a>
-                    <a href="{{ route('news') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all"><i class="fas fa-newspaper mr-2 text-blue-500"></i> Berita</a>
+
+                    @php($newsCategories = \App\Models\NewsCategory::active()->ordered()->get())
+                    <div class="relative group">
+                        <button id="newsDropdownBtn" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center">
+                            <i class="fas fa-newspaper mr-2 text-blue-500"></i> Berita
+                            <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                        </button>
+                        @if($newsCategories->isNotEmpty())
+                        <div id="newsDropdownMenu" class="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-200 absolute left-0 mt-2 w-56 bg-white border border-gray-100 rounded-lg shadow-lg py-2 z-50">
+                            <a href="{{ route('news') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50">Berita Terkini</a>
+                            <div class="my-2 border-t border-gray-100"></div>
+                            @foreach($newsCategories as $cat)
+                                <a href="{{ route('news', ['category' => $cat->slug]) }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50">{{ $cat->name }}</a>
+                            @endforeach
+                        </div>
+                        @endif
+                    </div>
+
                     <a href="{{ route('gallery') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all"><i class="fas fa-images mr-2 text-blue-500"></i> Galeri</a>
                     <a href="{{ route('about') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all"><i class="fas fa-info-circle mr-2 text-blue-500"></i> Tentang</a>
                     <a href="{{ route('contact') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all"><i class="fas fa-envelope mr-2 text-blue-500"></i> Kontak</a>
@@ -205,7 +222,19 @@
         <div id="mobile-menu" class="md:hidden hidden bg-white border-t border-gray-100 shadow-inner">
             <div class="px-2 pt-2 pb-3 space-y-1">
                 <a href="{{ route('home') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all"><i class="fas fa-home mr-2 text-blue-500"></i> Beranda</a>
-                <a href="{{ route('news') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all"><i class="fas fa-newspaper mr-2 text-blue-500"></i> Berita</a>
+                <div>
+                    <button id="mobile-news-toggle" class="w-full flex items-center justify-between py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all">
+                        <span><i class="fas fa-newspaper mr-2 text-blue-500"></i> Berita</span>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </button>
+                    @php($newsCategoriesMobile = \App\Models\NewsCategory::active()->ordered()->get())
+                    <div id="mobile-news-submenu" class="hidden ml-8 mt-1 space-y-1">
+                        <a href="{{ route('news') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all">Semua Berita</a>
+                        @foreach($newsCategoriesMobile as $cat)
+                            <a href="{{ route('news', ['category' => $cat->slug]) }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all">{{ $cat->name }}</a>
+                        @endforeach
+                    </div>
+                </div>
                 <a href="{{ route('gallery') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all"><i class="fas fa-images mr-2 text-blue-500"></i> Galeri</a>
                 <a href="{{ route('about') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all"><i class="fas fa-info-circle mr-2 text-blue-500"></i> Tentang</a>
                 <a href="{{ route('contact') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all"><i class="fas fa-envelope mr-2 text-blue-500"></i> Kontak</a>

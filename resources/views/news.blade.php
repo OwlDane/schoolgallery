@@ -73,6 +73,11 @@
                                 <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
                             </div>
                             <div class="p-6">
+                                @if($item->newsCategory)
+                                    <div class="mb-2">
+                                        <span class="inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-full font-semibold">{{ $item->newsCategory->name }}</span>
+                                    </div>
+                                @endif
                                 <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2">{{ $item->title }}</h3>
                                 <p class="text-gray-600 mb-4 line-clamp-3">{!! Str::limit(strip_tags($item->content), 150) !!}</p>
                                 <a href="{{ route('news.detail', $item->slug) }}" class="inline-flex items-center text-blue-600 font-semibold hover:text-blue-800 transition-colors">

@@ -35,6 +35,23 @@
         const menu = document.getElementById('mobile-menu');
         menu.classList.toggle('hidden');
     });
+
+    // Simple hover-intent for desktop dropdown (fallback for keyboard focus)
+    const newsDropdownBtn = document.getElementById('newsDropdownBtn');
+    const newsDropdownMenu = document.getElementById('newsDropdownMenu');
+    if (newsDropdownBtn && newsDropdownMenu) {
+        newsDropdownBtn.addEventListener('focus', () => newsDropdownMenu.classList.remove('invisible', 'opacity-0'));
+        newsDropdownBtn.addEventListener('blur', () => newsDropdownMenu.classList.add('invisible', 'opacity-0'));
+    }
+
+    // Mobile news submenu toggle
+    const mobileNewsToggle = document.getElementById('mobile-news-toggle');
+    const mobileNewsSubmenu = document.getElementById('mobile-news-submenu');
+    if (mobileNewsToggle && mobileNewsSubmenu) {
+        mobileNewsToggle.addEventListener('click', () => {
+            mobileNewsSubmenu.classList.toggle('hidden');
+        });
+    }
     
     // Smooth scroll for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {

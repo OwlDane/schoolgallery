@@ -23,6 +23,7 @@ Route::middleware('track.visits')->group(function () {
     Route::get('/gallery/download/{id}', [HomeController::class, 'download'])->name('gallery.download');
     Route::get('/news', [HomeController::class, 'news'])->name('news');
     Route::get('/news/{slug}', [HomeController::class, 'newsDetail'])->name('news.detail');
+    Route::post('/news/{slug}/comment', [HomeController::class, 'commentNews'])->name('news.comment');
     Route::get('/about', [HomeController::class, 'about'])->name('about');
     Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 });

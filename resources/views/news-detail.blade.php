@@ -30,9 +30,51 @@
                 @endif
                 
                 <div class="p-8">
+                    @if($news->newsCategory)
+                        <div class="mb-4">
+                            <span class="inline-block bg-indigo-100 text-indigo-800 text-xs px-3 py-1 rounded-full font-semibold">
+                                {{ $news->newsCategory->name }}
+                            </span>
+                        </div>
+                    @endif
                     <div class="prose prose-lg max-w-none">
                         {!! $news->content !!}
                     </div>
+                </div>
+            </div>
+
+            <!-- Comments -->
+            <div id="comments" class="mt-10">
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">Komentar</h3>
+                <div class="bg-white rounded-xl shadow p-6 mb-6">
+                    <form action="{{ route('news.comment', $news->slug) }}" method="POST" class="space-y-4">
+                        @csrf
+                        <div>
+                            <label class="block text-sm text-gray-700 mb-1">Nama (opsional)</label>
+                            <input type="text" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-gray-700 mb-1">Komentar</label>
+                            <textarea name="content" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"></textarea>
+                        </div>
+                        <div class="text-right">
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Kirim Komentar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="space-y-4">
+                    @forelse($news->comments as $comment)
+                        <div class="bg-white rounded-xl shadow p-4">
+                            <div class="flex items-center justify-between mb-1">
+                                <p class="font-semibold text-gray-800">{{ $comment->name ?? 'Pengunjung' }}</p>
+                                <p class="text-xs text-gray-500">{{ $comment->created_at->diffForHumans() }}</p>
+                            </div>
+                            <p class="text-gray-700">{{ $comment->content }}</p>
+                        </div>
+                    @empty
+                        <p class="text-gray-500">Belum ada komentar.</p>
+                    @endforelse
                 </div>
             </div>
 
