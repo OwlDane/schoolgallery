@@ -208,6 +208,28 @@
                     <a href="{{ route('gallery') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all"><i class="fas fa-images mr-2 text-blue-500"></i> Galeri</a>
                     <a href="{{ route('about') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all"><i class="fas fa-info-circle mr-2 text-blue-500"></i> Tentang</a>
                     <a href="{{ route('contact') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all"><i class="fas fa-envelope mr-2 text-blue-500"></i> Kontak</a>
+                    
+                    <!-- Guest Authentication -->
+                    @auth
+                        <div class="relative group">
+                            <button class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center">
+                                <i class="fas fa-user mr-2 text-blue-500"></i> {{ Auth::user()->name }}
+                                <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                            </button>
+                            <div class="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-200 absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-lg shadow-lg py-2 z-50">
+                                <form action="{{ route('guest.logout') }}" method="POST" class="block">
+                                    @csrf
+                                    <button type="submit" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50">
+                                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @else
+                        <a href="{{ route('guest.login') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all">
+                            <i class="fas fa-sign-in-alt mr-2 text-blue-500"></i> Login
+                        </a>
+                    @endauth
                 </div>
                 
                 <div class="md:hidden flex items-center">
@@ -238,6 +260,27 @@
                 <a href="{{ route('gallery') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all"><i class="fas fa-images mr-2 text-blue-500"></i> Galeri</a>
                 <a href="{{ route('about') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all"><i class="fas fa-info-circle mr-2 text-blue-500"></i> Tentang</a>
                 <a href="{{ route('contact') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all"><i class="fas fa-envelope mr-2 text-blue-500"></i> Kontak</a>
+                
+                <!-- Guest Authentication Mobile -->
+                @auth
+                    <div class="border-t border-gray-200 pt-2 mt-2">
+                        <div class="px-3 py-2 text-gray-700">
+                            <i class="fas fa-user mr-2 text-blue-500"></i> {{ Auth::user()->name }}
+                        </div>
+                        <form action="{{ route('guest.logout') }}" method="POST" class="block">
+                            @csrf
+                            <button type="submit" class="w-full text-left py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                            </button>
+                        </form>
+                    </div>
+                @else
+                    <div class="border-t border-gray-200 pt-2 mt-2">
+                        <a href="{{ route('guest.login') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all">
+                            <i class="fas fa-sign-in-alt mr-2 text-blue-500"></i> Login
+                        </a>
+                    </div>
+                @endauth
                 </div>
             </div>
         </div>

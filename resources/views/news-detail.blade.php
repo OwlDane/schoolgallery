@@ -46,22 +46,37 @@
             <!-- Comments -->
             <div id="comments" class="mt-10">
                 <h3 class="text-2xl font-bold text-gray-900 mb-4">Komentar</h3>
-                <div class="bg-white rounded-xl shadow p-6 mb-6">
-                    <form action="{{ route('news.comment', $news->slug) }}" method="POST" class="space-y-4">
-                        @csrf
-                        <div>
-                            <label class="block text-sm text-gray-700 mb-1">Nama (opsional)</label>
-                            <input type="text" name="name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                
+                @auth
+                    <div class="bg-white rounded-xl shadow p-6 mb-6">
+                        <form action="{{ route('news.comment', $news->slug) }}" method="POST" class="space-y-4">
+                            @csrf
+                            <div>
+                                <label class="block text-sm text-gray-700 mb-1">Nama (opsional)</label>
+                                <input type="text" name="name" value="{{ Auth::user()->name }}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-700 mb-1">Komentar</label>
+                                <textarea name="content" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"></textarea>
+                            </div>
+                            <div class="text-right">
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Kirim Komentar</button>
+                            </div>
+                        </form>
+                    </div>
+                @else
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
+                        <div class="text-center">
+                            <i class="fas fa-lock text-blue-500 text-2xl mb-3"></i>
+                            <h4 class="text-lg font-semibold text-blue-800 mb-2">Login Diperlukan</h4>
+                            <p class="text-blue-600 mb-4">Silakan login terlebih dahulu untuk dapat memberikan komentar.</p>
+                            <a href="{{ route('guest.login') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-sign-in-alt mr-2"></i>
+                                Login Sekarang
+                            </a>
                         </div>
-                        <div>
-                            <label class="block text-sm text-gray-700 mb-1">Komentar</label>
-                            <textarea name="content" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"></textarea>
-                        </div>
-                        <div class="text-right">
-                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Kirim Komentar</button>
-                        </div>
-                    </form>
-                </div>
+                    </div>
+                @endauth
 
                 <div class="space-y-4">
                     @forelse($news->comments as $comment)

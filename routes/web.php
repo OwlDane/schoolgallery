@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\SchoolProfileController;
 use App\Http\Controllers\Admin\AdminManagementController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Guest\AuthController as GuestAuthController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,21 +17,44 @@ Route::middleware('track.visits')->group(function () {
     Route::get('/gallery', [HomeController::class, 'gallery'])->name('gallery');
     Route::get('/gallery/category/{category}', [HomeController::class, 'galleryByCategory'])->name('gallery.category');
     Route::get('/gallery/{id}', [HomeController::class, 'galleryDetail'])->name('gallery.detail');
-    // Likes & Comments (public)
-    Route::post('/gallery/{id}/like', [HomeController::class, 'likeGallery'])->name('gallery.like');
-    Route::post('/gallery/{id}/unlike', [HomeController::class, 'unlikeGallery'])->name('gallery.unlike');
-    Route::post('/gallery/{id}/comment', [HomeController::class, 'commentGallery'])->name('gallery.comment');
     Route::get('/gallery/download/{id}', [HomeController::class, 'download'])->name('gallery.download');
     Route::get('/news', [HomeController::class, 'news'])->name('news');
     Route::get('/news/{slug}', [HomeController::class, 'newsDetail'])->name('news.detail');
-    Route::post('/news/{slug}/comment', [HomeController::class, 'commentNews'])->name('news.comment');
     Route::get('/about', [HomeController::class, 'about'])->name('about');
     Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 });
 
-// Alias login untuk default Laravel
+// Protected Routes (require login)
+Route::middleware(['auth', 'track.visits'])->group(function () {
+    // Gallery interactions
+    Route::post('/gallery/{id}/like', [HomeController::class, 'likeGallery'])->name('gallery.like');
+    Route::post('/gallery/{id}/unlike', [HomeController::class, 'unlikeGallery'])->name('gallery.unlike');
+    Route::post('/gallery/{id}/comment', [HomeController::class, 'commentGallery'])->name('gallery.comment');
+    
+    // News interactions
+    Route::post('/news/{slug}/comment', [HomeController::class, 'commentNews'])->name('news.comment');
+    
+    // Contact form submission
+    Route::post('/contact', [HomeController::class, 'contactSubmit'])->name('contact.submit');
+});
+
+// Guest Authentication Routes
+Route::prefix('guest')->name('guest.')->group(function () {
+    Route::middleware('guest')->group(function () {
+        Route::get('/login', [GuestAuthController::class, 'showLoginForm'])->name('login');
+        Route::post('/login', [GuestAuthController::class, 'login'])->name('login.submit');
+        Route::get('/register', [GuestAuthController::class, 'showRegisterForm'])->name('register');
+        Route::post('/register', [GuestAuthController::class, 'register'])->name('register.submit');
+    });
+    
+    Route::middleware('auth')->group(function () {
+        Route::post('/logout', [GuestAuthController::class, 'logout'])->name('logout');
+    });
+});
+
+// Alias login untuk default Laravel (redirect ke guest login)
 Route::get('/login', function () {
-    return redirect()->route('admin.login');
+    return redirect()->route('guest.login');
 })->name('login');
 
 // Admin Routes

@@ -31,27 +31,34 @@
                             </span>
                         </div>
                         <div class="flex space-x-4 items-center">
-                            @php
-                                $fp = request()->cookie('visitor_fingerprint') ?? request()->ip() . '|' . substr(hash('sha256', (string) request()->userAgent()), 0, 16);
-                                $alreadyLiked = $gallery->likes->firstWhere('visitor_fingerprint', $fp);
-                            @endphp
-                            @if($alreadyLiked)
-                                <form action="{{ route('gallery.unlike', $gallery->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="inline-flex items-center text-pink-600 hover:text-pink-700">
-                                        <i class="fas fa-heart mr-1"></i>
-                                        <span>Batalkan</span>
-                                    </button>
-                                </form>
+                            @auth
+                                @php
+                                    $fp = request()->cookie('visitor_fingerprint') ?? request()->ip() . '|' . substr(hash('sha256', (string) request()->userAgent()), 0, 16);
+                                    $alreadyLiked = $gallery->likes->firstWhere('visitor_fingerprint', $fp);
+                                @endphp
+                                @if($alreadyLiked)
+                                    <form action="{{ route('gallery.unlike', $gallery->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="inline-flex items-center text-pink-600 hover:text-pink-700">
+                                            <i class="fas fa-heart mr-1"></i>
+                                            <span>Batalkan</span>
+                                        </button>
+                                    </form>
+                                @else
+                                    <form action="{{ route('gallery.like', $gallery->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="inline-flex items-center text-gray-500 hover:text-pink-700">
+                                            <i class="far fa-heart mr-1"></i>
+                                            <span>Suka</span>
+                                        </button>
+                                    </form>
+                                @endif
                             @else
-                                <form action="{{ route('gallery.like', $gallery->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="inline-flex items-center text-gray-500 hover:text-pink-700">
-                                        <i class="far fa-heart mr-1"></i>
-                                        <span>Suka</span>
-                                    </button>
-                                </form>
-                            @endif
+                                <a href="{{ route('guest.login') }}" class="inline-flex items-center text-gray-500 hover:text-pink-700">
+                                    <i class="far fa-heart mr-1"></i>
+                                    <span>Suka</span>
+                                </a>
+                            @endauth
                             <a href="{{ asset('storage/' . $gallery->image) }}" 
                                class="text-blue-600 hover:text-blue-800" download>
                                 <i class="fas fa-download"></i> Unduh
@@ -71,18 +78,32 @@
             <div id="comments" class="mt-10">
                 <h3 class="text-2xl font-bold text-gray-900 mb-4">Komentar</h3>
 
-                <div class="bg-white rounded-xl shadow p-6 mb-6">
-                    <form action="{{ route('gallery.comment', $gallery->id) }}" method="POST" class="space-y-4">
-                        @csrf
-                        <div>
-                            <label class="block text-sm text-gray-700 mb-1">Komentar</label>
-                            <textarea name="content" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"></textarea>
+                @auth
+                    <div class="bg-white rounded-xl shadow p-6 mb-6">
+                        <form action="{{ route('gallery.comment', $gallery->id) }}" method="POST" class="space-y-4">
+                            @csrf
+                            <div>
+                                <label class="block text-sm text-gray-700 mb-1">Komentar</label>
+                                <textarea name="content" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"></textarea>
+                            </div>
+                            <div class="text-right">
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Kirim Komentar</button>
+                            </div>
+                        </form>
+                    </div>
+                @else
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
+                        <div class="text-center">
+                            <i class="fas fa-lock text-blue-500 text-2xl mb-3"></i>
+                            <h4 class="text-lg font-semibold text-blue-800 mb-2">Login Diperlukan</h4>
+                            <p class="text-blue-600 mb-4">Silakan login terlebih dahulu untuk dapat memberikan komentar.</p>
+                            <a href="{{ route('guest.login') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-sign-in-alt mr-2"></i>
+                                Login Sekarang
+                            </a>
                         </div>
-                        <div class="text-right">
-                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Kirim Komentar</button>
-                        </div>
-                    </form>
-                </div>
+                    </div>
+                @endauth
 
                 <div class="space-y-4">
                     @forelse($gallery->comments as $comment)

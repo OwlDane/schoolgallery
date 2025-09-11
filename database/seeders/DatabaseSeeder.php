@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         // Jalankan seeder dengan urutan yang benar
         $this->call([
             AdminSeeder::class,          // Buat admin terlebih dahulu
+            UserSeeder::class,           // Buat user guest
             KategoriSeeder::class,       // Buat kategori gallery
             NewsCategorySeeder::class,   // Buat kategori berita
             SchoolProfileSeeder::class,  // Terakhir buat profil sekolah
@@ -30,5 +31,7 @@ class DatabaseSeeder extends Seeder
         $this->command->info('Database telah diisi dengan data contoh!');
         $this->command->info('Email admin: admin@sekolah.com');
         $this->command->info('Password admin: password123');
+        $this->command->info('Email guest: john@example.com, jane@example.com, admin@example.com');
+        $this->command->info('Password guest: password123');
     }
 }

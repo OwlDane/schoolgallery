@@ -203,6 +203,21 @@ class HomeController extends Controller
         return view('contact', compact('schoolProfile'));
     }
 
+    public function contactSubmit(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|max:100',
+            'subject' => 'required|string|max:200',
+            'message' => 'required|string|max:1000',
+        ]);
+
+        // Here you can add logic to send email or save to database
+        // For now, just return success message
+        
+        return back()->with('success', 'Pesan Anda telah terkirim. Terima kasih telah menghubungi kami!');
+    }
+
     /**
      * Download a gallery image
      *

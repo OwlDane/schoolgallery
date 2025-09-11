@@ -56,34 +56,49 @@
                     <h2 class="text-3xl font-bold mb-6 text-gray-800">Kirim Pesan</h2>
                     <p class="text-gray-600 mb-8">Silakan isi formulir di bawah ini untuk mengirimkan pesan, pertanyaan, atau saran kepada kami. Tim kami akan merespons secepatnya.</p>
                     
-                    <form class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                                <input type="text" id="name" name="name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300">
+                    @auth
+                        <form action="{{ route('contact.submit') }}" method="POST" class="space-y-6">
+                            @csrf
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                                    <input type="text" id="name" name="name" value="{{ Auth::user()->name }}" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300">
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    <input type="email" id="email" name="email" value="{{ Auth::user()->email }}" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300">
+                                </div>
                             </div>
+                            
                             <div>
-                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                <input type="email" id="email" name="email" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300">
+                                <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subjek</label>
+                                <input type="text" id="subject" name="subject" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300">
+                            </div>
+                            
+                            <div>
+                                <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Pesan</label>
+                                <textarea id="message" name="message" rows="5" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"></textarea>
+                            </div>
+                            
+                            <div>
+                                <button type="submit" class="btn-hover bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg flex items-center">
+                                    <i class="fas fa-paper-plane mr-2"></i> Kirim Pesan
+                                </button>
+                            </div>
+                        </form>
+                    @else
+                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-8">
+                            <div class="text-center">
+                                <i class="fas fa-lock text-blue-500 text-3xl mb-4"></i>
+                                <h4 class="text-xl font-semibold text-blue-800 mb-3">Login Diperlukan</h4>
+                                <p class="text-blue-600 mb-6">Silakan login terlebih dahulu untuk dapat mengirimkan pesan kepada kami.</p>
+                                <a href="{{ route('guest.login') }}" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                                    <i class="fas fa-sign-in-alt mr-2"></i>
+                                    Login Sekarang
+                                </a>
                             </div>
                         </div>
-                        
-                        <div>
-                            <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subjek</label>
-                            <input type="text" id="subject" name="subject" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300">
-                        </div>
-                        
-                        <div>
-                            <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Pesan</label>
-                            <textarea id="message" name="message" rows="5" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"></textarea>
-                        </div>
-                        
-                        <div>
-                            <button type="submit" class="btn-hover bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg flex items-center">
-                                <i class="fas fa-paper-plane mr-2"></i> Kirim Pesan
-                            </button>
-                        </div>
-                    </form>
+                    @endauth
                 </div>
                 
                 <div class="lg:w-1/2" data-aos="fade-left">
