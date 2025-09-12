@@ -14,6 +14,9 @@ use App\Http\Controllers\Guest\InteractionController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\UserProfileController;
+use Illuminate\Support\Facades\URL;
+use App\Http\Controllers\SitemapController;
 
 // Public Routes (tracked visits)
 Route::middleware('track.visits')->group(function () {
@@ -63,6 +66,10 @@ Route::middleware(['auth', 'track.visits'])->group(function () {
     
     // Contact form submission
     Route::post('/contact', [HomeController::class, 'contactSubmit'])->name('contact.submit');
+
+    // User profile
+    Route::get('/profile', [UserProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [UserProfileController::class, 'update'])->name('profile.update');
 });
 
 // Guest Authentication Routes
@@ -159,9 +166,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('reports/export-content-stats', [ReportController::class, 'exportContentStats'])->name('reports.export-content-stats.quick');
         Route::post('reports/export-admin-activity', [ReportController::class, 'exportAdminActivity'])->name('reports.export-admin-activity');
         Route::get('reports/export-admin-activity', [ReportController::class, 'exportAdminActivity'])->name('reports.export-admin-activity.quick');
+
+        // Activity logs (read-only)
+        Route::get('activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity.index');
     });
 
 });
 
 // Chatbot endpoint
 Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
+
+// Sitemap
+Route::get('/sitemap.xml', [SitemapController::class, 'index']);

@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $schoolProfile->school_name ?? 'Galeri Sekolah' }}</title>
+    <title>@yield('meta_title', $schoolProfile->school_name ?? 'Galeri Sekolah')</title>
+    @include('layouts.seo')
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
@@ -169,11 +170,15 @@
     <!-- Navigation -->
     <nav class="bg-white shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
+            <div class="flex items-center justify-between h-16">
+                <!-- Left: School brand -->
+                <div class="flex items-center flex-1">
                     <a href="{{ route('home') }}" class="flex items-center">
                         @if($schoolProfile->school_logo)
-                            <img src="{{ asset('storage/' . $schoolProfile->school_logo) }}" alt="Logo" class="h-10 w-auto mr-3">
+                            <picture class="mr-3">
+                                <source srcset="{{ asset('storage/' . preg_replace('/\.(png|jpg|jpeg)$/i', '.webp', $schoolProfile->school_logo)) }}" type="image/webp">
+                                <img data-src="{{ asset('storage/' . $schoolProfile->school_logo) }}" loading="lazy" alt="Logo {{ $schoolProfile->school_name }}" class="h-10 w-auto">
+                            </picture>
                         @else
                             <div class="bg-blue-600 text-white p-2 rounded-lg mr-3">
                                 <i class="fas fa-school text-xl"></i>
@@ -186,13 +191,14 @@
                     </a>
                 </div>
                 
-                <div class="hidden md:flex items-center space-x-4">
-                    <a href="{{ route('home') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all"><i class="fas fa-home mr-2 text-blue-500"></i> Beranda</a>
+                <!-- Center: Main nav -->
+                <div class="hidden md:flex items-center space-x-4 justify-center flex-1">
+                    <a href="{{ route('home') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center gap-2"><i class="fas fa-home text-blue-500"></i><span>Beranda</span></a>
 
                     @php($newsCategories = \App\Models\NewsCategory::active()->ordered()->get())
                     <div class="relative group">
-                        <button id="newsDropdownBtn" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center">
-                            <i class="fas fa-newspaper mr-2 text-blue-500"></i> Berita
+                        <button id="newsDropdownBtn" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center gap-2">
+                            <i class="fas fa-newspaper text-blue-500"></i><span>Berita</span>
                             <i class="fas fa-chevron-down ml-1 text-xs"></i>
                         </button>
                         @if($newsCategories->isNotEmpty())
@@ -206,29 +212,21 @@
                         @endif
                     </div>
 
-                    <a href="{{ route('gallery') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all"><i class="fas fa-images mr-2 text-blue-500"></i> Galeri</a>
-                    <a href="{{ route('about') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all"><i class="fas fa-info-circle mr-2 text-blue-500"></i> Tentang</a>
-                    <a href="{{ route('contact') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all"><i class="fas fa-envelope mr-2 text-blue-500"></i> Kontak</a>
+                    <a href="{{ route('gallery') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center gap-2"><i class="fas fa-images text-blue-500"></i><span>Galeri</span></a>
+                    <a href="{{ route('about') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center gap-2"><i class="fas fa-info-circle text-blue-500"></i><span>Tentang</span></a>
+                    <a href="{{ route('contact') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center gap-2"><i class="fas fa-envelope text-blue-500"></i><span>Kontak</span></a>
                     
-                    <!-- Guest Authentication -->
+                </div>
+
+                <!-- Right: Profile/Login -->
+                <div class="hidden md:flex items-center justify-end flex-1">
                     @auth
-                        <div class="relative group">
-                            <button class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center">
-                                <i class="fas fa-user mr-2 text-blue-500"></i> {{ Auth::user()->name }}
-                                <i class="fas fa-chevron-down ml-1 text-xs"></i>
-                            </button>
-                            <div class="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-200 absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-lg shadow-lg py-2 z-50">
-                                <form action="{{ route('guest.logout') }}" method="POST" class="block">
-                                    @csrf
-                                    <button type="submit" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50">
-                                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
+                        <a href="{{ route('profile.edit') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center gap-2">
+                            <i class="fas fa-user text-blue-500"></i><span>{{ Auth::user()->name }}</span>
+                        </a>
                     @else
-                        <a href="{{ route('guest.login') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all">
-                            <i class="fas fa-sign-in-alt mr-2 text-blue-500"></i> Login
+                        <a href="{{ route('guest.login') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center gap-2">
+                            <i class="fas fa-sign-in-alt text-blue-500"></i><span>Login</span>
                         </a>
                     @endauth
                 </div>
@@ -265,15 +263,9 @@
                 <!-- Guest Authentication Mobile -->
                 @auth
                     <div class="border-t border-gray-200 pt-2 mt-2">
-                        <div class="px-3 py-2 text-gray-700">
-                            <i class="fas fa-user mr-2 text-blue-500"></i> {{ Auth::user()->name }}
-                        </div>
-                        <form action="{{ route('guest.logout') }}" method="POST" class="block">
-                            @csrf
-                            <button type="submit" class="w-full text-left py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all">
-                                <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                            </button>
-                        </form>
+                        <a href="{{ route('profile.edit') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all">
+                            <i class="fas fa-user-edit mr-2"></i> Profil
+                        </a>
                     </div>
                 @else
                     <div class="border-t border-gray-200 pt-2 mt-2">

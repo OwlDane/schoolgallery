@@ -62,9 +62,9 @@
                             <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 card-shine" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
                                 <div class="relative">
                                 @if($item->image)
-                                    <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->title }}" class="w-full h-48 object-cover">
+                                    <img data-src="{{ asset('storage/' . $item->image) }}" loading="lazy" alt="{{ $item->title }}" class="w-full h-48 object-cover">
                                 @else
-                                    <img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="{{ $item->title }}" class="w-full h-48 object-cover">
+                                    <img data-src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" loading="lazy" alt="{{ $item->title }}" class="w-full h-48 object-cover">
                                 @endif
                                 <div class="absolute top-4 right-4">
                                     <span class="bg-blue-600 text-white text-xs px-3 py-1 rounded-full">

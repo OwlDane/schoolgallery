@@ -71,6 +71,19 @@
         });
     });
     
+    // Lazyload images
+    document.addEventListener('DOMContentLoaded', function(){
+        const imgs = document.querySelectorAll('img[data-src]');
+        const observer = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting){
+                    const img = entry.target; img.src = img.getAttribute('data-src'); img.removeAttribute('data-src'); observer.unobserve(img);
+                }
+            });
+        }) : null;
+        imgs.forEach(img => { if(observer){ observer.observe(img);} else { img.src = img.getAttribute('data-src'); img.removeAttribute('data-src'); } });
+    });
+
     // Initialize Swiper if elements exist
     if (document.querySelector('.swiper-container')) {
         const swiper = new Swiper('.swiper-container', {
@@ -175,24 +188,29 @@
     .sg-chatbot-bubble.user{margin-left:auto;background:#e5edff;color:#1e3a8a}
     .sg-chatbot-bubble.bot{margin-right:auto;background:#fff;border:1px solid #e5e7eb;color:#111827}
     .sg-chatbot-spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(37,99,235,.2);border-top-color:#2563eb;border-radius:50%;animation:sgspin 1s linear infinite}
+    .sg-typing{display:inline-flex;align-items:center;gap:6px}
+    .sg-dot{width:6px;height:6px;background:#6b7280;border-radius:50%;opacity:.5;animation:sgblink 1.2s infinite}
+    .sg-dot:nth-child(2){animation-delay:.2s}
+    .sg-dot:nth-child(3){animation-delay:.4s}
+    @keyframes sgblink{0%,80%,100%{opacity:.2}40%{opacity:1}}
     @keyframes sgspin{to{transform:rotate(360deg)}}
 </style>
-<button id="sg-chatbot-toggle" aria-label="Buka Chatbot" class="sg-chatbot-button">
+<button id="sg-chatbot-toggle" aria-label="Buka Pinjep" class="sg-chatbot-button">
     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
 </button>
 <div id="sg-chatbot" class="sg-chatbot-panel">
     <div class="sg-chatbot-header">
         <div style="display:flex;align-items:center;gap:8px">
-            <span style="display:inline-flex;width:26px;height:26px;border-radius:50%;background:#fff;color:#2563eb;align-items:center;justify-content:center;font-weight:700">AI</span>
+            <span style="display:inline-flex;width:26px;height:26px;border-radius:50%;background:#fff;color:#2563eb;align-items:center;justify-content:center;font-weight:700">P</span>
             <div>
-                <div style="font-weight:700;font-size:14px">Asisten Galeri Sekolah</div>
-                <div style="font-size:12px;opacity:.9">Tanya seputar situs & pendidikan</div>
+                <div style="font-weight:700;font-size:14px">Pinjep</div>
+                <div style="font-size:12px;opacity:.9">Asisten SMKN 4 Bogor & pendidikan</div>
             </div>
         </div>
         <button id="sg-chatbot-close" style="background:transparent;border:none;color:#fff;cursor:pointer">✕</button>
     </div>
     <div id="sg-chatbot-msgs" class="sg-chatbot-messages">
-        <div class="sg-chatbot-bubble bot">Halo! Ada yang bisa saya bantu?</div>
+        <div class="sg-chatbot-bubble bot">Halo, saya Pinjep! Tanya apa saja seputar SMKN 4 Bogor atau pendidikan ya 😊</div>
     </div>
     <form id="sg-chatbot-form" class="sg-chatbot-input">
         <input id="sg-chatbot-input" type="text" placeholder="Ketik pertanyaan Anda..." autocomplete="off" required />
@@ -218,7 +236,14 @@
             const tpl=role==='user'?tplUser:tplBot; const el=tpl.content.firstElementChild.cloneNode(true); el.textContent=text; msgs.appendChild(el); scrollToBottom();
         }
         function setLoading(on){
-            if(on){ const wrap=document.createElement('div'); wrap.className='sg-chatbot-bubble bot'; wrap.id='sg-loading'; wrap.innerHTML='<span class="sg-chatbot-spinner"></span>'; msgs.appendChild(wrap); scrollToBottom(); }
+            if(on){
+                const wrap=document.createElement('div');
+                wrap.className='sg-chatbot-bubble bot';
+                wrap.id='sg-loading';
+                wrap.innerHTML='<span class="sg-typing"><span class="sg-dot"></span><span class="sg-dot"></span><span class="sg-dot"></span></span>';
+                msgs.appendChild(wrap);
+                scrollToBottom();
+            }
             else { const w=document.getElementById('sg-loading'); if(w) w.remove(); }
         }
 
@@ -231,7 +256,14 @@
                 const res=await fetch('{{ route('chatbot.ask') }}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':document.querySelector('meta[name=csrf-token]').getAttribute('content')},body:JSON.stringify({message:text,context:history})});
                 const data=await res.json();
                 setLoading(false);
-                if(data && data.success){ addMsg('bot',data.answer); history.push({role:'user',content:text}); history.push({role:'assistant',content:data.answer}); }
+                if(data && data.success){
+                    // Rapikan: hilangkan markdown tebal/miring sederhana
+                    let answer = data.answer || '';
+                    answer = answer.replace(/\*\*(.*?)\*\*/g,'$1').replace(/_(.*?)_/g,'$1');
+                    addMsg('bot', answer);
+                    history.push({role:'user',content:text});
+                    history.push({role:'assistant',content:answer});
+                }
                 else{ addMsg('bot', (data && data.error) ? data.error : 'Maaf, terjadi kesalahan.'); }
             }catch(err){ setLoading(false); addMsg('bot','Tidak dapat terhubung ke server.'); }
         });

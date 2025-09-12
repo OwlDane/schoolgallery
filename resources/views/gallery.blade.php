@@ -183,10 +183,9 @@
                              data-aos="fade-up" data-aos-delay="{{ $loop->index % 4 * 100 }}">
                             <a href="{{ route('gallery.detail', $gallery->id) }}" class="block image-container focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-none">
                                 @if($gallery->image)
-                                    <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}">
+                                    <img data-src="{{ asset('storage/' . $gallery->image) }}" loading="lazy" alt="{{ $gallery->title }}">
                                 @else
-                                    <img src="https://images.unsplash.com/photo-1588072432836-e10032774350?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
-                                         alt="{{ $gallery->title }}">
+                                    <img data-src="https://images.unsplash.com/photo-1588072432836-e10032774350?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" loading="lazy" alt="{{ $gallery->title }}">
                                 @endif
                             </a>
                             <div class="p-4">

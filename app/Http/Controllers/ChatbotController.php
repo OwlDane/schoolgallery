@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use App\Services\PinjepConfig;
 
 class ChatbotController extends Controller
 {
@@ -27,7 +28,10 @@ class ChatbotController extends Controller
         $history = $request->input('context', []);
 
         $messages = [
-            [ 'role' => 'system', 'content' => 'You are an assistant for a school gallery website. Answer briefly and helpfully about this site and general education.' ],
+            [ 'role' => 'system', 'content' => PinjepConfig::systemPrompt() ],
+            // Few-shot to shape tone
+            [ 'role' => 'user', 'content' => 'Apa jurusan di SMKN 4 Bogor?' ],
+            [ 'role' => 'assistant', 'content' => 'Ada empat: Teknik Otomotif (TO), Teknik Pengelasan & Fabrikasi Logam (TPL), Teknik Jaringan Komputer & Telekomunikasi (TJKT), dan Pengembangan Perangkat Lunak & Gim (PPLG). Mau bahas salah satunya?' ],
         ];
         foreach ($history as $turn) {
             if (isset($turn['role'], $turn['content'])) {
@@ -37,10 +41,12 @@ class ChatbotController extends Controller
         $messages[] = [ 'role' => 'user', 'content' => $userMessage ];
 
         try {
-            $endpoint = config('services.qwen.endpoint', 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions');
+            // Default ke OpenRouter jika tidak di-set di config
+            $endpoint = config('services.qwen.endpoint', 'https://openrouter.ai/api/v1/chat/completions');
 
             $payload = [
-                'model' => config('services.qwen.model', 'qwen-plus'),
+                // Default model diset ke DeepSeek R1 (free) di OpenRouter
+                'model' => config('services.qwen.model', 'deepseek/deepseek-r1-0528:free'),
                 'messages' => $messages,
                 'temperature' => 0.2,
                 'max_tokens' => 512,
@@ -60,13 +66,30 @@ class ChatbotController extends Controller
             $response = Http::withHeaders($headers)->post($endpoint, $payload);
 
             if (!$response->successful()) {
-                Log::warning('Qwen API error', [
-                    'status' => $response->status(),
-                    'body' => $response->body(),
+                $status = $response->status();
+                $body = $response->body();
+                Log::warning('OpenRouter/Qwen API error', [
+                    'status' => $status,
+                    'body' => $body,
+                    'endpoint' => $endpoint,
+                    'model' => $payload['model'] ?? null,
                 ]);
+                // Pesan error yang lebih ramah untuk kasus umum
+                if ($status === 401) {
+                    return response()->json([
+                        'success' => false,
+                        'error' => 'Kunci API OpenRouter/Qwen tidak valid atau tidak diterima. Periksa QWEN_API_KEY di .env.',
+                    ], 502);
+                }
+                if ($status === 400 && str_contains(strtolower($body), 'not a valid model')) {
+                    return response()->json([
+                        'success' => false,
+                        'error' => 'ID model tidak valid. Periksa variabel QWEN_MODEL di .env dan gunakan model yang tersedia di OpenRouter.',
+                    ], 502);
+                }
                 return response()->json([
                     'success' => false,
-                    'error' => 'Gagal mengambil respon dari AI. Coba lagi nanti.',
+                    'error' => 'Pinjep lagi sibuk/terputus koneksi. Coba lagi sebentar ya.',
                 ], 502);
             }
 
@@ -87,7 +110,7 @@ class ChatbotController extends Controller
             Log::error('Chatbot ask error', [ 'error' => $e->getMessage() ]);
             return response()->json([
                 'success' => false,
-                'error' => 'Terjadi kesalahan. Coba lagi nanti.',
+                'error' => 'Pinjep lagi ada kendala. Coba beberapa saat lagi.',
             ], 500);
         }
     }
