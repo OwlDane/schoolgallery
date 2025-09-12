@@ -134,6 +134,7 @@ class InteractionController extends Controller
                 'content' => $comment->content,
                 'depth' => $comment->depth,
                 'created_at' => $comment->created_at->format('d M Y H:i'),
+                'created_at_iso' => $comment->created_at->toIso8601String(),
                 'is_reply' => $comment->parent_id ? true : false
             ]
         ]);
@@ -153,6 +154,7 @@ class InteractionController extends Controller
                 'content' => $comment->content,
                 'depth' => $comment->depth,
                 'created_at' => $comment->created_at->format('d M Y H:i'),
+                'created_at_iso' => $comment->created_at->toIso8601String(),
                 'replies' => $comment->replies->map(function ($reply) {
                     return [
                         'id' => $reply->id,
@@ -160,6 +162,7 @@ class InteractionController extends Controller
                         'content' => $reply->content,
                         'depth' => $reply->depth,
                         'created_at' => $reply->created_at->format('d M Y H:i'),
+                        'created_at_iso' => $reply->created_at->toIso8601String(),
                     ];
                 })
             ];
@@ -341,6 +344,7 @@ class InteractionController extends Controller
                 'content' => $comment->content,
                 'depth' => $comment->depth,
                 'created_at' => $comment->created_at->format('d M Y H:i'),
+                'created_at_iso' => $comment->created_at->toIso8601String(),
                 'is_reply' => $comment->parent_id ? true : false
             ]
         ]);
@@ -360,6 +364,7 @@ class InteractionController extends Controller
                 'content' => $comment->content,
                 'depth' => $comment->depth,
                 'created_at' => $comment->created_at->format('d M Y H:i'),
+                'created_at_iso' => $comment->created_at->toIso8601String(),
                 'replies' => $comment->replies->map(function ($reply) {
                     return [
                         'id' => $reply->id,
@@ -367,6 +372,7 @@ class InteractionController extends Controller
                         'content' => $reply->content,
                         'depth' => $reply->depth,
                         'created_at' => $reply->created_at->format('d M Y H:i'),
+                        'created_at_iso' => $reply->created_at->toIso8601String(),
                     ];
                 })
             ];

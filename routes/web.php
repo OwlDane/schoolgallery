@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\SchoolProfileController;
+use App\Http\Controllers\Admin\EventsController;
 use App\Http\Controllers\Admin\AdminManagementController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Guest\AuthController as GuestAuthController;
@@ -128,6 +129,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('news', NewsController::class);
         Route::patch('news/{news}/toggle-publish', [NewsController::class, 'togglePublish'])->name('news.toggle-publish');
         Route::delete('news/{news}/remove-image', [NewsController::class, 'removeImage'])->name('news.remove-image');
+
+        // Events Management
+        Route::resource('events', EventsController::class)->except(['show']);
+        Route::patch('events/{event}/toggle-publish', [EventsController::class, 'togglePublish'])->name('events.toggle-publish');
 
         // School Profile Management (Super Admin Only)
         Route::middleware('admin.role:super_admin')->group(function () {

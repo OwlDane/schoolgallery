@@ -7,6 +7,7 @@ use App\Models\GalleryLike;
 use App\Models\GalleryComment;
 use App\Models\News;
 use App\Models\NewsCategory;
+use App\Models\Event;
 use App\Models\NewsComment;
 use App\Models\SchoolProfile;
 use Illuminate\Http\Request;
@@ -126,8 +127,9 @@ class HomeController extends Controller
         $news = $query->paginate(10);
         $schoolProfile = SchoolProfile::getProfile();
         $categories = NewsCategory::active()->ordered()->get();
+        $upcomingEvents = Event::published()->upcoming()->orderBy('start_at')->take(5)->get();
 
-        return view('news', compact('news', 'schoolProfile', 'categories'));
+        return view('news', compact('news', 'schoolProfile', 'categories', 'upcomingEvents'));
     }
 
     public function newsDetail($slug)
@@ -139,8 +141,9 @@ class HomeController extends Controller
             ->take(4)
             ->get();
         $schoolProfile = SchoolProfile::getProfile();
+        $upcomingEvents = Event::published()->upcoming()->orderBy('start_at')->take(5)->get();
 
-        return view('news-detail', compact('news', 'relatedNews', 'schoolProfile'));
+        return view('news-detail', compact('news', 'relatedNews', 'schoolProfile', 'upcomingEvents'));
     }
 
     public function commentNews(Request $request, $slug)

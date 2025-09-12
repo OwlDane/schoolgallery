@@ -19,10 +19,11 @@
         </div>
     </section>
 
-    <!-- News Content -->
+    <!-- News Content + Sidebar -->
     <section class="py-12 bg-white">
-        <div class="max-w-4xl mx-auto px-4">
-            <div class="bg-white rounded-xl overflow-hidden shadow-lg mb-8" data-aos="fade-up">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-8 bg-white rounded-xl overflow-hidden shadow-lg mb-8" data-aos="fade-up">
                 @if($news->image)
                     <img src="{{ asset('storage/' . $news->image) }}" alt="{{ $news->title }}" class="w-full h-auto object-cover">
                 @else
@@ -46,7 +47,7 @@
             <!-- Comments Section -->
             <div id="comments" class="mt-10">
                 <h3 class="text-2xl font-bold text-gray-900 mb-4">Komentar</h3>
-
+                
                 @auth
                     <!-- Comment Form - Only for authenticated users -->
                     <div class="bg-white rounded-xl shadow p-6 mb-6">
@@ -91,7 +92,7 @@
                 <!-- Comments List -->
                 <div id="newsCommentsList" class="space-y-4">
                     <!-- Comments will be loaded here via JavaScript -->
-                </div>
+                            </div>
 
                 <!-- Loading indicator -->
                 <div id="newsCommentsLoading" class="text-center py-4">
@@ -115,6 +116,31 @@
                 <a href="#" class="bg-blue-800 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-blue-900 transition-colors">
                     <i class="fab fa-linkedin-in"></i>
                 </a>
+            </div>
+
+            <aside class="lg:col-span-4">
+                <div class="bg-white rounded-xl shadow-lg p-6 sticky top-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center"><i class="fas fa-calendar-alt text-blue-600 mr-2"></i> Acara Mendatang</h3>
+                    @if(isset($upcomingEvents) && $upcomingEvents->isNotEmpty())
+                        <ul class="space-y-4">
+                            @foreach($upcomingEvents as $event)
+                                <li class="border border-gray-100 rounded-lg p-4 hover:shadow-sm transition">
+                                    <p class="text-sm text-gray-500 mb-1">
+                                        <i class="far fa-clock mr-1"></i>
+                                        <span class="timeago" data-time="{{ $event->start_at->toIso8601String() }}">{{ $event->start_at->format('d M Y H:i') }}</span>
+                                    </p>
+                                    <p class="font-semibold text-gray-800">{{ $event->title }}</p>
+                                    @if($event->location)
+                                        <p class="text-xs text-gray-500"><i class="fas fa-map-marker-alt mr-1"></i>{{ $event->location }}</p>
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <p class="text-gray-500">Belum ada acara mendatang.</p>
+                    @endif
+                </div>
+            </aside>
             </div>
         </div>
     </section>
@@ -226,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                         <div>
                             <p class="font-semibold text-gray-800">${comment.name}</p>
-                            <p class="text-xs text-gray-500">${comment.created_at}</p>
+                            <p class="text-xs text-gray-500"><span class="timeago" data-time="${comment.created_at_iso}">${comment.created_at}</span></p>
                         </div>
                     </div>
                     ${isAuthenticated ? `
@@ -249,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </div>
                                     <div>
                                         <p class="font-medium text-gray-800 text-sm">${reply.name}</p>
-                                        <p class="text-xs text-gray-500">${reply.created_at}</p>
+                                        <p class="text-xs text-gray-500"><span class="timeago" data-time="${reply.created_at_iso}">${reply.created_at}</span></p>
                                     </div>
                                 </div>
                                 <p class="text-gray-700 text-sm ml-11">${reply.content}</p>
@@ -259,6 +285,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 ` : ''}
             </div>
         `).join('');
+
+        updateRelativeTimes();
     }
     
     // Submit news comment
@@ -337,5 +365,49 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
 });
+</script>
+<script>
+// Lightweight relative time updater without external libs
+function updateRelativeTimes() {
+    const elements = document.querySelectorAll('.timeago[data-time]');
+    const now = new Date();
+    elements.forEach(el => {
+        const iso = el.getAttribute('data-time');
+        if (!iso) return;
+        const date = new Date(iso);
+        const seconds = Math.floor((now - date) / 1000);
+        const rtf = new Intl.RelativeTimeFormat('id', { numeric: 'auto' });
+
+        const divisions = [
+            { amount: 60, name: 'second' },
+            { amount: 60, name: 'minute' },
+            { amount: 24, name: 'hour' },
+            { amount: 7, name: 'day' },
+            { amount: 4.34524, name: 'week' },
+            { amount: 12, name: 'month' },
+            { amount: Number.POSITIVE_INFINITY, name: 'year' }
+        ];
+
+        let duration = Math.abs(seconds);
+        let unit = 'second';
+        let value = -seconds; // past times should be negative for rtf
+
+        for (let i = 0; i < divisions.length; i++) {
+            const division = divisions[i];
+            if (duration < division.amount) {
+                unit = division.name;
+                break;
+            }
+            duration /= division.amount;
+            value = value / division.amount;
+        }
+
+        const rounded = Math.round(value);
+        el.textContent = rtf.format(rounded, unit);
+        el.title = date.toLocaleString('id-ID');
+    });
+}
+
+setInterval(updateRelativeTimes, 60000);
 </script>
 @endpush

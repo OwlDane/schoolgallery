@@ -65,6 +65,9 @@
                 <a href="{{ route('admin.news.index') }}" class="sidebar-item flex items-center px-4 py-3 mb-2 {{ request()->routeIs('admin.news.*') ? 'active' : '' }}">
                     <i class="fas fa-newspaper mr-3 w-5 text-center"></i> Berita
                 </a>
+                <a href="{{ route('admin.events.index') }}" class="sidebar-item flex items-center px-4 py-3 mb-2 {{ request()->routeIs('admin.events.*') ? 'active' : '' }}">
+                    <i class="fas fa-calendar-alt mr-3 w-5 text-center"></i> Acara
+                </a>
                 <a href="{{ route('admin.galleries.index') }}" class="sidebar-item flex items-center px-4 py-3 mb-2 {{ request()->routeIs('admin.galleries.*') ? 'active' : '' }}">
                     <i class="fas fa-images mr-3 w-5 text-center"></i> Galeri
                 </a>

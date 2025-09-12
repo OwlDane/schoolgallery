@@ -42,7 +42,7 @@
                                     <i class="{{ $userLiked ? 'fas' : 'far' }} fa-heart mr-2"></i>
                                     <span id="likeText" class="font-medium">{{ $userLiked ? 'Batalkan' : 'Suka' }}</span>
                                     <span id="likeCount" class="ml-2 text-sm bg-gray-100 px-2 py-1 rounded-full">({{ $gallery->likes->count() }})</span>
-                                </button>
+                                        </button>
                             @else
                                 <a href="{{ route('guest.login') }}" class="inline-flex items-center text-gray-500 hover:text-pink-700 transition-colors px-3 py-2 rounded-lg hover:bg-pink-50">
                                     <i class="far fa-heart mr-2"></i>
@@ -115,7 +115,7 @@
                 <!-- Comments List -->
                 <div id="commentsList" class="space-y-4">
                     <!-- Comments will be loaded here via JavaScript -->
-                </div>
+                            </div>
 
                 <!-- Loading indicator -->
                 <div id="commentsLoading" class="text-center py-4">
@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                         <div class="min-w-0 flex-1">
                             <p class="font-semibold text-gray-800 truncate">${comment.name}</p>
-                            <p class="text-xs text-gray-500">${comment.created_at}</p>
+                            <p class="text-xs text-gray-500"><span class="timeago" data-time="${comment.created_at_iso}">${comment.created_at}</span></p>
                         </div>
                     </div>
                     ${isAuthenticated ? `
@@ -353,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </div>
                                     <div class="min-w-0 flex-1">
                                         <p class="font-medium text-gray-800 text-sm truncate">${reply.name}</p>
-                                        <p class="text-xs text-gray-500">${reply.created_at}</p>
+                                        <p class="text-xs text-gray-500"><span class="timeago" data-time="${reply.created_at_iso}">${reply.created_at}</span></p>
                                     </div>
                                 </div>
                                 <p class="text-gray-700 text-sm ml-11 break-words">${reply.content}</p>
@@ -363,6 +363,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 ` : ''}
             </div>
         `).join('');
+
+        updateRelativeTimes();
     }
     
     // Submit comment
@@ -448,5 +450,51 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
 });
+</script>
+<script>
+// Lightweight relative time updater without external libs
+function updateRelativeTimes() {
+    const elements = document.querySelectorAll('.timeago[data-time]');
+    const now = new Date();
+    elements.forEach(el => {
+        const iso = el.getAttribute('data-time');
+        if (!iso) return;
+        const date = new Date(iso);
+        const seconds = Math.floor((now - date) / 1000);
+        const rtf = new Intl.RelativeTimeFormat('id', { numeric: 'auto' });
+
+        const divisions = [
+            { amount: 60, name: 'second' },
+            { amount: 60, name: 'minute' },
+            { amount: 24, name: 'hour' },
+            { amount: 7, name: 'day' },
+            { amount: 4.34524, name: 'week' },
+            { amount: 12, name: 'month' },
+            { amount: Number.POSITIVE_INFINITY, name: 'year' }
+        ];
+
+        let duration = Math.abs(seconds);
+        let unit = 'second';
+        let value = -seconds; // past times should be negative for rtf
+
+        for (let i = 0; i < divisions.length; i++) {
+            const division = divisions[i];
+            if (duration < division.amount) {
+                unit = division.name;
+                break;
+            }
+            duration /= division.amount;
+            value = value / division.amount;
+        }
+
+        // Round appropriately
+        const rounded = Math.round(value);
+        el.textContent = rtf.format(rounded, unit);
+        el.title = date.toLocaleString('id-ID');
+    });
+}
+
+// Refresh every minute
+setInterval(updateRelativeTimes, 60000);
 </script>
 @endpush

@@ -39,7 +39,7 @@
         </div>
     </section>
 
-    <!-- News List Section -->
+    <!-- News + Sidebar Section -->
     <section class="py-12 bg-white">
         <div class="max-w-7xl mx-auto px-4">
             @if(request('search'))
@@ -56,10 +56,11 @@
                     <p class="text-gray-600">Silakan coba dengan kata kunci lain atau kembali lagi nanti.</p>
                 </div>
             @else
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    @foreach($news as $item)
-                        <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 card-shine" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
-                            <div class="relative">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                        @foreach($news as $item)
+                            <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 card-shine" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
+                                <div class="relative">
                                 @if($item->image)
                                     <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->title }}" class="w-full h-48 object-cover">
                                 @else
@@ -83,9 +84,34 @@
                                 <a href="{{ route('news.detail', $item->slug) }}" class="inline-flex items-center text-blue-600 font-semibold hover:text-blue-800 transition-colors">
                                     Baca selengkapnya <i class="fas fa-arrow-right ml-2"></i>
                                 </a>
+                                </div>
                             </div>
+                        @endforeach
+                    </div>
+
+                    <aside class="lg:col-span-4">
+                        <div class="bg-white rounded-xl shadow-lg p-6 sticky top-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center"><i class="fas fa-calendar-alt text-blue-600 mr-2"></i> Acara Mendatang</h3>
+                            @if(isset($upcomingEvents) && $upcomingEvents->isNotEmpty())
+                                <ul class="space-y-4">
+                                    @foreach($upcomingEvents as $event)
+                                        <li class="border border-gray-100 rounded-lg p-4 hover:shadow-sm transition">
+                                            <p class="text-sm text-gray-500 mb-1">
+                                                <i class="far fa-clock mr-1"></i>
+                                                <span class="timeago" data-time="{{ $event->start_at->toIso8601String() }}">{{ $event->start_at->format('d M Y H:i') }}</span>
+                                            </p>
+                                            <p class="font-semibold text-gray-800">{{ $event->title }}</p>
+                                            @if($event->location)
+                                                <p class="text-xs text-gray-500"><i class="fas fa-map-marker-alt mr-1"></i>{{ $event->location }}</p>
+                                            @endif
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <p class="text-gray-500">Belum ada acara mendatang.</p>
+                            @endif
                         </div>
-                    @endforeach
+                    </aside>
                 </div>
 
                 <!-- Pagination -->
