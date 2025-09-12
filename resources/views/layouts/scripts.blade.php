@@ -163,4 +163,79 @@
     }
 </script>
 
+<!-- Floating Chatbot Widget -->
+<style>
+    .sg-chatbot-button{position:fixed;right:20px;bottom:20px;z-index:9999;background:#2563eb;color:#fff;border:none;border-radius:9999px;width:56px;height:56px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 15px -3px rgba(37,99,235,.3),0 4px 6px -2px rgba(37,99,235,.2);cursor:pointer}
+    .sg-chatbot-panel{position:fixed;right:20px;bottom:90px;width:340px;max-width:92vw;height:480px;z-index:10000;background:#fff;border-radius:16px;box-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 10px 10px -5px rgba(0,0,0,.04);display:none;flex-direction:column;overflow:hidden;border:1px solid #e5e7eb}
+    .sg-chatbot-header{background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);color:#fff;padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+    .sg-chatbot-messages{flex:1;padding:12px;overflow:auto;background:#f9fafb}
+    .sg-chatbot-input{display:flex;gap:8px;padding:12px;border-top:1px solid #e5e7eb;background:#fff}
+    .sg-chatbot-input input{flex:1;border:1px solid #d1d5db;border-radius:10px;padding:10px 12px;outline:none}
+    .sg-chatbot-bubble{max-width:80%;margin:8px 0;padding:10px 12px;border-radius:12px;font-size:14px;line-height:1.4}
+    .sg-chatbot-bubble.user{margin-left:auto;background:#e5edff;color:#1e3a8a}
+    .sg-chatbot-bubble.bot{margin-right:auto;background:#fff;border:1px solid #e5e7eb;color:#111827}
+    .sg-chatbot-spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(37,99,235,.2);border-top-color:#2563eb;border-radius:50%;animation:sgspin 1s linear infinite}
+    @keyframes sgspin{to{transform:rotate(360deg)}}
+</style>
+<button id="sg-chatbot-toggle" aria-label="Buka Chatbot" class="sg-chatbot-button">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
+</button>
+<div id="sg-chatbot" class="sg-chatbot-panel">
+    <div class="sg-chatbot-header">
+        <div style="display:flex;align-items:center;gap:8px">
+            <span style="display:inline-flex;width:26px;height:26px;border-radius:50%;background:#fff;color:#2563eb;align-items:center;justify-content:center;font-weight:700">AI</span>
+            <div>
+                <div style="font-weight:700;font-size:14px">Asisten Galeri Sekolah</div>
+                <div style="font-size:12px;opacity:.9">Tanya seputar situs & pendidikan</div>
+            </div>
+        </div>
+        <button id="sg-chatbot-close" style="background:transparent;border:none;color:#fff;cursor:pointer">✕</button>
+    </div>
+    <div id="sg-chatbot-msgs" class="sg-chatbot-messages">
+        <div class="sg-chatbot-bubble bot">Halo! Ada yang bisa saya bantu?</div>
+    </div>
+    <form id="sg-chatbot-form" class="sg-chatbot-input">
+        <input id="sg-chatbot-input" type="text" placeholder="Ketik pertanyaan Anda..." autocomplete="off" required />
+        <button id="sg-chatbot-send" type="submit" class="btn-primary" style="border:none;border-radius:10px;padding:10px 14px;color:#fff;background:#2563eb">Kirim</button>
+    </form>
+    <template id="sg-msg-user"><div class="sg-chatbot-bubble user"></div></template>
+    <template id="sg-msg-bot"><div class="sg-chatbot-bubble bot"></div></template>
+</div>
+<script>
+    (function(){
+        const panel=document.getElementById('sg-chatbot');
+        const toggle=document.getElementById('sg-chatbot-toggle');
+        const closeBtn=document.getElementById('sg-chatbot-close');
+        const form=document.getElementById('sg-chatbot-form');
+        const input=document.getElementById('sg-chatbot-input');
+        const msgs=document.getElementById('sg-chatbot-msgs');
+        const tplUser=document.getElementById('sg-msg-user');
+        const tplBot=document.getElementById('sg-msg-bot');
+        let history=[];
+
+        function scrollToBottom(){msgs.scrollTop=msgs.scrollHeight}
+        function addMsg(role,text){
+            const tpl=role==='user'?tplUser:tplBot; const el=tpl.content.firstElementChild.cloneNode(true); el.textContent=text; msgs.appendChild(el); scrollToBottom();
+        }
+        function setLoading(on){
+            if(on){ const wrap=document.createElement('div'); wrap.className='sg-chatbot-bubble bot'; wrap.id='sg-loading'; wrap.innerHTML='<span class="sg-chatbot-spinner"></span>'; msgs.appendChild(wrap); scrollToBottom(); }
+            else { const w=document.getElementById('sg-loading'); if(w) w.remove(); }
+        }
+
+        toggle.addEventListener('click',()=>{ panel.style.display = panel.style.display==='flex'?'none':'flex'; panel.style.display==='flex' && input.focus(); if(panel.style.display==='flex'){ panel.style.display='flex'; panel.style.flexDirection='column'; } });
+        closeBtn.addEventListener('click',()=>{ panel.style.display='none'; });
+
+        form.addEventListener('submit',async(e)=>{
+            e.preventDefault(); const text=input.value.trim(); if(!text) return; addMsg('user',text); input.value=''; setLoading(true);
+            try{
+                const res=await fetch('{{ route('chatbot.ask') }}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':document.querySelector('meta[name=csrf-token]').getAttribute('content')},body:JSON.stringify({message:text,context:history})});
+                const data=await res.json();
+                setLoading(false);
+                if(data && data.success){ addMsg('bot',data.answer); history.push({role:'user',content:text}); history.push({role:'assistant',content:data.answer}); }
+                else{ addMsg('bot', (data && data.error) ? data.error : 'Maaf, terjadi kesalahan.'); }
+            }catch(err){ setLoading(false); addMsg('bot','Tidak dapat terhubung ke server.'); }
+        });
+    })();
+</script>
+
 @stack('scripts')

@@ -13,6 +13,7 @@ use App\Http\Controllers\Guest\AuthController as GuestAuthController;
 use App\Http\Controllers\Guest\InteractionController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ChatbotController;
 
 // Public Routes (tracked visits)
 Route::middleware('track.visits')->group(function () {
@@ -161,3 +162,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 
 });
+
+// Chatbot endpoint
+Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
