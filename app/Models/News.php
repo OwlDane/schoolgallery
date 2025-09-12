@@ -54,6 +54,11 @@ class News extends Model
 
     public function comments()
     {
+        return $this->hasMany(NewsComment::class)->where('is_approved', true)->mainComments()->latest();
+    }
+
+    public function allComments()
+    {
         return $this->hasMany(NewsComment::class)->where('is_approved', true)->latest();
     }
 

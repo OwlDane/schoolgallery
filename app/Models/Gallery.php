@@ -43,6 +43,11 @@ class Gallery extends Model
 
     public function comments()
     {
+        return $this->hasMany(GalleryComment::class)->mainComments()->latest();
+    }
+
+    public function allComments()
+    {
         return $this->hasMany(GalleryComment::class)->latest();
     }
 

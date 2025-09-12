@@ -71,7 +71,9 @@ class HomeController extends Controller
 
     public function galleryDetail($id)
     {
-        $gallery = Gallery::published()->with(['likes', 'comments' => function($q){ $q->where('is_approved', true); }])->findOrFail($id);
+        $gallery = Gallery::published()->with(['likes', 'comments' => function($q){ 
+            $q->where('is_approved', true)->mainComments()->with('replies'); 
+        }])->findOrFail($id);
         $relatedGalleries = Gallery::published()
             ->where('id', '!=', $gallery->id)
             ->latest()
@@ -84,54 +86,23 @@ class HomeController extends Controller
 
     public function likeGallery(Request $request, $id)
     {
-        $gallery = Gallery::published()->findOrFail($id);
-        $fingerprint = $request->cookie('visitor_fingerprint') ?? $request->ip() . '|' . substr(hash('sha256', (string) $request->userAgent()), 0, 16);
-
-        $existing = GalleryLike::where('gallery_id', $gallery->id)
-            ->where('visitor_fingerprint', $fingerprint)
-            ->first();
-
-        if (!$existing) {
-            GalleryLike::create([
-                'gallery_id' => $gallery->id,
-                'visitor_fingerprint' => $fingerprint,
-                'ip_address' => $request->ip(),
-                'user_agent' => (string) $request->userAgent(),
-            ]);
-        }
-
-        return redirect()->route('gallery.detail', $gallery->id)->with('liked', true);
+        // This method is now handled by InteractionController
+        // Redirect to the new API endpoint
+        return redirect()->route('gallery.detail', $id);
     }
 
     public function unlikeGallery(Request $request, $id)
     {
-        $gallery = Gallery::published()->findOrFail($id);
-        $fingerprint = $request->cookie('visitor_fingerprint') ?? $request->ip() . '|' . substr(hash('sha256', (string) $request->userAgent()), 0, 16);
-
-        GalleryLike::where('gallery_id', $gallery->id)
-            ->where('visitor_fingerprint', $fingerprint)
-            ->delete();
-
-        return redirect()->route('gallery.detail', $gallery->id)->with('unliked', true);
+        // This method is now handled by InteractionController
+        // Redirect to the new API endpoint
+        return redirect()->route('gallery.detail', $id);
     }
 
     public function commentGallery(Request $request, $id)
     {
-        $gallery = Gallery::published()->findOrFail($id);
-
-        $validated = $request->validate([
-            'content' => 'required|string|max:2000',
-        ]);
-
-        GalleryComment::create([
-            'gallery_id' => $gallery->id,
-            'name' => 'Guest',
-            'email' => null,
-            'content' => $validated['content'],
-            'is_approved' => true,
-        ]);
-
-        return redirect()->route('gallery.detail', $gallery->id)->with('commented', true);
+        // This method is now handled by InteractionController
+        // Redirect to the new API endpoint
+        return redirect()->route('gallery.detail', $id);
     }
 
     public function news(Request $request)

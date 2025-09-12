@@ -11,6 +11,7 @@ class GalleryLike extends Model
 
     protected $fillable = [
         'gallery_id',
+        'user_id',
         'visitor_fingerprint',
         'ip_address',
         'user_agent',
@@ -19,5 +20,10 @@ class GalleryLike extends Model
     public function gallery()
     {
         return $this->belongsTo(Gallery::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

@@ -57,36 +57,58 @@
                     <p class="text-gray-600 mb-8">Silakan isi formulir di bawah ini untuk mengirimkan pesan, pertanyaan, atau saran kepada kami. Tim kami akan merespons secepatnya.</p>
                     
                     @auth
-                        <form action="{{ route('contact.submit') }}" method="POST" class="space-y-6">
+                        <!-- Contact Form - Only for authenticated users -->
+                        <form id="contactForm" class="space-y-6">
                             @csrf
+                            <div class="flex items-center space-x-3 mb-6">
+                                <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-lg">
+                                    {{ auth()->user()->name[0] }}
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-800 text-lg">{{ auth()->user()->name }}</p>
+                                    <p class="text-sm text-gray-500">Kirim pesan kepada kami</p>
+                                </div>
+                            </div>
+                            
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                                    <input type="text" id="name" name="name" value="{{ Auth::user()->name }}" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300">
+                                    <input type="text" id="name" name="name" 
+                                           value="{{ auth()->user()->name }}" 
+                                           readonly
+                                           class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 text-gray-600">
                                 </div>
                                 <div>
                                     <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                    <input type="email" id="email" name="email" value="{{ Auth::user()->email }}" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300">
+                                    <input type="email" id="email" name="email" 
+                                           value="{{ auth()->user()->email }}" 
+                                           readonly
+                                           class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-50 text-gray-600">
                                 </div>
                             </div>
                             
                             <div>
-                                <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subjek</label>
-                                <input type="text" id="subject" name="subject" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300">
+                                <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subjek *</label>
+                                <input type="text" id="subject" name="subject" required 
+                                       class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                                       placeholder="Masukkan subjek pesan Anda">
                             </div>
                             
                             <div>
-                                <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Pesan</label>
-                                <textarea id="message" name="message" rows="5" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"></textarea>
+                                <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Pesan *</label>
+                                <textarea id="message" name="message" rows="5" required 
+                                          class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                                          placeholder="Tulis pesan Anda di sini..."></textarea>
                             </div>
                             
-                            <div>
-                                <button type="submit" class="btn-hover bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg flex items-center">
+                            <div class="text-right">
+                                <button type="submit" id="submitBtn" class="btn-hover bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg flex items-center">
                                     <i class="fas fa-paper-plane mr-2"></i> Kirim Pesan
                                 </button>
                             </div>
                         </form>
                     @else
+                        <!-- Login required message -->
                         <div class="bg-blue-50 border border-blue-200 rounded-xl p-8">
                             <div class="text-center">
                                 <i class="fas fa-lock text-blue-500 text-3xl mb-4"></i>
@@ -206,3 +228,72 @@
         </div>
     </section>
 @endsection
+
+@auth
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.getElementById('contactForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (contactForm && submitBtn) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitContact();
+        });
+        
+        function submitContact() {
+            const formData = new FormData(contactForm);
+            
+            // Disable submit button and show loading
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mengirim...';
+            
+            fetch('/contact', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                    contactForm.reset();
+                } else {
+                    showNotification(data.message || 'Terjadi kesalahan', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error submitting contact form:', error);
+                showNotification('Terjadi kesalahan saat mengirim pesan', 'error');
+            })
+            .finally(() => {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Kirim Pesan';
+            });
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            }`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+    }
+});
+</script>
+@endpush
+@endauth

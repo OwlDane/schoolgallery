@@ -212,25 +212,19 @@
                                     </a>
                                 </div>
                                 <div class="mt-3 flex items-center justify-between text-sm text-gray-600">
-                                    @php
-                                        $fp = request()->cookie('visitor_fingerprint') ?? request()->ip() . '|' . substr(hash('sha256', (string) request()->userAgent()), 0, 16);
-                                        $alreadyLiked = isset($gallery->likes) ? $gallery->likes->firstWhere('visitor_fingerprint', $fp) : null;
-                                    @endphp
-                                    @if($alreadyLiked)
-                                        <form action="{{ route('gallery.unlike', $gallery->id) }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="inline-flex items-center text-pink-600 hover:text-pink-700">
-                                                <i class="fas fa-heart mr-1"></i>
-                                            </button>
-                                        </form>
+                                    @auth
+                                        <button onclick="toggleLike({{ $gallery->id }})" 
+                                                class="like-btn inline-flex items-center text-gray-500 hover:text-pink-700"
+                                                data-gallery-id="{{ $gallery->id }}">
+                                            <i class="far fa-heart mr-1"></i>
+                                            <span class="like-count">{{ $gallery->likes_count ?? 0 }}</span>
+                                        </button>
                                     @else
-                                        <form action="{{ route('gallery.like', $gallery->id) }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="inline-flex items-center text-gray-500 hover:text-pink-700">
-                                                <i class="far fa-heart mr-1"></i>
-                                            </button>
-                                        </form>
-                                    @endif
+                                        <div class="inline-flex items-center text-gray-400">
+                                            <i class="far fa-heart mr-1"></i>
+                                            <span>{{ $gallery->likes_count ?? 0 }}</span>
+                                        </div>
+                                    @endauth
                                     <a href="{{ route('gallery.detail', $gallery->id) }}#comments" class="inline-flex items-center">
                                         <i class="far fa-comment mr-1"></i>
                                     </a>
@@ -279,6 +273,46 @@
             }, 5000);
         }
     });
+
+    // Like functionality
+    async function toggleLike(galleryId) {
+        try {
+            const response = await fetch(`/gallery/${galleryId}/like`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json();
+            
+            if (data.success) {
+                // Update like button
+                const likeBtn = document.querySelector(`[data-gallery-id="${galleryId}"]`);
+                const likeIcon = likeBtn.querySelector('i');
+                const likeCount = likeBtn.querySelector('.like-count');
+                
+                if (data.liked) {
+                    likeIcon.className = 'fas fa-heart mr-1';
+                    likeBtn.className = 'like-btn inline-flex items-center text-pink-600 hover:text-pink-700';
+                } else {
+                    likeIcon.className = 'far fa-heart mr-1';
+                    likeBtn.className = 'like-btn inline-flex items-center text-gray-500 hover:text-pink-700';
+                }
+                
+                likeCount.textContent = data.likes_count;
+            }
+        } catch (error) {
+            console.error('Error toggling like:', error);
+            showNotification('Terjadi kesalahan saat like/unlike', 'error');
+        }
+    }
 </script>
 @endpush
 

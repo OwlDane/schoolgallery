@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\SchoolProfileController;
 use App\Http\Controllers\Admin\AdminManagementController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Guest\AuthController as GuestAuthController;
+use App\Http\Controllers\Guest\InteractionController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,13 +25,34 @@ Route::middleware('track.visits')->group(function () {
     Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 });
 
+// Guest Interaction Routes (no login required)
+Route::middleware('track.visits')->group(function () {
+    // Gallery interactions - comments can be viewed by everyone
+    Route::get('/gallery/{id}/comments', [InteractionController::class, 'getComments'])->name('gallery.comments');
+    
+    // News interactions - comments can be viewed by everyone
+    Route::get('/news/{id}/comments', [InteractionController::class, 'getNewsComments'])->name('news.comments');
+    
+    // Contact form for guests
+    Route::post('/contact', [InteractionController::class, 'sendContact'])->name('contact.submit');
+    
+    // Photo submission for guests
+    Route::post('/submit-photo', [InteractionController::class, 'submitPhoto'])->name('photo.submit');
+});
+
+// Authenticated User Interaction Routes (login required)
+Route::middleware(['auth', 'track.visits'])->group(function () {
+    // Gallery interactions for authenticated users
+    Route::post('/gallery/{id}/like', [InteractionController::class, 'toggleLike'])->name('gallery.like');
+    Route::post('/gallery/{id}/comment', [InteractionController::class, 'addComment'])->name('gallery.comment');
+    Route::get('/gallery/{id}/like-status', [InteractionController::class, 'checkLikeStatus'])->name('gallery.like-status');
+    
+    // News interactions for authenticated users
+    Route::post('/news/{id}/comment', [InteractionController::class, 'addNewsComment'])->name('news.comment');
+});
+
 // Protected Routes (require login)
 Route::middleware(['auth', 'track.visits'])->group(function () {
-    // Gallery interactions
-    Route::post('/gallery/{id}/like', [HomeController::class, 'likeGallery'])->name('gallery.like');
-    Route::post('/gallery/{id}/unlike', [HomeController::class, 'unlikeGallery'])->name('gallery.unlike');
-    Route::post('/gallery/{id}/comment', [HomeController::class, 'commentGallery'])->name('gallery.comment');
-    
     // News interactions
     Route::post('/news/{slug}/comment', [HomeController::class, 'commentNews'])->name('news.comment');
     

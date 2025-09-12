@@ -43,28 +43,38 @@
                 </div>
             </div>
 
-            <!-- Comments -->
+            <!-- Comments Section -->
             <div id="comments" class="mt-10">
                 <h3 class="text-2xl font-bold text-gray-900 mb-4">Komentar</h3>
-                
+
                 @auth
+                    <!-- Comment Form - Only for authenticated users -->
                     <div class="bg-white rounded-xl shadow p-6 mb-6">
-                        <form action="{{ route('news.comment', $news->slug) }}" method="POST" class="space-y-4">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+                                {{ auth()->user()->name[0] }}
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-800">{{ auth()->user()->name }}</p>
+                                <p class="text-sm text-gray-500">Berikan komentar Anda</p>
+                            </div>
+                        </div>
+                        <form id="newsCommentForm" class="space-y-4">
                             @csrf
                             <div>
-                                <label class="block text-sm text-gray-700 mb-1">Nama (opsional)</label>
-                                <input type="text" name="name" value="{{ Auth::user()->name }}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-sm text-gray-700 mb-1">Komentar</label>
-                                <textarea name="content" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"></textarea>
+                                <textarea name="content" rows="3" required 
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                                          placeholder="Tulis komentar Anda di sini..."></textarea>
                             </div>
                             <div class="text-right">
-                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Kirim Komentar</button>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-paper-plane mr-2"></i>Kirim Komentar
+                                </button>
                             </div>
                         </form>
                     </div>
                 @else
+                    <!-- Login required message -->
                     <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
                         <div class="text-center">
                             <i class="fas fa-lock text-blue-500 text-2xl mb-3"></i>
@@ -78,18 +88,15 @@
                     </div>
                 @endauth
 
-                <div class="space-y-4">
-                    @forelse($news->comments as $comment)
-                        <div class="bg-white rounded-xl shadow p-4">
-                            <div class="flex items-center justify-between mb-1">
-                                <p class="font-semibold text-gray-800">{{ $comment->name ?? 'Pengunjung' }}</p>
-                                <p class="text-xs text-gray-500">{{ $comment->created_at->diffForHumans() }}</p>
-                            </div>
-                            <p class="text-gray-700">{{ $comment->content }}</p>
-                        </div>
-                    @empty
-                        <p class="text-gray-500">Belum ada komentar.</p>
-                    @endforelse
+                <!-- Comments List -->
+                <div id="newsCommentsList" class="space-y-4">
+                    <!-- Comments will be loaded here via JavaScript -->
+                </div>
+
+                <!-- Loading indicator -->
+                <div id="newsCommentsLoading" class="text-center py-4">
+                    <i class="fas fa-spinner fa-spin text-blue-500"></i>
+                    <span class="ml-2 text-gray-600">Memuat komentar...</span>
                 </div>
             </div>
 
@@ -157,3 +164,178 @@
         </div>
     </section>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const newsId = {{ $news->id }};
+    const isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
+    
+    // Only initialize for authenticated users
+    if (isAuthenticated) {
+        // Load comments
+        loadNewsComments();
+        
+        // Comment form handler
+        const newsCommentForm = document.getElementById('newsCommentForm');
+        if (newsCommentForm) {
+            newsCommentForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitNewsComment();
+            });
+        }
+    } else {
+        // Load comments for display only
+        loadNewsComments();
+    }
+    
+    // Load news comments
+    function loadNewsComments() {
+        fetch(`/news/${newsId}/comments`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayNewsComments(data.comments);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading news comments:', error);
+                document.getElementById('newsCommentsLoading').innerHTML = 
+                    '<p class="text-red-500">Gagal memuat komentar</p>';
+            });
+    }
+    
+    // Display news comments
+    function displayNewsComments(comments) {
+        const commentsList = document.getElementById('newsCommentsList');
+        const loading = document.getElementById('newsCommentsLoading');
+        
+        loading.style.display = 'none';
+        
+        if (comments.length === 0) {
+            commentsList.innerHTML = '<p class="text-gray-500 text-center py-8">Belum ada komentar. Jadilah yang pertama berkomentar!</p>';
+            return;
+        }
+        
+        commentsList.innerHTML = comments.map(comment => `
+            <div class="bg-white rounded-xl shadow p-4 ${comment.depth > 0 ? 'ml-8 border-l-4 border-blue-200' : ''}">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+                            ${comment.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-800">${comment.name}</p>
+                            <p class="text-xs text-gray-500">${comment.created_at}</p>
+                        </div>
+                    </div>
+                    ${isAuthenticated ? `
+                        <button onclick="replyToNewsComment(${comment.id}, '${comment.name}')" 
+                                class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            <i class="fas fa-reply mr-1"></i>Balas
+                        </button>
+                    ` : ''}
+                </div>
+                <p class="text-gray-700 ml-12">${comment.content}</p>
+                
+                <!-- Replies -->
+                ${comment.replies && comment.replies.length > 0 ? `
+                    <div class="mt-3 ml-12 space-y-3">
+                        ${comment.replies.map(reply => `
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <div class="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                                        ${reply.name.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-800 text-sm">${reply.name}</p>
+                                        <p class="text-xs text-gray-500">${reply.created_at}</p>
+                                    </div>
+                                </div>
+                                <p class="text-gray-700 text-sm ml-11">${reply.content}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        `).join('');
+    }
+    
+    // Submit news comment
+    function submitNewsComment() {
+        const form = document.getElementById('newsCommentForm');
+        const formData = new FormData(form);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mengirim...';
+        
+        fetch(`/news/${newsId}/comment`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                form.reset();
+                showNotification(data.message, 'success');
+                loadNewsComments(); // Reload comments
+            } else {
+                showNotification(data.message || 'Terjadi kesalahan', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error submitting news comment:', error);
+            showNotification('Terjadi kesalahan', 'error');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Kirim Komentar';
+        });
+    }
+    
+    // Reply to news comment (global function)
+    window.replyToNewsComment = function(commentId, commenterName) {
+        const form = document.getElementById('newsCommentForm');
+        const contentTextarea = form.querySelector('textarea[name="content"]');
+        
+        // Add reply indicator
+        contentTextarea.value = `@${commenterName} `;
+        contentTextarea.focus();
+        
+        // Add hidden field for parent_id
+        let parentIdField = form.querySelector('input[name="parent_id"]');
+        if (!parentIdField) {
+            parentIdField = document.createElement('input');
+            parentIdField.type = 'hidden';
+            parentIdField.name = 'parent_id';
+            form.appendChild(parentIdField);
+        }
+        parentIdField.value = commentId;
+        
+        // Scroll to form
+        form.scrollIntoView({ behavior: 'smooth' });
+    };
+    
+    // Show notification
+    function showNotification(message, type) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white ${
+            type === 'success' ? 'bg-green-500' : 'bg-red-500'
+        }`;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+});
+</script>
+@endpush
