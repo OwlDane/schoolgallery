@@ -9,6 +9,7 @@ use App\Models\GalleryLike;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use App\Models\NewsBookmark;
 
 class InteractionController extends Controller
 {
@@ -287,6 +288,54 @@ class InteractionController extends Controller
             'success' => true,
             'liked' => $liked,
             'like_count' => $likeCount
+        ]);
+    }
+
+    /**
+     * Toggle bookmark news (auth required)
+     */
+    public function toggleNewsBookmark(Request $request, $newsId)
+    {
+        if (!auth()->check()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda harus login terlebih dahulu'
+            ], 401);
+        }
+
+        $userId = auth()->id();
+        $existing = NewsBookmark::where('user_id', $userId)->where('news_id', $newsId)->first();
+        if ($existing) {
+            $existing->delete();
+            $bookmarked = false;
+        } else {
+            NewsBookmark::create(['user_id' => $userId, 'news_id' => $newsId]);
+            $bookmarked = true;
+        }
+
+        return response()->json([
+            'success' => true,
+            'bookmarked' => $bookmarked,
+        ]);
+    }
+
+    /**
+     * Check bookmark status for a news (auth required)
+     */
+    public function checkNewsBookmark(Request $request, $newsId)
+    {
+        if (!auth()->check()) {
+            return response()->json([
+                'success' => true,
+                'bookmarked' => false,
+            ]);
+        }
+
+        $userId = auth()->id();
+        $bookmarked = NewsBookmark::where('user_id', $userId)->where('news_id', $newsId)->exists();
+        return response()->json([
+            'success' => true,
+            'bookmarked' => $bookmarked,
         ]);
     }
 

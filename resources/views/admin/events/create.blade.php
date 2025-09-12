@@ -17,7 +17,7 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.events.store') }}" method="POST" class="bg-white rounded-xl shadow p-6 space-y-4">
+    <form action="{{ route('admin.events.store') }}" method="POST" enctype="multipart/form-data" class="bg-white rounded-xl shadow p-6 space-y-4">
         @csrf
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Judul</label>
@@ -30,6 +30,11 @@
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Lokasi</label>
             <input type="text" name="location" value="{{ old('location') }}" class="w-full border rounded px-3 py-2">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Gambar (opsional)</label>
+            <input type="file" name="image" accept="image/*" class="w-full border rounded px-3 py-2">
+            <p class="text-xs text-gray-500 mt-1">Rekomendasi rasio 16:9, ukuran maksimum 1MB.</p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

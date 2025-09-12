@@ -128,8 +128,9 @@ class HomeController extends Controller
         $schoolProfile = SchoolProfile::getProfile();
         $categories = NewsCategory::active()->ordered()->get();
         $upcomingEvents = Event::published()->upcoming()->orderBy('start_at')->take(5)->get();
+        $latestNews = News::published()->latest()->take(5)->get();
 
-        return view('news', compact('news', 'schoolProfile', 'categories', 'upcomingEvents'));
+        return view('news', compact('news', 'schoolProfile', 'categories', 'upcomingEvents', 'latestNews'));
     }
 
     public function newsDetail($slug)
@@ -142,8 +143,9 @@ class HomeController extends Controller
             ->get();
         $schoolProfile = SchoolProfile::getProfile();
         $upcomingEvents = Event::published()->upcoming()->orderBy('start_at')->take(5)->get();
+        $latestNews = News::published()->latest()->take(5)->get();
 
-        return view('news-detail', compact('news', 'relatedNews', 'schoolProfile', 'upcomingEvents'));
+        return view('news-detail', compact('news', 'relatedNews', 'schoolProfile', 'upcomingEvents', 'latestNews'));
     }
 
     public function commentNews(Request $request, $slug)

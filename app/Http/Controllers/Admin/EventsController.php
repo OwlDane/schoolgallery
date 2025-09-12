@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class EventsController extends Controller
 {
@@ -25,12 +26,18 @@ class EventsController extends Controller
             'title' => 'required|string|max:200',
             'description' => 'nullable|string',
             'location' => 'nullable|string|max:200',
+            'image' => 'nullable|image|max:1024',
             'start_at' => 'required|date',
             'end_at' => 'nullable|date|after_or_equal:start_at',
             'is_published' => 'sometimes|boolean',
         ]);
 
         $validated['is_published'] = $request->boolean('is_published');
+        $validated['slug'] = Str::slug($validated['title']) . '-' . substr(md5(uniqid()), 0, 6);
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('events', 'public');
+        }
 
         Event::create($validated);
 
@@ -48,12 +55,20 @@ class EventsController extends Controller
             'title' => 'required|string|max:200',
             'description' => 'nullable|string',
             'location' => 'nullable|string|max:200',
+            'image' => 'nullable|image|max:1024',
             'start_at' => 'required|date',
             'end_at' => 'nullable|date|after_or_equal:start_at',
             'is_published' => 'sometimes|boolean',
         ]);
 
         $validated['is_published'] = $request->boolean('is_published');
+        if ($event->title !== $validated['title']) {
+            $validated['slug'] = Str::slug($validated['title']) . '-' . substr(md5(uniqid()), 0, 6);
+        }
+
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('events', 'public');
+        }
 
         $event->update($validated);
 

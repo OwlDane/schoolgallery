@@ -90,26 +90,54 @@
                     </div>
 
                     <aside class="lg:col-span-4">
-                        <div class="bg-white rounded-xl shadow-lg p-6 sticky top-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6 sticky top-6 mb-6">
                             <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center"><i class="fas fa-calendar-alt text-blue-600 mr-2"></i> Acara Mendatang</h3>
                             @if(isset($upcomingEvents) && $upcomingEvents->isNotEmpty())
                                 <ul class="space-y-4">
                                     @foreach($upcomingEvents as $event)
-                                        <li class="border border-gray-100 rounded-lg p-4 hover:shadow-sm transition">
-                                            <p class="text-sm text-gray-500 mb-1">
+                                        <li class="border border-gray-100 rounded-lg p-4 hover:shadow-sm transition flex items-start gap-3">
+                                            @if($event->image)
+                                                <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->title }}" class="w-14 h-14 rounded object-cover flex-shrink-0">
+                                            @else
+                                                <div class="w-14 h-14 rounded bg-gray-100 text-gray-400 flex items-center justify-center flex-shrink-0"><i class="far fa-image"></i></div>
+                                            @endif
+                                            <div class="min-w-0">
+                                            <p class="text-xs text-gray-500 mb-1">
                                                 <i class="far fa-clock mr-1"></i>
                                                 <span class="timeago" data-time="{{ $event->start_at->toIso8601String() }}">{{ $event->start_at->format('d M Y H:i') }}</span>
                                             </p>
-                                            <p class="font-semibold text-gray-800">{{ $event->title }}</p>
+                                            <p class="font-semibold text-gray-800"><a href="{{ route('events.show', $event->slug) }}" class="hover:text-blue-700 line-clamp-2">{{ $event->title }}</a></p>
                                             @if($event->location)
                                                 <p class="text-xs text-gray-500"><i class="fas fa-map-marker-alt mr-1"></i>{{ $event->location }}</p>
                                             @endif
+                                            </div>
                                         </li>
                                     @endforeach
                                 </ul>
                             @else
                                 <p class="text-gray-500">Belum ada acara mendatang.</p>
                             @endif
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-lg p-6 sticky top-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center"><i class="fas fa-bolt text-yellow-500 mr-2"></i> Berita Terbaru</h3>
+                            @if(isset($latestNews) && $latestNews->isNotEmpty())
+                                <ul class="space-y-3">
+                                    @foreach($latestNews as $ln)
+                                        <li>
+                                            <a href="{{ route('news.detail', $ln->slug) }}" class="block">
+                                                <p class="font-medium text-gray-800 line-clamp-2">{{ $ln->title }}</p>
+                                                <p class="text-xs text-gray-500"><i class="far fa-calendar-alt mr-1"></i>{{ $ln->created_at->format('d M Y') }}</p>
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <p class="text-gray-500">Belum ada berita terbaru.</p>
+                            @endif
+                            <div class="mt-4 text-right">
+                                <a href="{{ route('news') }}" class="text-blue-600 hover:text-blue-800 text-sm font-semibold">Lihat semua</a>
+                            </div>
                         </div>
                     </aside>
                 </div>

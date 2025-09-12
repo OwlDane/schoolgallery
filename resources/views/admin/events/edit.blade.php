@@ -17,7 +17,7 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.events.update', $event) }}" method="POST" class="bg-white rounded-xl shadow p-6 space-y-4">
+    <form action="{{ route('admin.events.update', $event) }}" method="POST" enctype="multipart/form-data" class="bg-white rounded-xl shadow p-6 space-y-4">
         @csrf
         @method('PUT')
         <div>
@@ -31,6 +31,14 @@
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Lokasi</label>
             <input type="text" name="location" value="{{ old('location', $event->location) }}" class="w-full border rounded px-3 py-2">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Gambar (opsional)</label>
+            <input type="file" name="image" accept="image/*" class="w-full border rounded px-3 py-2">
+            @if($event->image)
+                <p class="text-xs text-gray-500 mt-1">Gambar saat ini:</p>
+                <img src="{{ asset('storage/' . $event->image) }}" alt="{{ $event->title }}" class="mt-2 rounded w-full max-w-sm">
+            @endif
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

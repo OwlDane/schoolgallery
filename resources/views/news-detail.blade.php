@@ -38,88 +38,34 @@
                             </span>
                         </div>
                     @endif
+                    <div class="flex items-center flex-wrap gap-4 text-sm text-gray-500 mb-6">
+                        <span class="inline-flex items-center"><i class="far fa-calendar-alt mr-2 text-gray-400"></i>{{ $news->created_at->format('d M Y') }}</span>
+                        <span class="inline-flex items-center"><i class="far fa-user mr-2 text-gray-400"></i>Admin</span>
+                    </div>
                     <div class="prose prose-lg max-w-none">
                         {!! $news->content !!}
                     </div>
+                    <div class="border-t mt-8 pt-6 flex items-center gap-3">
+                        <span class="text-gray-700 font-medium">Bagikan:</span>
+                        <a href="#" class="bg-blue-600 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="bg-blue-400 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="bg-green-600 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-green-700 transition-colors">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="#" class="bg-blue-800 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-blue-900 transition-colors">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
 
-            <!-- Comments Section -->
-            <div id="comments" class="mt-10">
-                <h3 class="text-2xl font-bold text-gray-900 mb-4">Komentar</h3>
-                
-                @auth
-                    <!-- Comment Form - Only for authenticated users -->
-                    <div class="bg-white rounded-xl shadow p-6 mb-6">
-                        <div class="flex items-center space-x-3 mb-4">
-                            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
-                                {{ auth()->user()->name[0] }}
-                            </div>
-                            <div>
-                                <p class="font-semibold text-gray-800">{{ auth()->user()->name }}</p>
-                                <p class="text-sm text-gray-500">Berikan komentar Anda</p>
-                            </div>
-                        </div>
-                        <form id="newsCommentForm" class="space-y-4">
-                            @csrf
-                            <div>
-                                <textarea name="content" rows="3" required 
-                                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                                          placeholder="Tulis komentar Anda di sini..."></textarea>
-                            </div>
-                            <div class="text-right">
-                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                                    <i class="fas fa-paper-plane mr-2"></i>Kirim Komentar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                @else
-                    <!-- Login required message -->
-                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
-                        <div class="text-center">
-                            <i class="fas fa-lock text-blue-500 text-2xl mb-3"></i>
-                            <h4 class="text-lg font-semibold text-blue-800 mb-2">Login Diperlukan</h4>
-                            <p class="text-blue-600 mb-4">Silakan login terlebih dahulu untuk dapat memberikan komentar.</p>
-                            <a href="{{ route('guest.login') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                                <i class="fas fa-sign-in-alt mr-2"></i>
-                                Login Sekarang
-                            </a>
-                        </div>
-                    </div>
-                @endauth
-
-                <!-- Comments List -->
-                <div id="newsCommentsList" class="space-y-4">
-                    <!-- Comments will be loaded here via JavaScript -->
-                            </div>
-
-                <!-- Loading indicator -->
-                <div id="newsCommentsLoading" class="text-center py-4">
-                    <i class="fas fa-spinner fa-spin text-blue-500"></i>
-                    <span class="ml-2 text-gray-600">Memuat komentar...</span>
-                </div>
-            </div>
-
-            <!-- Share Buttons -->
-            <div class="flex items-center justify-center gap-4 my-8" data-aos="fade-up">
-                <span class="text-gray-700 font-medium">Bagikan:</span>
-                <a href="#" class="bg-blue-600 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors">
-                    <i class="fab fa-facebook-f"></i>
-                </a>
-                <a href="#" class="bg-blue-400 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors">
-                    <i class="fab fa-twitter"></i>
-                </a>
-                <a href="#" class="bg-green-600 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-green-700 transition-colors">
-                    <i class="fab fa-whatsapp"></i>
-                </a>
-                <a href="#" class="bg-blue-800 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-blue-900 transition-colors">
-                    <i class="fab fa-linkedin-in"></i>
-                </a>
-            </div>
 
             <aside class="lg:col-span-4">
-                <div class="bg-white rounded-xl shadow-lg p-6 sticky top-6">
+                <div class="bg-white rounded-xl shadow-lg p-6 sticky top-6 mb-6">
                     <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center"><i class="fas fa-calendar-alt text-blue-600 mr-2"></i> Acara Mendatang</h3>
                     @if(isset($upcomingEvents) && $upcomingEvents->isNotEmpty())
                         <ul class="space-y-4">
@@ -129,7 +75,7 @@
                                         <i class="far fa-clock mr-1"></i>
                                         <span class="timeago" data-time="{{ $event->start_at->toIso8601String() }}">{{ $event->start_at->format('d M Y H:i') }}</span>
                                     </p>
-                                    <p class="font-semibold text-gray-800">{{ $event->title }}</p>
+                                    <p class="font-semibold text-gray-800"><a href="{{ route('events.show', $event->slug) }}" class="hover:text-blue-700">{{ $event->title }}</a></p>
                                     @if($event->location)
                                         <p class="text-xs text-gray-500"><i class="fas fa-map-marker-alt mr-1"></i>{{ $event->location }}</p>
                                     @endif
@@ -140,6 +86,57 @@
                         <p class="text-gray-500">Belum ada acara mendatang.</p>
                     @endif
                 </div>
+
+                <!-- Comments Section in Sidebar -->
+                <div id="comments" class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Komentar</h3>
+                    @auth
+                        <div class="bg-gray-50 rounded-xl p-4 mb-6">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+                                    {{ auth()->user()->name[0] }}
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-800">{{ auth()->user()->name }}</p>
+                                    <p class="text-sm text-gray-500">Berikan komentar Anda</p>
+                                </div>
+                            </div>
+                            <form id="newsCommentForm" class="space-y-4">
+                                @csrf
+                                <div>
+                                    <textarea name="content" rows="3" required 
+                                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                                              placeholder="Tulis komentar Anda di sini..."></textarea>
+                                </div>
+                                <div class="text-right">
+                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                        <i class="fas fa-paper-plane mr-2"></i>Kirim
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    @else
+                        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+                            <div class="text-center">
+                                <i class="fas fa-lock text-blue-500 text-2xl mb-3"></i>
+                                <h4 class="text-lg font-semibold text-blue-800 mb-2">Login Diperlukan</h4>
+                                <p class="text-blue-600 mb-4">Silakan login terlebih dahulu untuk dapat memberikan komentar.</p>
+                                <a href="{{ route('guest.login') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-sign-in-alt mr-2"></i>
+                                    Login Sekarang
+                                </a>
+                            </div>
+                        </div>
+                    @endauth
+
+                    <div id="newsCommentsList" class="space-y-4">
+                        <!-- Comments will be loaded here via JavaScript -->
+                    </div>
+                    <div id="newsCommentsLoading" class="text-center py-4">
+                        <i class="fas fa-spinner fa-spin text-blue-500"></i>
+                        <span class="ml-2 text-gray-600">Memuat komentar...</span>
+                    </div>
+                </div>
             </aside>
             </div>
         </div>
@@ -148,44 +145,45 @@
     <!-- Related News -->
     <section class="py-12 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4">
-            <div class="text-center mb-12" data-aos="fade-up">
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">Berita Terkait</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">Baca juga berita lainnya dari {{ $schoolProfile->school_name ?? 'Sekolah Kami' }}</p>
+            <div class="flex items-center justify-between mb-6" data-aos="fade-up">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Berita Terkait</h2>
+                    <p class="text-gray-600 hidden sm:block">Baca juga berita lainnya dari {{ $schoolProfile->school_name ?? 'Sekolah Kami' }}</p>
+                </div>
+                <a href="{{ route('news') }}" class="inline-flex items-center text-blue-600 font-semibold hover:text-blue-800 transition-colors">
+                    Lihat semua berita <i class="fas fa-arrow-right ml-2"></i>
+                </a>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                @forelse($relatedNews as $item)
-                    <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
-                        <div class="relative">
-                            @if($item->image)
-                                <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->title }}" class="w-full h-40 object-cover">
-                            @else
-                                <img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="{{ $item->title }}" class="w-full h-40 object-cover">
-                            @endif
-                            <div class="absolute top-2 right-2">
-                                <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
-                                    {{ $item->created_at->format('d M Y') }}
-                                </span>
+            <div class="overflow-x-auto scrollbar-thin" data-aos="fade-up">
+                <div class="flex gap-4 snap-x snap-mandatory">
+                    @forelse($relatedNews as $item)
+                        <div class="shrink-0 w-64 sm:w-72 md:w-80 snap-start bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+                            <div class="relative">
+                                @if($item->image)
+                                    <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->title }}" class="w-full h-40 object-cover">
+                                @else
+                                    <img src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="{{ $item->title }}" class="w-full h-40 object-cover">
+                                @endif
+                                <div class="absolute top-2 right-2">
+                                    <span class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                                        {{ $item->created_at->format('d M Y') }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="text-base md:text-lg font-bold mb-2 text-gray-800 line-clamp-2">{{ $item->title }}</h3>
+                                <a href="{{ route('news.detail', $item->slug) }}" class="inline-flex items-center text-blue-600 font-medium hover:text-blue-800 transition-colors text-sm">
+                                    Baca selengkapnya <i class="fas fa-arrow-right ml-1"></i>
+                                </a>
                             </div>
                         </div>
-                        <div class="p-4">
-                            <h3 class="text-lg font-bold mb-2 text-gray-800 line-clamp-2">{{ $item->title }}</h3>
-                            <a href="{{ route('news.detail', $item->slug) }}" class="inline-flex items-center text-blue-600 font-medium hover:text-blue-800 transition-colors text-sm">
-                                Baca selengkapnya <i class="fas fa-arrow-right ml-1"></i>
-                            </a>
+                    @empty
+                        <div class="text-center py-8 w-full">
+                            <p class="text-gray-600">Tidak ada berita terkait.</p>
                         </div>
-                    </div>
-                @empty
-                    <div class="col-span-4 text-center py-8">
-                        <p class="text-gray-600">Tidak ada berita terkait.</p>
-                    </div>
-                @endforelse
-            </div>
-
-            <div class="text-center mt-8">
-                <a href="{{ route('news') }}" class="btn-hover inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg">
-                    <i class="fas fa-newspaper mr-2"></i> Lihat Semua Berita
-                </a>
+                    @endforelse
+                </div>
             </div>
         </div>
     </section>
@@ -214,6 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Load comments for display only
         loadNewsComments();
     }
+    // Bookmark feature removed per request
     
     // Load news comments
     function loadNewsComments() {

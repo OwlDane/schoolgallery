@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\SchoolProfileController;
 use App\Http\Controllers\Admin\EventsController;
+use App\Http\Controllers\EventController as PublicEventController;
 use App\Http\Controllers\Admin\AdminManagementController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Guest\AuthController as GuestAuthController;
@@ -22,6 +23,7 @@ Route::middleware('track.visits')->group(function () {
     Route::get('/gallery/download/{id}', [HomeController::class, 'download'])->name('gallery.download');
     Route::get('/news', [HomeController::class, 'news'])->name('news');
     Route::get('/news/{slug}', [HomeController::class, 'newsDetail'])->name('news.detail');
+    Route::get('/events/{slug}', [PublicEventController::class, 'show'])->name('events.show');
     Route::get('/about', [HomeController::class, 'about'])->name('about');
     Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 });
@@ -50,6 +52,7 @@ Route::middleware(['auth', 'track.visits'])->group(function () {
     
     // News interactions for authenticated users
     Route::post('/news/{id}/comment', [InteractionController::class, 'addNewsComment'])->name('news.comment');
+    // Bookmark endpoints removed per request
 });
 
 // Protected Routes (require login)
