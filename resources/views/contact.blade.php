@@ -144,37 +144,6 @@
         </div>
     </section>
 
-    <!-- FAQ Section -->
-    <section class="py-16 bg-white">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="text-center mb-12" data-aos="fade-up">
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">Pertanyaan Umum</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">Beberapa pertanyaan yang sering ditanyakan tentang {{ $schoolProfile->school_name ?? 'Sekolah Kami' }}</p>
-            </div>
-
-            <div class="max-w-3xl mx-auto space-y-6">
-                <div class="bg-gray-50 rounded-xl p-6 hover:shadow-md transition-all duration-300" data-aos="fade-up" data-aos-delay="0">
-                    <h3 class="text-xl font-bold mb-2 text-gray-800">Bagaimana cara mendaftar di {{ $schoolProfile->school_name ?? 'Sekolah Kami' }}?</h3>
-                    <p class="text-gray-600">Pendaftaran dapat dilakukan secara online melalui website kami atau langsung datang ke sekolah dengan membawa dokumen yang diperlukan seperti akta kelahiran, kartu keluarga, dan rapor sebelumnya.</p>
-                </div>
-
-                <div class="bg-gray-50 rounded-xl p-6 hover:shadow-md transition-all duration-300" data-aos="fade-up" data-aos-delay="100">
-                    <h3 class="text-xl font-bold mb-2 text-gray-800">Apa saja fasilitas yang tersedia di sekolah?</h3>
-                    <p class="text-gray-600">Kami memiliki berbagai fasilitas modern seperti ruang kelas ber-AC, laboratorium komputer dan sains, perpustakaan, lapangan olahraga, kantin, dan ruang kesenian.</p>
-                </div>
-
-                <div class="bg-gray-50 rounded-xl p-6 hover:shadow-md transition-all duration-300" data-aos="fade-up" data-aos-delay="200">
-                    <h3 class="text-xl font-bold mb-2 text-gray-800">Apakah ada program ekstrakurikuler?</h3>
-                    <p class="text-gray-600">Ya, kami menyediakan berbagai kegiatan ekstrakurikuler seperti basket, futsal, pramuka, paduan suara, tari tradisional, robotik, dan klub bahasa untuk mengembangkan minat dan bakat siswa.</p>
-                </div>
-
-                <div class="bg-gray-50 rounded-xl p-6 hover:shadow-md transition-all duration-300" data-aos="fade-up" data-aos-delay="300">
-                    <h3 class="text-xl font-bold mb-2 text-gray-800">Berapa biaya pendidikan di {{ $schoolProfile->school_name ?? 'Sekolah Kami' }}?</h3>
-                    <p class="text-gray-600">Biaya pendidikan bervariasi tergantung jenjang kelas. Untuk informasi lebih detail, silakan hubungi bagian administrasi kami melalui telepon atau email yang tertera di halaman ini.</p>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Social Media Section -->
     <section class="py-16 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">

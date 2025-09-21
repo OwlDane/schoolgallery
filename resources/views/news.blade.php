@@ -25,16 +25,27 @@
 
     <!-- Search Section -->
     <section class="py-8 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4">
-            <form action="{{ route('news') }}" method="GET" class="flex flex-col md:flex-row gap-4 justify-center">
-                <div class="relative flex-grow max-w-3xl">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari berita..." 
-                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-12">
-                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+        <div class="max-w-4xl mx-auto px-4">
+            <form action="{{ route('news') }}" method="GET" class="relative">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        value="{{ request('search') }}" 
+                        placeholder="Cari berita..." 
+                        class="w-full px-5 py-4 pr-12 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-14 shadow-sm hover:shadow-md"
+                    >
+                    <div class="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <button 
+                        type="submit" 
+                        class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-300 flex items-center"
+                    >
+                        <span class="hidden sm:inline">Cari</span>
+                        <i class="fas fa-search sm:ml-2"></i>
+                    </button>
                 </div>
-                <button type="submit" class="btn-hover bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg flex items-center justify-center">
-                    <i class="fas fa-search mr-2"></i> Cari
-                </button>
             </form>
         </div>
     </section>
@@ -57,41 +68,70 @@
                 </div>
             @else
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                        @foreach($news as $item)
-                            <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 card-shine" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
-                                <div class="relative">
-                                @if($item->image)
-                                    <img data-src="{{ asset('storage/' . $item->image) }}" loading="lazy" alt="{{ $item->title }}" class="w-full h-48 object-cover">
-                                @else
-                                    <img data-src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" loading="lazy" alt="{{ $item->title }}" class="w-full h-48 object-cover">
-                                @endif
-                                <div class="absolute top-4 right-4">
-                                    <span class="bg-blue-600 text-white text-xs px-3 py-1 rounded-full">
-                                        <i class="far fa-calendar-alt mr-1"></i> {{ $item->created_at->format('d M Y') }}
-                                    </span>
-                                </div>
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
-                            </div>
-                            <div class="p-6">
-                                @if($item->newsCategory)
-                                    <div class="mb-2">
-                                        <span class="inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-full font-semibold">{{ $item->newsCategory->name }}</span>
+                    <!-- Main Content -->
+                    <div class="lg:col-span-8 space-y-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            @foreach($news as $item)
+                                <a href="{{ route('news.detail', $item->slug) }}" class="group block h-full">
+                                    <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 h-full flex flex-col border border-gray-100">
+                                        <div class="relative flex-shrink-0">
+                                            @if($item->image)
+                                                <img 
+                                                    src="{{ asset('storage/' . $item->image) }}" 
+                                                    alt="{{ $item->title }}" 
+                                                    class="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+                                                    loading="lazy"
+                                                >
+                                            @else
+                                                <div class="w-full h-48 bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center">
+                                                    <i class="fas fa-newspaper text-white text-5xl"></i>
+                                                </div>
+                                            @endif
+                                            <div class="absolute top-3 right-3">
+                                                <span class="bg-blue-600/90 text-white text-xs px-3 py-1 rounded-full shadow-md backdrop-blur-sm">
+                                                    <i class="far fa-calendar-alt mr-1"></i> {{ $item->created_at->format('d M Y') }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="p-5 flex-grow flex flex-col">
+                                            @if($item->newsCategory)
+                                                <div class="mb-2">
+                                                    <span class="inline-block bg-indigo-100 text-indigo-800 text-xs px-2.5 py-1 rounded-full font-medium">
+                                                        {{ $item->newsCategory->name }}
+                                                    </span>
+                                                </div>
+                                            @endif
+                                            <h3 class="text-lg font-bold text-gray-800 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                                                {{ $item->title }}
+                                            </h3>
+                                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                                                {!! Str::limit(strip_tags($item->content), 120) !!}
+                                            </p>
+                                            <div class="mt-auto pt-3">
+                                                <span class="inline-flex items-center text-blue-600 font-medium text-sm group-hover:underline">
+                                                    Baca selengkapnya
+                                                    <i class="fas fa-arrow-right ml-2 text-xs mt-0.5"></i>
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                @endif
-                                <h3 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2">{{ $item->title }}</h3>
-                                <p class="text-gray-600 mb-4 line-clamp-3">{!! Str::limit(strip_tags($item->content), 150) !!}</p>
-                                <a href="{{ route('news.detail', $item->slug) }}" class="inline-flex items-center text-blue-600 font-semibold hover:text-blue-800 transition-colors">
-                                    Baca selengkapnya <i class="fas fa-arrow-right ml-2"></i>
                                 </a>
-                                </div>
-                            </div>
-                        @endforeach
+                            @endforeach
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="mt-12">
+                            {{ $news->withQueryString()->links() }}
+                        </div>
                     </div>
 
-                    <aside class="lg:col-span-4">
-                        <div class="bg-white rounded-xl shadow-lg p-6 sticky top-6 mb-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
-                            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center"><i class="fas fa-calendar-alt text-blue-600 mr-2"></i> Acara Mendatang</h3>
+                    <!-- Sidebar -->
+                    <aside class="lg:col-span-4 space-y-6">
+                        <!-- Upcoming Events Card -->
+                        <div class="bg-white rounded-xl shadow-lg p-6 sticky top-6 mb-6">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-calendar-alt text-blue-600 mr-2"></i> Acara Mendatang
+                            </h3>
                             @if(isset($upcomingEvents) && $upcomingEvents->isNotEmpty())
                                 <ul class="space-y-4">
                                     @foreach($upcomingEvents as $event)
@@ -111,11 +151,13 @@
                                                             <span class="timeago" data-time="{{ $event->start_at->toIso8601String() }}">{{ $event->start_at->format('d M Y H:i') }}</span>
                                                         </p>
                                                     </div>
-                                                    <p class="font-semibold text-gray-800"><a href="{{ route('events.show', $event->slug) }}" class="hover:text-blue-700 line-clamp-2">{{ $event->title }}</a></p>
+                                                    <p class="font-semibold text-gray-800">
+                                                        <a href="{{ route('events.show', $event->slug) }}" class="hover:text-blue-700 line-clamp-2">{{ $event->title }}</a>
+                                                    </p>
                                                     @if($event->location)
                                                         <p class="text-xs text-gray-600 mt-1 flex items-center">
                                                             <i class="fas fa-map-marker-alt mr-1 text-red-500"></i>
-                                                            <span>{{ $event->location }}</span>
+                                                            <span class="truncate">{{ $event->location }}</span>
                                                         </p>
                                                     @endif
                                                 </div>
@@ -124,7 +166,7 @@
                                     @endforeach
                                 </ul>
                                 <div class="mt-4 text-center">
-                                    <a href="#" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors duration-300 shadow-md hover:shadow-lg">
+                                    <a href="{{ route('events.index') }}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors duration-300 shadow-md hover:shadow-lg">
                                         <i class="fas fa-calendar-plus mr-1"></i> Lihat Semua Acara
                                     </a>
                                 </div>
@@ -137,35 +179,58 @@
                             @endif
                         </div>
 
-                        <div class="bg-white rounded-xl shadow-lg p-6 sticky top-6">
-                            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center"><i class="fas fa-fire text-orange-500 mr-2"></i> Berita Terpopuler</h3>
-                            @if(isset($latestNews) && $latestNews->isNotEmpty())
-                                <ul class="space-y-4">
-                                    @foreach($latestNews as $index => $ln)
-                                        @if($index < 5)
-                                        <li class="relative border-b border-gray-100 pb-3 last:border-0 last:pb-0">
-                                            <div class="absolute top-0 left-0 bg-gradient-to-r from-blue-600 to-indigo-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold shadow-md">
-                                                {{ $index + 1 }}
+                        <!-- Popular News Card -->
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden mt-6 sticky top-[400px]">
+                            <div class="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-6 py-4">
+                                <h3 class="text-lg font-semibold flex items-center">
+                                    <i class="fas fa-fire mr-2"></i> Berita Terpopuler
+                                </h3>
+                            </div>
+                            <div class="p-5">
+                                @if(isset($latestNews) && $latestNews->isNotEmpty())
+                                    <div class="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                                        @foreach($latestNews as $index => $ln)
+                                            @if($index < 5)
+                                            <div class="group">
+                                                <a href="{{ route('news.detail', $ln->slug) }}" class="block">
+                                                    <div class="flex items-start gap-3 p-3 rounded-lg transition-colors duration-200 hover:bg-orange-50">
+                                                        <div class="relative flex-shrink-0">
+                                                            <div class="w-8 h-8 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white flex items-center justify-center font-bold text-sm shadow-md">
+                                                                {{ $index + 1 }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex-1 min-w-0">
+                                                            <h4 class="text-sm font-medium text-gray-800 line-clamp-2 group-hover:text-orange-600 transition-colors">
+                                                                {{ $ln->title }}
+                                                            </h4>
+                                                            <div class="flex items-center mt-1.5 text-xs text-gray-500">
+                                                                <span class="flex items-center">
+                                                                    <i class="far fa-eye mr-1"></i> {{ number_format($ln->views) }}
+                                                                </span>
+                                                                <span class="mx-2">•</span>
+                                                                <span>{{ $ln->created_at->diffForHumans() }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </a>
                                             </div>
-                                            <a href="{{ route('news.detail', $ln->slug) }}" class="block pl-10">
-                                                <p class="font-medium text-gray-800 line-clamp-2 hover:text-blue-600 transition-colors duration-300">{{ $ln->title }}</p>
-                                                <div class="flex items-center text-xs text-gray-500 mt-1">
-                                                    <span class="mr-3"><i class="far fa-calendar-alt mr-1"></i>{{ $ln->created_at->format('d M Y') }}</span>
-                                                    <span><i class="far fa-eye mr-1"></i>{{ rand(100, 999) }} dilihat</span>
-                                                </div>
-                                            </a>
-                                        </li>
-                                        @endif
-                                    @endforeach
-                                </ul>
-                            @else
-                                <p class="text-gray-500">Belum ada berita terpopuler.</p>
-                            @endif
-                            <div class="mt-4 text-right">
-                                <a href="{{ route('news') }}" class="text-blue-600 hover:text-blue-800 text-sm font-semibold flex items-center justify-end">
-                                    <span>Lihat semua</span>
-                                    <i class="fas fa-arrow-right ml-1 text-xs transition-transform duration-300 group-hover:translate-x-1"></i>
-                                </a>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                    <div class="mt-4 pt-4 border-t border-gray-100">
+                                        <a href="{{ route('news') }}" class="text-sm font-medium text-orange-600 hover:text-orange-700 inline-flex items-center">
+                                            Lihat semua berita
+                                            <i class="fas fa-arrow-right ml-2 text-xs mt-0.5"></i>
+                                        </a>
+                                    </div>
+                                @else
+                                    <div class="text-center py-6">
+                                        <div class="text-orange-100 mb-2">
+                                            <i class="fas fa-newspaper text-4xl"></i>
+                                        </div>
+                                        <p class="text-gray-500 text-sm">Belum ada berita terpopuler</p>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </aside>

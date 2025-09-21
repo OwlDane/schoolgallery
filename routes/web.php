@@ -27,6 +27,7 @@ Route::middleware('track.visits')->group(function () {
     Route::get('/gallery/download/{id}', [HomeController::class, 'download'])->name('gallery.download');
     Route::get('/news', [HomeController::class, 'news'])->name('news');
     Route::get('/news/{slug}', [HomeController::class, 'newsDetail'])->name('news.detail');
+    Route::get('/events', [PublicEventController::class, 'index'])->name('events.index'); // Tambahkan route ini
     Route::get('/events/{slug}', [PublicEventController::class, 'show'])->name('events.show');
     Route::get('/about', [HomeController::class, 'about'])->name('about');
     Route::get('/contact', [HomeController::class, 'contact'])->name('contact');

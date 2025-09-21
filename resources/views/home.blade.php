@@ -73,7 +73,7 @@
             
             <div class="grid grid-cols-1 gap-8">
                 @forelse($latestNews as $index => $news)
-                    @if($index < 5)
+                    @if($index < 2)
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover card-shine border border-gray-100 flex flex-col md:flex-row" data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
                         <div class="relative md:w-1/4 image-hover">
                             <div class="card-shine-effect absolute inset-0 z-0"></div>
@@ -84,11 +84,6 @@
                                 @else
                                     <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="School News" class="w-full h-56 md:h-full object-cover absolute top-0 left-0">
                                 @endif
-                            </div>
-                            <div class="absolute top-4 left-4">
-                                <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xl font-bold w-12 h-12 rounded-full shadow-lg flex items-center justify-center">
-                                    #{{ $index + 1 }}
-                                </div>
                             </div>
                         </div>
                         <div class="p-6 md:w-3/4">
