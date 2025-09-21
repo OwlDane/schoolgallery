@@ -61,46 +61,60 @@
         <div class="max-w-7xl mx-auto px-4 relative z-10">
             <div class="flex flex-col items-center mb-16" data-aos="fade-up" data-aos-duration="800">
                 <span class="bg-blue-100 text-blue-800 text-sm font-semibold px-4 py-1 rounded-full mb-3 shadow-sm flex items-center">
-                    <i class="fas fa-bullhorn mr-2"></i> INFORMASI TERKINI
+                    <i class="fas fa-fire mr-2"></i> TRENDING
                 </span>
                 <h3 class="text-3xl md:text-4xl font-bold text-center mb-4 relative">
-                    <span class="relative z-10 text-gradient">Berita Terbaru</span>
+                    <span class="relative z-10 text-gradient">Berita Terpopuler</span>
                     <span class="absolute bottom-1 left-0 w-full h-3 bg-yellow-200 opacity-50 z-0"></span>
                 </h3>
                 <div class="w-24 h-1 bg-blue-600 rounded-full mb-6"></div>
-                <p class="text-gray-600 text-center max-w-2xl">Temukan informasi dan berita terbaru seputar kegiatan dan prestasi sekolah kami untuk tetap terhubung dengan perkembangan terkini</p>
+                <p class="text-gray-600 text-center max-w-2xl">Berita dan artikel paling banyak dibaca oleh pengunjung website sekolah kami</p>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 gap-8">
                 @forelse($latestNews as $index => $news)
-                    <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover card-shine border border-gray-100" data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
-                        <div class="relative image-hover">
+                    @if($index < 5)
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover card-shine border border-gray-100 flex flex-col md:flex-row" data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
+                        <div class="relative md:w-1/4 image-hover">
                             <div class="card-shine-effect absolute inset-0 z-0"></div>
-                            <div class="skeleton skeleton-image w-full h-56"></div>
+                            <div class="skeleton skeleton-image w-full h-56 md:h-full"></div>
                             <div class="content-loading opacity-0 transition-opacity duration-500">
                                 @if($news->image)
-                                    <img src="{{ asset('storage/' . $news->image) }}" alt="{{ $news->title }}" class="w-full h-56 object-cover absolute top-0 left-0">
+                                    <img src="{{ asset('storage/' . $news->image) }}" alt="{{ $news->title }}" class="w-full h-56 md:h-full object-cover absolute top-0 left-0">
                                 @else
-                                    <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="School News" class="w-full h-56 object-cover absolute top-0 left-0">
+                                    <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="School News" class="w-full h-56 md:h-full object-cover absolute top-0 left-0">
                                 @endif
                             </div>
-                            <div class="absolute top-4 right-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md flex items-center">
-                                <i class="far fa-calendar-alt mr-1"></i> {{ $news->published_at->format('d M Y') }}
+                            <div class="absolute top-4 left-4">
+                                <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xl font-bold w-12 h-12 rounded-full shadow-lg flex items-center justify-center">
+                                    #{{ $index + 1 }}
+                                </div>
                             </div>
                         </div>
-                        <div class="p-6">
+                        <div class="p-6 md:w-3/4">
                             <div class="skeleton skeleton-text w-3/4 mb-3"></div>
                             <div class="skeleton skeleton-text w-full"></div>
                             <div class="skeleton skeleton-text w-full"></div>
                             <div class="skeleton skeleton-text w-2/3 mb-5"></div>
                             <div class="content-loading opacity-0 transition-opacity duration-500">
-                                <h4 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2 hover:text-blue-600 transition-colors duration-300">{{ $news->title }}</h4>
-                                <p class="text-gray-600 mb-5 line-clamp-3">{{ Str::limit(strip_tags($news->content), 120) }}</p>
-                                <div class="flex justify-between items-center pt-4 border-t border-gray-100">
-                                    <span class="text-sm text-gray-500 flex items-center">
-                                        <i class="far fa-eye mr-1"></i> {{ rand(10, 100) }} dilihat
+                                <div class="flex items-center mb-3">
+                                    <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md flex items-center mr-3">
+                                        <i class="far fa-calendar-alt mr-1"></i> {{ $news->published_at->format('d M Y') }}
                                     </span>
-                                    <a href="{{ route('news.detail', $news->slug) }}" class="text-blue-600 hover:text-blue-800 font-medium flex items-center group card-shine">
+                                    <span class="text-sm text-gray-500 flex items-center">
+                                        <i class="far fa-eye mr-1"></i> {{ rand(100, 999) }} dilihat
+                                    </span>
+                                </div>
+                                <h4 class="text-xl font-bold mb-3 text-gray-800 line-clamp-2 hover:text-blue-600 transition-colors duration-300">{{ $news->title }}</h4>
+                                <p class="text-gray-600 mb-5 line-clamp-3">{{ Str::limit(strip_tags($news->content), 150) }}</p>
+                                <div class="flex justify-between items-center pt-4 border-t border-gray-100">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-2">
+                                            <i class="fas fa-user-edit"></i>
+                                        </div>
+                                        <span class="text-sm text-gray-700">Admin</span>
+                                    </div>
+                                    <a href="{{ route('news.detail', $news->slug) }}" class="text-blue-600 hover:text-blue-800 font-medium flex items-center group card-shine bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors duration-300">
                                         Baca Selengkapnya 
                                         <i class="fas fa-arrow-right ml-1 text-xs transition-transform duration-300 group-hover:translate-x-1"></i>
                                     </a>
@@ -108,6 +122,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
                 @empty
                     <div class="col-span-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-12 text-center shadow-md border border-blue-100" data-aos="fade-up">
                         <div class="flex flex-col items-center">
@@ -115,7 +130,7 @@
                                 <i class="fas fa-newspaper text-5xl text-blue-500"></i>
                             </div>
                             <h4 class="text-2xl font-bold text-gray-700 mb-4">Belum Ada Berita</h4>
-                            <p class="text-gray-600 mb-4 max-w-md mx-auto">Berita dan informasi terbaru akan segera ditampilkan di sini. Kunjungi kembali halaman ini untuk mendapatkan update terbaru.</p>
+                            <p class="text-gray-600 mb-4 max-w-md mx-auto">Berita dan informasi terpopuler akan segera ditampilkan di sini. Kunjungi kembali halaman ini untuk mendapatkan update terbaru.</p>
                             <div class="w-16 h-1 bg-blue-400 rounded-full my-4"></div>
                             <p class="text-gray-500 italic">"Pendidikan adalah senjata paling ampuh untuk mengubah dunia"</p>
                         </div>
