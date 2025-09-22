@@ -192,46 +192,72 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300" data-aos="fade-up" data-aos-delay="0">
-                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
-                         alt="Kepala Sekolah" class="w-full h-64 object-cover">
+                @forelse($teachers->take(8) as $index => $teacher)
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group" data-aos="fade-up" data-aos-delay="{{ $index * 50 }}">
+                    <div class="relative overflow-hidden">
+                        @if($teacher->image)
+                            <img src="{{ asset('storage/' . $teacher->image) }}" 
+                                 alt="{{ $teacher->name }}" 
+                                 class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110">
+                        @else
+                            <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
+                                <i class="fas fa-user text-6xl text-gray-400"></i>
+                            </div>
+                        @endif
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                            <div class="text-white text-left w-full">
+                                <h3 class="font-bold text-lg">{{ $teacher->name }}</h3>
+                                <p class="text-blue-300">{{ $teacher->position }}</p>
+                                
+                                @if($teacher->facebook || $teacher->twitter || $teacher->instagram || $teacher->linkedin)
+                                <div class="flex space-x-2 mt-2">
+                                    @if($teacher->facebook)
+                                        <a href="{{ $teacher->facebook }}" target="_blank" class="text-white hover:text-blue-300">
+                                            <i class="fab fa-facebook-f"></i>
+                                        </a>
+                                    @endif
+                                    @if($teacher->twitter)
+                                        <a href="{{ $teacher->twitter }}" target="_blank" class="text-white hover:text-blue-300">
+                                            <i class="fab fa-twitter"></i>
+                                        </a>
+                                    @endif
+                                    @if($teacher->instagram)
+                                        <a href="{{ $teacher->instagram }}" target="_blank" class="text-white hover:text-blue-300">
+                                            <i class="fab fa-instagram"></i>
+                                        </a>
+                                    @endif
+                                    @if($teacher->linkedin)
+                                        <a href="{{ $teacher->linkedin }}" target="_blank" class="text-white hover:text-blue-300">
+                                            <i class="fab fa-linkedin-in"></i>
+                                        </a>
+                                    @endif
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
                     <div class="p-6 text-center">
-                        <h3 class="text-xl font-bold mb-1 text-gray-800">Drs. Mulya Murprihartono, M.Si</h3>
-                        <p class="text-blue-600 font-medium mb-3">Kepala Sekolah</p>
-                        <p class="text-gray-600 text-sm">Menjabat sebagai kepala sekolah di SMKN 4 Kota Bogor pada tahun ajaran 2022-2023 dan telah menyampaikan materi mengenai kepemimpinan dan jati diri pada kegiatan di sekolah tersebut. </p>
+                        <h3 class="text-xl font-bold mb-1 text-gray-800">{{ $teacher->name }}</h3>
+                        <p class="text-blue-600 font-medium mb-3">{{ $teacher->position }}</p>
+                        @if($teacher->description)
+                            <p class="text-gray-600 text-sm">{{ Str::limit($teacher->description, 100) }}</p>
+                        @endif
                     </div>
                 </div>
-
-                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300" data-aos="fade-up" data-aos-delay="100">
-                    <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
-                         alt="Wakil Kepala Sekolah" class="w-full h-64 object-cover">
-                    <div class="p-6 text-center">
-                        <h3 class="text-xl font-bold mb-1 text-gray-800">MULYADIH, S.PD</h3>
-                        <p class="text-blue-600 font-medium mb-3">Wakil Kepala Sekolah</p>
-                        <p class="text-gray-600 text-sm">Spesialis kurikulum dengan pengalaman mengajar selama 15 tahun di berbagai jenjang pendidikan</p>
-                    </div>
+                @empty
+                <div class="col-span-4 text-center py-8">
+                    <p class="text-gray-500">Belum ada data guru yang tersedia.</p>
                 </div>
-
-                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300" data-aos="fade-up" data-aos-delay="200">
-                    <img src="https://images.unsplash.com/photo-1580894732444-8ecded7900cd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
-                         alt="Guru Matematika" class="w-full h-64 object-cover">
-                    <div class="p-6 text-center">
-                        <h3 class="text-xl font-bold mb-1 text-gray-800">Novita Wandasari, S.Pd</h3>
-                        <p class="text-blue-600 font-medium mb-3">Kesiswaan</p>
-                        <p class="text-gray-600 text-sm">Berpengalaman menjadi kaprodi jurusan PPLG di SMK Negeri 4 Kota Bogor</p>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300" data-aos="fade-up" data-aos-delay="300">
-                    <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
-                         alt="Guru Bahasa Inggris" class="w-full h-64 object-cover">
-                    <div class="p-6 text-center">
-                        <h3 class="text-xl font-bold mb-1 text-gray-800">Yunita Indrasari, St, M. Kom</h3>
-                        <p class="text-blue-600 font-medium mb-3">Kejuruan TJKT</p>
-                        <p class="text-gray-600 text-sm">Berpengalaman mengajar di bidang jaringan komputer dan telekomunikasi serta mengajar di bidang kewirausahaan</p>
-                    </div>
-                </div>
+                @endforelse
             </div>
+            
+            @if($teachers->count() > 8)
+            <div class="text-center mt-8">
+                <a href="{{ route('teachers') }}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition duration-300">
+                    Lihat Semua Guru
+                </a>
+            </div>
+            @endif
         </div>
     </section>  
 

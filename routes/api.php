@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\GalleryController;
 use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\SchoolProfileController;
+use App\Http\Controllers\Api\TeacherController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,11 +22,21 @@ Route::prefix('v1')->group(function () {
     Route::get('/news/categories', [NewsController::class, 'categories']);
     Route::get('/news/{slug}', [NewsController::class, 'show']);
     
-    // News - Protected routes (admin only)
+    // Teachers - Public routes
+    Route::get('/teachers', [TeacherController::class, 'index']);
+    Route::get('/teachers/{teacher}', [TeacherController::class, 'show']);
+    
+    // Protected routes (admin only)
     Route::middleware('auth:sanctum')->prefix('admin')->group(function () {
+        // News routes
         Route::post('/news', [NewsController::class, 'store']);
         Route::put('/news/{id}', [NewsController::class, 'update']);
         Route::delete('/news/{id}', [NewsController::class, 'destroy']);
+        
+        // Teacher routes
+        Route::post('/teachers', [TeacherController::class, 'store']);
+        Route::put('/teachers/{teacher}', [TeacherController::class, 'update']);
+        Route::delete('/teachers/{teacher}', [TeacherController::class, 'destroy']);
     });
     
     // Admin Authentication

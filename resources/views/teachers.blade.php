@@ -1,0 +1,82 @@
+@extends('layouts.app')
+
+@section('content')
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-700 to-purple-800 text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 relative z-10">
+            <div class="text-center">
+                <span class="inline-block bg-blue-500/30 text-white text-sm font-semibold px-4 py-1 rounded-full mb-4 backdrop-blur-sm border border-blue-400/30">
+                    <i class="fas fa-users mr-2"></i> DAFTAR GURU
+                </span>
+                <h1 class="text-4xl md:text-5xl font-bold mb-6 text-shadow leading-tight">
+                    Tim Pengajar {{ $schoolProfile->school_name ?? 'Sekolah Kami' }}
+                </h1>
+                <p class="text-blue-100 text-lg">Tenaga pendidik profesional yang berdedikasi</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Teachers Grid -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4">
+            @if($teachers->isEmpty())
+                <div class="text-center text-gray-500">Belum ada data guru yang tersedia.</div>
+            @else
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    @foreach($teachers as $index => $teacher)
+                    <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group">
+                        <div class="relative overflow-hidden">
+                            @if($teacher->image)
+                                <img src="{{ asset('storage/' . $teacher->image) }}" 
+                                     alt="{{ $teacher->name }}" 
+                                     class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110">
+                            @else
+                                <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
+                                    <i class="fas fa-user text-6xl text-gray-400"></i>
+                                </div>
+                            @endif
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                                <div class="text-white text-left w-full">
+                                    <h3 class="font-bold text-lg">{{ $teacher->name }}</h3>
+                                    <p class="text-blue-300">{{ $teacher->position }}</p>
+                                    @if($teacher->facebook || $teacher->twitter || $teacher->instagram || $teacher->linkedin)
+                                    <div class="flex space-x-2 mt-2">
+                                        @if($teacher->facebook)
+                                            <a href="{{ $teacher->facebook }}" target="_blank" class="text-white hover:text-blue-300">
+                                                <i class="fab fa-facebook-f"></i>
+                                            </a>
+                                        @endif
+                                        @if($teacher->twitter)
+                                            <a href="{{ $teacher->twitter }}" target="_blank" class="text-white hover:text-blue-300">
+                                                <i class="fab fa-twitter"></i>
+                                            </a>
+                                        @endif
+                                        @if($teacher->instagram)
+                                            <a href="{{ $teacher->instagram }}" target="_blank" class="text-white hover:text-blue-300">
+                                                <i class="fab fa-instagram"></i>
+                                            </a>
+                                        @endif
+                                        @if($teacher->linkedin)
+                                            <a href="{{ $teacher->linkedin }}" target="_blank" class="text-white hover:text-blue-300">
+                                                <i class="fab fa-linkedin-in"></i>
+                                            </a>
+                                        @endif
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6 text-center">
+                            <h3 class="text-xl font-bold mb-1 text-gray-800">{{ $teacher->name }}</h3>
+                            <p class="text-blue-600 font-medium mb-3">{{ $teacher->position }}</p>
+                            @if($teacher->description)
+                                <p class="text-gray-600 text-sm">{{ Str::limit($teacher->description, 100) }}</p>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    </section>
+@endsection

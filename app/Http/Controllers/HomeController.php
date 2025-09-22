@@ -10,6 +10,7 @@ use App\Models\NewsCategory;
 use App\Models\Event;
 use App\Models\NewsComment;
 use App\Models\SchoolProfile;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -170,7 +171,15 @@ class HomeController extends Controller
     public function about()
     {
         $schoolProfile = SchoolProfile::getProfile();
-        return view('about', compact('schoolProfile'));
+        $teachers = Teacher::active()->ordered()->get();
+        return view('about', compact('schoolProfile', 'teachers'));
+    }
+
+    public function teachers()
+    {
+        $schoolProfile = SchoolProfile::getProfile();
+        $teachers = Teacher::active()->ordered()->get();
+        return view('teachers', compact('schoolProfile', 'teachers'));
     }
 
     public function contact()

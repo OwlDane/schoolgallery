@@ -15,10 +15,10 @@ class AdminSeeder extends Seeder
         Admin::withTrashed()->where('email', 'admin@sekolah.com')->forceDelete();
 
         // Buat admin baru
-        Admin::create([
+        $admin = Admin::create([
             'name' => 'Administrator',
             'email' => 'admin@sekolah.com',
-            'password' => 'password123',
+            'password' => Hash::make('password123'),
             'role' => 'super_admin',
             'is_active' => true,
             'email_verified_at' => now(),

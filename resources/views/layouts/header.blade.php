@@ -194,6 +194,7 @@
                 <!-- Center: Main nav -->
                 <div class="hidden md:flex items-center space-x-4 justify-center flex-1">
                     <a href="{{ route('home') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center gap-2"><i class="fas fa-home text-blue-500"></i><span>Beranda</span></a>
+                    <a href="{{ route('about') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center gap-2"><i class="fas fa-info-circle text-blue-500"></i><span>Tentang</span></a>
 
                     @php($newsCategories = \App\Models\NewsCategory::active()->ordered()->get())
                     <div class="relative group">
@@ -213,7 +214,6 @@
                     </div>
 
                     <a href="{{ route('gallery') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center gap-2"><i class="fas fa-images text-blue-500"></i><span>Galeri</span></a>
-                    <a href="{{ route('about') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center gap-2"><i class="fas fa-info-circle text-blue-500"></i><span>Tentang</span></a>
                     <a href="{{ route('contact') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center gap-2"><i class="fas fa-envelope text-blue-500"></i><span>Kontak</span></a>
                     
                 </div>
@@ -243,6 +243,7 @@
         <div id="mobile-menu" class="md:hidden hidden bg-white border-t border-gray-100 shadow-inner">
             <div class="px-2 pt-2 pb-3 space-y-1">
                 <a href="{{ route('home') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all"><i class="fas fa-home mr-2 text-blue-500"></i> Beranda</a>
+                <a href="{{ route('about') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all"><i class="fas fa-info-circle mr-2 text-blue-500"></i> Tentang</a>
                 <div>
                     <button id="mobile-news-toggle" class="w-full flex items-center justify-between py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all">
                         <span><i class="fas fa-newspaper mr-2 text-blue-500"></i> Berita</span>
@@ -257,7 +258,6 @@
                     </div>
                 </div>
                 <a href="{{ route('gallery') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all"><i class="fas fa-images mr-2 text-blue-500"></i> Galeri</a>
-                <a href="{{ route('about') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all"><i class="fas fa-info-circle mr-2 text-blue-500"></i> Tentang</a>
                 <a href="{{ route('contact') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all"><i class="fas fa-envelope mr-2 text-blue-500"></i> Kontak</a>
                 
                 <!-- Guest Authentication Mobile -->

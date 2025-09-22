@@ -71,6 +71,9 @@
                 <a href="{{ route('admin.galleries.index') }}" class="sidebar-item flex items-center px-4 py-3 mb-2 {{ request()->routeIs('admin.galleries.*') ? 'active' : '' }}">
                     <i class="fas fa-images mr-3 w-5 text-center"></i> Galeri
                 </a>
+                <a href="{{ route('admin.teachers.index') }}" class="sidebar-item flex items-center px-4 py-3 mb-2 {{ request()->routeIs('admin.teachers.*') ? 'active' : '' }}">
+                    <i class="fas fa-chalkboard-teacher mr-3 w-5 text-center"></i> Guru
+                </a>
                 <a href="{{ route('admin.reports.index') }}" class="sidebar-item flex items-center px-4 py-3 mb-2 {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
                     <i class="fas fa-chart-line mr-3 w-5 text-center"></i> Laporan
                 </a>

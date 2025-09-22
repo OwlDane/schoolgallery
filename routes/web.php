@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\EventsController;
 use App\Http\Controllers\EventController as PublicEventController;
 use App\Http\Controllers\Admin\AdminManagementController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Guest\AuthController as GuestAuthController;
 use App\Http\Controllers\Guest\InteractionController;
 use App\Http\Controllers\HomeController;
@@ -30,6 +31,7 @@ Route::middleware('track.visits')->group(function () {
     Route::get('/events', [PublicEventController::class, 'index'])->name('events.index'); // Tambahkan route ini
     Route::get('/events/{slug}', [PublicEventController::class, 'show'])->name('events.show');
     Route::get('/about', [HomeController::class, 'about'])->name('about');
+    Route::get('/teachers', [HomeController::class, 'teachers'])->name('teachers');
     Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 });
 
@@ -158,6 +160,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('admins/{admin}/reset-password', [AdminManagementController::class, 'resetPassword'])->name('admins.reset-password');
             Route::patch('admins/{admin}/toggle-active', [AdminManagementController::class, 'toggleActive'])->name('admins.toggle-active');
         });
+
+        // Teacher Management
+        Route::resource('teachers', TeacherController::class);
 
         // Reports & Export
         Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
