@@ -192,7 +192,7 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                @forelse($teachers->take(8) as $index => $teacher)
+                @forelse($teachers->take(4) as $index => $teacher)
                 <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group" data-aos="fade-up" data-aos-delay="{{ $index * 50 }}">
                     <div class="relative overflow-hidden">
                         @if($teacher->image)
@@ -251,7 +251,7 @@
                 @endforelse
             </div>
             
-            @if($teachers->count() > 8)
+            @if($teachers->count() > 4)
             <div class="text-center mt-8">
                 <a href="{{ route('teachers') }}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition duration-300">
                     Lihat Semua Guru

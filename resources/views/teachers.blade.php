@@ -19,6 +19,29 @@
     <!-- Teachers Grid -->
     <section class="py-16 bg-white">
         <div class="max-w-7xl mx-auto px-4">
+            <!-- Search Bar -->
+            <form method="GET" action="{{ route('teachers') }}" class="mb-8" id="teacherSearchForm">
+                <div class="flex items-center gap-3">
+                    <div class="flex-1">
+                        <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari guru..." class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    </div>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                        <i class="fas fa-search mr-1"></i> Cari
+                    </button>
+                </div>
+            </form>
+            <script>
+                (function(){
+                    const form = document.getElementById('teacherSearchForm');
+                    if (!form) return;
+                    const input = form.querySelector('input[name="q"]');
+                    let t;
+                    input && input.addEventListener('input', function(){
+                        clearTimeout(t);
+                        t = setTimeout(()=>{ form.submit(); }, 300);
+                    });
+                })();
+            </script>
             @if($teachers->isEmpty())
                 <div class="text-center text-gray-500">Belum ada data guru yang tersedia.</div>
             @else

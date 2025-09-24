@@ -175,10 +175,20 @@ class HomeController extends Controller
         return view('about', compact('schoolProfile', 'teachers'));
     }
 
-    public function teachers()
+    public function teachers(Request $request)
     {
         $schoolProfile = SchoolProfile::getProfile();
-        $teachers = Teacher::active()->ordered()->get();
+        $query = Teacher::active()->ordered();
+
+        if ($request->filled('q')) {
+            $search = $request->q;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('position', 'like', "%{$search}%");
+            });
+        }
+
+        $teachers = $query->get();
         return view('teachers', compact('schoolProfile', 'teachers'));
     }
 
