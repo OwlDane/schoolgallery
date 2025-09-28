@@ -145,6 +145,18 @@
                     </button>
                 </form>
             </div>
+            <script>
+                (function(){
+                    const form = document.querySelector('form[action="{{ route('gallery') }}"]');
+                    if (!form) return;
+                    const input = form.querySelector('input[name="search"]');
+                    let t;
+                    input && input.addEventListener('input', function(){
+                        clearTimeout(t);
+                        t = setTimeout(()=>{ form.submit(); }, 300);
+                    });
+                })();
+            </script>
             
             @if(!$kategoris->isEmpty())
                 <div class="flex flex-wrap gap-3 justify-center mb-8">

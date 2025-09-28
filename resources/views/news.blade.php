@@ -22,6 +22,18 @@
             </div>
         </div>
     </section>
+    <script>
+        (function(){
+            const form = document.querySelector('form[action="{{ route('news') }}"]');
+            if (!form) return;
+            const input = form.querySelector('input[name="search"]');
+            let t;
+            input && input.addEventListener('input', function(){
+                clearTimeout(t);
+                t = setTimeout(()=>{ form.submit(); }, 300);
+            });
+        })();
+    </script>
 
     <!-- Search Section -->
     <section class="py-8 bg-gray-50">

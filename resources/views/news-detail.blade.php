@@ -171,33 +171,12 @@
         @endauth
 
         <div id="newsCommentsList" class="space-y-4">
-            @foreach($news->comments as $comment)
-                @if($comment->is_approved || (auth()->check() && auth()->user()->id === $comment->user_id))
-                    <div class="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
-                        <div class="flex items-start space-x-3">
-                            <div class="w-10 h-10 bg-blue-500 rounded-full flex-shrink-0 flex items-center justify-center text-white font-semibold">
-                                {{ substr($comment->user->name, 0, 1) }}
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <p class="font-semibold text-gray-800">{{ $comment->user->name }}</p>
-                                        <p class="text-xs text-gray-500">
-                                            {{ $comment->created_at->diffForHumans() }}
-                                            @if($comment->is_approved === 0)
-                                                <span class="text-yellow-600 ml-2">
-                                                    <i class="fas fa-clock"></i> Menunggu persetujuan
-                                                </span>
-                                            @endif
-                                        </p>
-                                    </div>
-                                </div>
-                                <p class="mt-1 text-gray-700">{{ $comment->content }}</p>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-            @endforeach
+            <!-- Comments will be loaded here via JavaScript -->
+        </div>
+        <!-- Loading indicator -->
+        <div id="newsCommentsLoading" class="text-center py-4">
+            <i class="fas fa-spinner fa-spin text-blue-500"></i>
+            <span class="ml-2 text-gray-600">Memuat komentar...</span>
         </div>
     </div>
 </aside>

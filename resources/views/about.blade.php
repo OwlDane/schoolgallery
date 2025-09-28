@@ -299,7 +299,7 @@
             </div>
 
             <div class="text-center mt-8">
-                <a href="{{ route('gallery') }}" class="btn-hover inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg">
+                <a href="{{ route('gallery.category', 'fasilitas-sekolah') }}" class="btn-hover inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg">
                     <i class="fas fa-images mr-2"></i> Lihat Galeri Fasilitas
                 </a>
             </div>
