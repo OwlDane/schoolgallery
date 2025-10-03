@@ -19,7 +19,7 @@ class AdminSeeder extends Seeder
             'name' => 'Administrator',
             'email' => 'admin@sekolah.com',
             'password' => Hash::make('password123'),
-            'role' => 'super_admin',
+            'role' => 'super_admin',    
             'is_active' => true,
             'email_verified_at' => now(),
             'remember_token' => Str::random(10),
