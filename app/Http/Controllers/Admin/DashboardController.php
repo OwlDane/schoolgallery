@@ -292,6 +292,42 @@ class DashboardController extends Controller
                     'regular_admin' => Admin::where('role', 'admin')->count(),
                     'recent_logins' => Admin::where('updated_at', '>=', now()->subDays(7))->count()
                 ];
+
+                // Monthly new admins (last 12 months)
+                $monthlyAdmins = Admin::where('created_at', '>=', now()->startOfMonth()->subMonths(11))
+                    ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as ym, COUNT(*) as total")
+                    ->groupBy('ym')
+                    ->orderBy('ym')
+                    ->get();
+
+                $labels = [];
+                $series = [];
+                for ($i = 11; $i >= 0; $i--) {
+                    $m = now()->startOfMonth()->subMonths($i);
+                    $key = $m->format('Y-m');
+                    $labels[] = $m->format('M Y');
+                    $series[] = (int) ($monthlyAdmins->firstWhere('ym', $key)->total ?? 0);
+                }
+                $data['chart'] = [
+                    'labels' => $labels,
+                    'series' => $series,
+                ];
+
+                // Role and status counts for charts
+                $data['role_chart'] = [
+                    'labels' => ['Super Admin', 'Admin'],
+                    'series' => [
+                        (int) $data['super_admin'],
+                        (int) $data['regular_admin'],
+                    ],
+                ];
+                $data['status_chart'] = [
+                    'labels' => ['Aktif', 'Nonaktif'],
+                    'series' => [
+                        (int) $data['active'],
+                        (int) $data['inactive'],
+                    ],
+                ];
                 break;
                 
             case 'visitors':

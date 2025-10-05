@@ -137,8 +137,8 @@
                 <a href="{{ route('admin.news.edit', $berita->id) }}" class="block hover:bg-blue-50 transition-colors duration-300 p-4 group">
                     <div class="flex items-start">
                         <div class="flex-shrink-0 h-20 w-20 rounded-lg bg-gray-100 overflow-hidden shadow-sm group-hover:shadow transition-all">
-                            @if($berita->gambar)
-                                <img src="{{ asset('storage/' . $berita->gambar) }}" alt="{{ $berita->judul }}" class="h-full w-full object-cover">
+                            @if($berita->image)
+                                <img src="{{ asset('storage/' . $berita->image) }}" alt="{{ $berita->title }}" class="h-full w-full object-cover">
                             @else
                                 <div class="h-full w-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-400">
                                     <i class="fas fa-newspaper text-xl"></i>
@@ -147,16 +147,16 @@
                         </div>
                         <div class="ml-4 flex-1">
                             <div class="flex justify-between">
-                                <h4 class="text-sm font-medium text-gray-900 line-clamp-1 group-hover:text-blue-700 transition-colors">{{ $berita->judul }}</h4>
-                                <span class="text-xs px-2 py-1 rounded-full {{ $berita->status == 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                    {{ $berita->status == 'published' ? 'Published' : 'Draft' }}
+                                <h4 class="text-sm font-medium text-gray-900 line-clamp-1 group-hover:text-blue-700 transition-colors">{{ $berita->title }}</h4>
+                                <span class="text-xs px-2 py-1 rounded-full {{ $berita->is_published ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                    {{ $berita->is_published ? 'Published' : 'Draft' }}
                                 </span>
                             </div>
-                            <p class="mt-1 text-xs text-gray-500 line-clamp-2">{{ Str::limit(strip_tags($berita->isi), 100) }}</p>
+                            <p class="mt-1 text-xs text-gray-500 line-clamp-2">{{ Str::limit(strip_tags($berita->content), 100) }}</p>
                             <div class="mt-2 flex items-center text-xs text-gray-400">
                                 <span class="flex items-center"><i class="far fa-clock mr-1"></i> {{ $berita->created_at->diffForHumans() }}</span>
                                 <span class="mx-2">•</span>
-                                <span class="flex items-center"><i class="far fa-folder mr-1"></i> {{ $berita->kategori->nama ?? 'Tanpa Kategori' }}</span>
+                                <span class="flex items-center"><i class="far fa-folder mr-1"></i> {{ $berita->newsCategory->name ?? 'Tanpa Kategori' }}</span>
                             </div>
                         </div>
                     </div>

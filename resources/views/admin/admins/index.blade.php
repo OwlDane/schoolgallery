@@ -3,12 +3,12 @@
 @section('title', 'Manajemen Admin')
 
 @section('content')
-<!-- Header dengan animasi dan gradien -->
+<!-- Header lebih sederhana dan tombol kembali -->
 <div class="mb-8">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div class="animate-fade-in">
             <h1 class="text-3xl font-bold text-gray-800 flex items-center">
-                <span class="bg-gradient-to-r from-red-500 to-blue-600 p-2 rounded-lg text-white mr-3 shadow-lg">
+                <span class="bg-blue-600 p-2 rounded-lg text-white mr-3">
                     <i class="fas fa-users-cog"></i>
                 </span>
                 Manajemen Admin
@@ -18,9 +18,14 @@
                 Kelola akun admin dan izin akses sistem
             </p>
         </div>
-        <a href="{{ route('admin.admins.create') }}" class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white px-6 py-3 rounded-lg flex items-center transition-all duration-300 transform hover:scale-105 shadow-lg">
-            <i class="fas fa-plus-circle mr-2"></i> Tambah Admin
-        </a>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('admin.dashboard') }}" class="px-4 py-2 rounded-lg border border-blue-600 text-blue-700 hover:bg-blue-50 transition">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali
+            </a>
+            <a href="{{ route('admin.admins.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center transition">
+                <i class="fas fa-plus-circle mr-2"></i> Tambah Admin
+            </a>
+        </div>
     </div>
 </div>
 
@@ -83,19 +88,15 @@
 <!-- Admin Cards Grid dengan animasi hover -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="adminCards">
     @forelse($admins as $admin)
-    <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 admin-card" 
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition admin-card border border-gray-200 hover:border-blue-200" 
          data-role="{{ $admin->role }}" 
          data-status="{{ $admin->is_active ? 'active' : 'inactive' }}">
-        <!-- Card Header dengan gradien yang lebih menarik -->
-        <div class="bg-gradient-to-r {{ $admin->role === 'super_admin' ? 'from-purple-600 to-indigo-700' : 'from-blue-500 to-cyan-600' }} p-5 text-white relative overflow-hidden">
-            <!-- Decorative circles -->
-            <div class="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-white opacity-10"></div>
-            <div class="absolute -right-3 -bottom-6 w-16 h-16 rounded-full bg-white opacity-10"></div>
-            
-            <div class="flex items-center justify-between relative z-10">
+        <!-- Card Header minimalis -->
+        <div class="p-5 text-gray-800 border-l-4 border-blue-600 bg-white">
+            <div class="flex items-center justify-between">
                 <div class="flex items-center">
-                    <div class="w-14 h-14 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-4 shadow-lg border-2 border-white border-opacity-30">
-                        <i class="fas {{ $admin->role === 'super_admin' ? 'fa-crown' : 'fa-user-shield' }} text-xl"></i>
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mr-4 border border-gray-200">
+                        <i class="fas {{ $admin->role === 'super_admin' ? 'fa-crown' : 'fa-user-shield' }} text-gray-600"></i>
                     </div>
                     <div>
                         <h3 class="font-bold text-xl">{{ $admin->name }}</h3>
@@ -105,19 +106,18 @@
                     </div>
                 </div>
                 <div class="text-right">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold {{ $admin->is_active ? 'bg-green-500' : 'bg-gray-500' }} shadow">
-                        <span class="w-2 h-2 rounded-full {{ $admin->is_active ? 'bg-white animate-pulse' : 'bg-gray-300' }} mr-1"></span>
-                        {{ $admin->is_active ? 'Aktif' : 'Tidak Aktif' }}
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ $admin->is_active ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'bg-gray-100 text-gray-700 border border-gray-200' }}">
+                        <span class="w-1.5 h-1.5 rounded-full {{ $admin->is_active ? 'bg-blue-600' : 'bg-gray-500' }} mr-2"></span>{{ $admin->is_active ? 'Aktif' : 'Tidak Aktif' }}
                     </span>
                 </div>
             </div>
         </div>
 
-        <!-- Card Body dengan layout yang lebih baik -->
+        <!-- Card Body dengan layout rapi -->
         <div class="p-6">
-            <!-- Role Badge dengan desain yang lebih menarik -->
+            <!-- Role Badge sederhana -->
             <div class="mb-5">
-                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold {{ $admin->role === 'super_admin' ? 'bg-gradient-to-r from-purple-100 to-indigo-100 text-indigo-800' : 'bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800' }} shadow-sm">
+                <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
                     <i class="fas {{ $admin->role === 'super_admin' ? 'fa-crown' : 'fa-user-shield' }} mr-2"></i>
                     {{ $admin->role === 'super_admin' ? 'Super Admin' : 'Admin' }}
                 </span>
@@ -145,16 +145,16 @@
                 </div>
             </div>
 
-            <!-- Action Buttons dengan desain yang lebih menarik -->
+            <!-- Action Buttons sederhana -->
             <div class="flex flex-wrap gap-2">
                 <!-- Edit Button -->
-                <a href="{{ route('admin.admins.edit', $admin) }}" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white px-3 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center justify-center group">
-                    <i class="fas fa-edit mr-2 group-hover:animate-bounce"></i> Edit
+                <a href="{{ route('admin.admins.edit', $admin) }}" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2.5 rounded-lg text-sm font-medium transition flex items-center justify-center">
+                    <i class="fas fa-edit mr-2"></i> Edit
                 </a>
 
                 <!-- Reset Password Link -->
-                <a href="{{ route('admin.admins.edit', $admin) }}#reset" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center justify-center group">
-                    <i class="fas fa-key mr-2 group-hover:animate-bounce"></i> Reset
+                <a href="{{ route('admin.admins.edit', $admin) }}#reset" class="flex-1 bg-white text-blue-600 border border-blue-600 hover:bg-blue-50 px-3 py-2.5 rounded-lg text-sm font-medium transition flex items-center justify-center">
+                    <i class="fas fa-key mr-2"></i> Reset
                 </a>
 
                 <!-- Toggle Active Button -->
@@ -162,8 +162,8 @@
                 <form action="{{ route('admin.admins.toggle-active', $admin) }}" method="POST" class="flex-1">
                     @csrf
                     @method('PATCH')
-                    <button type="submit" class="w-full {{ $admin->is_active ? 'bg-gray-500 hover:bg-gray-600' : 'bg-green-600 hover:bg-green-700' }} text-white px-3 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center justify-center group" onclick="return confirm('Ubah status aktif admin ini?')">
-                        <i class="fas {{ $admin->is_active ? 'fa-user-slash' : 'fa-user-check' }} mr-2 group-hover:animate-bounce"></i> {{ $admin->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                    <button type="submit" class="w-full {{ $admin->is_active ? 'bg-gray-500 hover:bg-gray-600' : 'bg-blue-600 hover:bg-blue-700' }} text-white px-3 py-2.5 rounded-lg text-sm font-medium transition flex items-center justify-center" onclick="return confirm('Ubah status aktif admin ini?')">
+                        <i class="fas {{ $admin->is_active ? 'fa-user-slash' : 'fa-user-check' }} mr-2"></i> {{ $admin->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                     </button>
                 </form>
                 @endif
@@ -173,8 +173,8 @@
                 <form action="{{ route('admin.admins.destroy', $admin) }}" method="POST" class="flex-1">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white px-3 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center justify-center group" onclick="return confirm('Hapus admin ini? Tindakan ini tidak dapat dibatalkan.')">
-                        <i class="fas fa-trash mr-2 group-hover:animate-bounce"></i> Hapus
+                    <button type="submit" class="w-full bg-white text-red-600 border border-red-500 hover:bg-red-50 px-3 py-2.5 rounded-lg text-sm font-medium transition flex items-center justify-center" onclick="return confirm('Hapus admin ini? Tindakan ini tidak dapat dibatalkan.')">
+                        <i class="fas fa-trash mr-2"></i> Hapus
                     </button>
                 </form>
                 @else
@@ -202,54 +202,66 @@
     @endforelse
 </div>
 
-<!-- Statistics Summary dengan desain yang lebih menarik -->
+<!-- Ringkasan Admin (layout seragam & netral) -->
 @if($admins->count() > 0)
 <div class="mt-10 bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
-    <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
+    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
         <h3 class="text-lg font-semibold text-gray-800 flex items-center">
-            <i class="fas fa-chart-pie text-blue-500 mr-2"></i>
+            <i class="fas fa-chart-pie text-blue-600 mr-2"></i>
             Ringkasan Admin
         </h3>
     </div>
     <div class="p-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 text-center transform transition-all hover:scale-105 shadow-sm hover:shadow-md border border-green-100">
-                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-500 mb-4">
+            <div class="bg-white rounded-xl p-6 text-center border border-gray-200">
+                <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 mb-3">
                     <i class="fas fa-user-check text-xl"></i>
                 </div>
-                <div class="text-3xl font-bold text-green-600 mb-1">{{ $admins->where('is_active', true)->count() }}</div>
-                <div class="text-sm font-medium text-green-800">Admin Aktif</div>
+                <div class="text-2xl font-semibold text-gray-800 mb-1">{{ $admins->where('is_active', true)->count() }}</div>
+                <div class="text-sm text-gray-600">Admin Aktif</div>
             </div>
             
-            <div class="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-6 text-center transform transition-all hover:scale-105 shadow-sm hover:shadow-md border border-purple-100">
-                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-100 text-purple-500 mb-4">
+            <div class="bg-white rounded-xl p-6 text-center border border-gray-200">
+                <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 mb-3">
                     <i class="fas fa-crown text-xl"></i>
                 </div>
-                <div class="text-3xl font-bold text-purple-600 mb-1">{{ $admins->where('role', 'super_admin')->count() }}</div>
-                <div class="text-sm font-medium text-purple-800">Super Admin</div>
+                <div class="text-2xl font-semibold text-gray-800 mb-1">{{ $admins->where('role', 'super_admin')->count() }}</div>
+                <div class="text-sm text-gray-600">Super Admin</div>
             </div>
             
-            <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-6 text-center transform transition-all hover:scale-105 shadow-sm hover:shadow-md border border-blue-100">
-                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-500 mb-4">
+            <div class="bg-white rounded-xl p-6 text-center border border-gray-200">
+                <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 mb-3">
                     <i class="fas fa-user-shield text-xl"></i>
                 </div>
-                <div class="text-3xl font-bold text-blue-600 mb-1">{{ $admins->where('role', 'admin')->count() }}</div>
-                <div class="text-sm font-medium text-blue-800">Admin Biasa</div>
+                <div class="text-2xl font-semibold text-gray-800 mb-1">{{ $admins->where('role', 'admin')->count() }}</div>
+                <div class="text-sm text-gray-600">Admin Biasa</div>
             </div>
             
-            <div class="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-6 text-center transform transition-all hover:scale-105 shadow-sm hover:shadow-md border border-red-100">
-                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 text-red-500 mb-4">
+            <div class="bg-white rounded-xl p-6 text-center border border-gray-200">
+                <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-400 mb-3">
                     <i class="fas fa-user-slash text-xl"></i>
                 </div>
-                <div class="text-3xl font-bold text-red-600 mb-1">{{ $admins->where('is_active', false)->count() }}</div>
-                <div class="text-sm font-medium text-red-800">Admin Nonaktif</div>
+                <div class="text-2xl font-semibold text-gray-800 mb-1">{{ $admins->where('is_active', false)->count() }}</div>
+                <div class="text-sm text-gray-600">Admin Nonaktif</div>
+            </div>
+        </div>
+        <!-- Charts: Distribusi Role & Status -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div class="bg-white border border-gray-200 rounded-xl p-4">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">Distribusi Role</h4>
+                <canvas id="adminRoleChart" class="w-full h-56"></canvas>
+            </div>
+            <div class="bg-white border border-gray-200 rounded-xl p-4">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">Status Aktif</h4>
+                <canvas id="adminStatusChart" class="w-full h-56"></canvas>
             </div>
         </div>
     </div>
 </div>
 @endif
 
-<!-- JavaScript untuk filter dan animasi -->
+<!-- JavaScript untuk filter, animasi, dan grafik -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Auto-hide alerts after 10 seconds
@@ -262,6 +274,40 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }, 10000);
+
+    // Charts (Role & Status)
+    const roleCtx = document.getElementById('adminRoleChart')?.getContext('2d');
+    const statusCtx = document.getElementById('adminStatusChart')?.getContext('2d');
+
+    if (roleCtx) {
+        new Chart(roleCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Super Admin', 'Admin'],
+                datasets: [{
+                    data: [{{ $admins->where('role', 'super_admin')->count() }}, {{ $admins->where('role', 'admin')->count() }}],
+                    backgroundColor: ['#3b82f6', '#93c5fd'],
+                    borderColor: ['#3b82f6', '#93c5fd']
+                }]
+            },
+            options: { plugins: { legend: { position: 'bottom' } } }
+        });
+    }
+
+    if (statusCtx) {
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Aktif', 'Nonaktif'],
+                datasets: [{
+                    data: [{{ $admins->where('is_active', true)->count() }}, {{ $admins->where('is_active', false)->count() }}],
+                    backgroundColor: ['#2563eb', '#93c5fd'],
+                    borderColor: ['#2563eb', '#93c5fd']
+                }]
+            },
+            options: { plugins: { legend: { position: 'bottom' } } }
+        });
+    }
 
     // Filter functionality
     const searchInput = document.getElementById('searchAdmin');

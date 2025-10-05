@@ -39,6 +39,20 @@ class Event extends Model
               ->orWhere('start_at', '>=', now());
         });
     }
+
+    /**
+     * Delete events that have passed.
+     * Expired = (end_at < now) OR (end_at IS NULL AND start_at < now)
+     */
+    public static function deleteExpired(): int
+    {
+        return static::where(function($q){
+                $q->where('end_at', '<', now())
+                  ->orWhere(function($qq){
+                      $qq->whereNull('end_at')->where('start_at', '<', now());
+                  });
+            })->delete();
+    }
 }
 
 

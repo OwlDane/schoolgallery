@@ -234,6 +234,8 @@
                 <canvas id="visitorsSummaryChart" class="w-full h-64"></canvas>
             @elseif($type === 'galleries' && isset($data['chart']))
                 <canvas id="galleriesChart" class="w-full h-64"></canvas>
+            @elseif($type === 'admins')
+                <canvas id="adminsMonthlyChart" class="w-full h-64"></canvas>
             @else
                 <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
                     <div class="text-center">
@@ -278,6 +280,19 @@
                 Kunjungan Harian (30 Hari Terakhir)
             </h3>
             <canvas id="visitorsDailyChart" class="w-full h-64"></canvas>
+        </div>
+        @endif
+
+        @if($type === 'admins')
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-users-cog text-blue-500 mr-2"></i>
+                Distribusi Admin
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <canvas id="adminsRoleChart" class="w-full h-64"></canvas>
+                <canvas id="adminsStatusChart" class="w-full h-64"></canvas>
+            </div>
         </div>
         @endif
     </div>
@@ -404,6 +419,63 @@ document.addEventListener('DOMContentLoaded', function(){
                         x: { ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } }
                     }
                 }
+            });
+        }
+    })();
+    @endif
+
+    @if($type === 'admins')
+    (function(){
+        // Monthly new admins
+        const mctx = document.getElementById('adminsMonthlyChart')?.getContext('2d');
+        if (mctx) {
+            new Chart(mctx, {
+                type: 'line',
+                data: {
+                    labels: @json($data['chart']['labels'] ?? []),
+                    datasets: [{
+                        label: 'Admin Baru per Bulan',
+                        data: @json($data['chart']['series'] ?? []),
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37,99,235,0.12)',
+                        tension: 0.35,
+                        fill: true,
+                        pointRadius: 2
+                    }]
+                },
+                options: { plugins: { legend: { display: true } }, scales: { y: { beginAtZero: true, precision: 0 } } }
+            });
+        }
+
+        // Role distribution
+        const rctx = document.getElementById('adminsRoleChart')?.getContext('2d');
+        if (rctx) {
+            new Chart(rctx, {
+                type: 'pie',
+                data: {
+                    labels: @json($data['role_chart']['labels'] ?? []),
+                    datasets: [{
+                        data: @json($data['role_chart']['series'] ?? []),
+                        backgroundColor: ['#3b82f6','#93c5fd']
+                    }]
+                },
+                options: { plugins: { legend: { position: 'bottom' } } }
+            });
+        }
+
+        // Status distribution
+        const sctx = document.getElementById('adminsStatusChart')?.getContext('2d');
+        if (sctx) {
+            new Chart(sctx, {
+                type: 'doughnut',
+                data: {
+                    labels: @json($data['status_chart']['labels'] ?? []),
+                    datasets: [{
+                        data: @json($data['status_chart']['series'] ?? []),
+                        backgroundColor: ['#2563eb','#93c5fd']
+                    }]
+                },
+                options: { plugins: { legend: { position: 'bottom' } }, cutout: '60%' }
             });
         }
     })();
