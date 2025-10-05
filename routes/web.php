@@ -127,6 +127,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('galleries/kategori/{kategoriSlug?}', [GalleryController::class, 'index'])->name('galleries.kategori');
         Route::get('galleries/create', [GalleryController::class, 'create'])->name('galleries.create');
         Route::post('galleries', [GalleryController::class, 'store'])->name('galleries.store');
+        Route::get('galleries/{gallery}', [GalleryController::class, 'show'])->name('galleries.show');
         Route::get('galleries/{gallery}/edit', [GalleryController::class, 'edit'])->name('galleries.edit');
         Route::put('galleries/{gallery}', [GalleryController::class, 'update'])->name('galleries.update');
         Route::delete('galleries/{gallery}', [GalleryController::class, 'destroy'])->name('galleries.destroy');
@@ -147,6 +148,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Events Management
         Route::resource('events', EventsController::class)->except(['show']);
         Route::patch('events/{event}/toggle-publish', [EventsController::class, 'togglePublish'])->name('events.toggle-publish');
+
+        // Comments Management
+        Route::get('comments', [\App\Http\Controllers\Admin\CommentsController::class, 'index'])->name('comments.index');
+        Route::patch('comments/{type}/{id}/approve', [\App\Http\Controllers\Admin\CommentsController::class, 'approve'])->name('comments.approve');
+        Route::delete('comments/{type}/{id}', [\App\Http\Controllers\Admin\CommentsController::class, 'destroy'])->name('comments.destroy');
 
         // School Profile Management (Super Admin Only)
         Route::middleware('admin.role:super_admin')->group(function () {

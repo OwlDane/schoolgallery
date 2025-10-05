@@ -116,10 +116,13 @@
                                 @endif
                             </div>
                             <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-900 hover:text-blue-600 transition duration-150">{{ $item->title }}</div>
+                                <a href="{{ route('admin.news.show', $item) }}" class="text-sm font-medium text-gray-900 hover:text-blue-600 transition duration-150">{{ $item->title }}</a>
                                 <div class="text-xs text-gray-500 mt-1">{{ Str::limit(strip_tags($item->content), 60) }}</div>
-                                <div class="text-xs text-gray-400 mt-1 flex items-center">
-                                    <i class="fas fa-user mr-1"></i> {{ $item->author }}
+                                <div class="text-xs text-gray-400 mt-1 flex items-center gap-3">
+                                    <span><i class="fas fa-user mr-1"></i> {{ $item->author }}</span>
+                                    <a href="{{ route('admin.news.show', $item) }}#comments" class="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition" title="Lihat komentar">
+                                        <i class="far fa-comment mr-1"></i>{{ $item->comments()->count() }}
+                                    </a>
                                 </div>
                             </div>
                         </div>

@@ -65,8 +65,12 @@
                         <div class="flex justify-between items-center text-sm text-gray-500">
                             <span><i class="fas fa-user mr-1"></i> {{ $gallery->admin->name ?? 'Admin' }}</span>
                             <span class="inline-flex items-center gap-3">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-pink-100 text-pink-700"><i class="fas fa-heart mr-1"></i>{{ $gallery->likes()->count() }}</span>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 text-gray-700"><i class="far fa-comment mr-1"></i>{{ $gallery->comments()->count() }}</span>
+                                <a href="{{ route('admin.galleries.show', $gallery) }}" class="inline-flex items-center px-2 py-0.5 rounded-full bg-pink-100 text-pink-700 hover:bg-pink-200 transition" title="Lihat yang menyukai">
+                                    <i class="fas fa-heart mr-1"></i>{{ $gallery->likes()->count() }}
+                                </a>
+                                <a href="{{ route('admin.galleries.show', $gallery) }}#comments" class="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition" title="Lihat komentar">
+                                    <i class="far fa-comment mr-1"></i>{{ $gallery->comments()->count() }}
+                                </a>
                                 <span><i class="fas fa-calendar ml-2 mr-1"></i> {{ $gallery->created_at->format('d M Y') }}</span>
                             </span>
                         </div>

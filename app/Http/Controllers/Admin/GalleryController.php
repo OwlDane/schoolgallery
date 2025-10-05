@@ -67,6 +67,12 @@ class GalleryController extends Controller
             ->with('success', 'Galeri berhasil ditambahkan.');
     }
 
+    public function show(Gallery $gallery)
+    {
+        $gallery->load(['likes.user', 'comments', 'kategori', 'admin']);
+        return view('admin.galleries.show', compact('gallery'));
+    }
+
     public function edit(Request $request, Gallery $gallery)
     {
         $kategoris = Kategori::where('is_active', true)->get();

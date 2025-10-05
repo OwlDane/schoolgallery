@@ -60,6 +60,7 @@ class NewsController extends Controller
 
     public function show(News $news)
     {
+        $news->load(['comments', 'newsCategory', 'admin']);
         return view('admin.news.show', compact('news'));
     }
 
