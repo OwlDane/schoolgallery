@@ -230,6 +230,10 @@
             </h3>
             @if($type === 'news' && isset($data['chart']))
                 <canvas id="newsChart" class="w-full h-64"></canvas>
+            @elseif($type === 'visitors')
+                <canvas id="visitorsSummaryChart" class="w-full h-64"></canvas>
+            @elseif($type === 'galleries' && isset($data['chart']))
+                <canvas id="galleriesChart" class="w-full h-64"></canvas>
             @else
                 <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
                     <div class="text-center">
@@ -273,13 +277,7 @@
                 <i class="fas fa-chart-line text-purple-500 mr-2"></i>
                 Kunjungan Harian (30 Hari Terakhir)
             </h3>
-            <div class="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-                <div class="text-center">
-                    <i class="fas fa-chart-line text-4xl text-gray-400 mb-2"></i>
-                    <p class="text-gray-500">Grafik kunjungan harian akan ditampilkan di sini</p>
-                    <p class="text-sm text-gray-400">Data tersedia: {{ $data['daily']->count() }} hari</p>
-                </div>
-            </div>
+            <canvas id="visitorsDailyChart" class="w-full h-64"></canvas>
         </div>
         @endif
     </div>
@@ -304,30 +302,112 @@
 @endsection
 
 @push('scripts')
-@if($type === 'news' && isset($data['chart']))
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
-    const ctx = document.getElementById('newsChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: @json($data['chart']['labels']),
-            datasets: [{
-                label: 'Berita Terbit per Bulan',
-                data: @json($data['chart']['series']),
-                borderColor: '#3b82f6',
-                backgroundColor: 'rgba(59,130,246,0.15)',
-                fill: true,
-                tension: 0.35,
-            }]
-        },
-        options: {
-            plugins: { legend: { display: true } },
-            scales: { y: { beginAtZero: true, precision: 0 } }
+    @if($type === 'news' && isset($data['chart']))
+    (function(){
+        const ctx = document.getElementById('newsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: @json($data['chart']['labels']),
+                datasets: [{
+                    label: 'Berita Terbit per Bulan',
+                    data: @json($data['chart']['series']),
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59,130,246,0.15)',
+                    fill: true,
+                    tension: 0.35,
+                }]
+            },
+            options: {
+                plugins: { legend: { display: true } },
+                scales: { y: { beginAtZero: true, precision: 0 } }
+            }
+        });
+    })();
+    @endif
+
+    @if($type === 'galleries' && isset($data['chart']))
+    (function(){
+        const ctx = document.getElementById('galleriesChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: @json($data['chart']['labels']),
+                datasets: [{
+                    label: 'Galeri Terbit per Bulan',
+                    data: @json($data['chart']['series']),
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99,102,241,0.15)',
+                    fill: true,
+                    tension: 0.35,
+                }]
+            },
+            options: {
+                plugins: { legend: { display: true } },
+                scales: { y: { beginAtZero: true, precision: 0 } }
+            }
+        });
+    })();
+    @endif
+
+    @if($type === 'visitors')
+    (function(){
+        // Summary chart: This Month vs Last Month
+        const sctx = document.getElementById('visitorsSummaryChart')?.getContext('2d');
+        if (sctx) {
+            new Chart(sctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Bulan Ini', 'Bulan Lalu'],
+                    datasets: [{
+                        label: 'Total Kunjungan',
+                        data: [{{ (int)($data['this_month'] ?? 0) }}, {{ (int)($data['last_month'] ?? 0) }}],
+                        backgroundColor: ['rgba(34,197,94,0.6)','rgba(59,130,246,0.6)'],
+                        borderColor: ['#22c55e','#3b82f6'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, precision: 0 } }
+                }
+            });
         }
-    });
+
+        // Daily chart for last 30 days
+        const dctx = document.getElementById('visitorsDailyChart')?.getContext('2d');
+        if (dctx) {
+            const daily = @json($data['daily'] ?? []);
+            const labels = daily.map(item => item.date);
+            const values = daily.map(item => parseInt(item.total, 10));
+            new Chart(dctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Kunjungan Harian',
+                        data: values,
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139,92,246,0.15)',
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 2
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: true } },
+                    scales: { 
+                        y: { beginAtZero: true, precision: 0 },
+                        x: { ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } }
+                    }
+                }
+            });
+        }
+    })();
+    @endif
 });
 </script>
-@endif
 @endpush

@@ -225,6 +225,27 @@ class DashboardController extends Controller
                         ->groupBy('news_category_id')
                         ->get()
                 ];
+
+                // Monthly published counts for last 12 months (using created_at as publish date)
+                $monthlyNews = News::where('is_published', true)
+                    ->where('created_at', '>=', now()->startOfMonth()->subMonths(11))
+                    ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as ym, COUNT(*) as total")
+                    ->groupBy('ym')
+                    ->orderBy('ym')
+                    ->get();
+
+                $labels = [];
+                $series = [];
+                for ($i = 11; $i >= 0; $i--) {
+                    $m = now()->startOfMonth()->subMonths($i);
+                    $key = $m->format('Y-m');
+                    $labels[] = $m->format('M Y');
+                    $series[] = (int) ($monthlyNews->firstWhere('ym', $key)->total ?? 0);
+                }
+                $data['chart'] = [
+                    'labels' => $labels,
+                    'series' => $series,
+                ];
                 break;
                 
             case 'galleries':
@@ -238,6 +259,27 @@ class DashboardController extends Controller
                         ->selectRaw('kategori_id, count(*) as total')
                         ->groupBy('kategori_id')
                         ->get()
+                ];
+
+                // Monthly published galleries for last 12 months
+                $monthlyGalleries = Gallery::where('is_published', true)
+                    ->where('created_at', '>=', now()->startOfMonth()->subMonths(11))
+                    ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as ym, COUNT(*) as total")
+                    ->groupBy('ym')
+                    ->orderBy('ym')
+                    ->get();
+
+                $labels = [];
+                $series = [];
+                for ($i = 11; $i >= 0; $i--) {
+                    $m = now()->startOfMonth()->subMonths($i);
+                    $key = $m->format('Y-m');
+                    $labels[] = $m->format('M Y');
+                    $series[] = (int) ($monthlyGalleries->firstWhere('ym', $key)->total ?? 0);
+                }
+                $data['chart'] = [
+                    'labels' => $labels,
+                    'series' => $series,
                 ];
                 break;
                 
