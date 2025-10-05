@@ -29,7 +29,8 @@ class CheckAdminRole
 
         // Check if admin has required role
         if (!in_array($admin->role, $roles)) {
-            abort(403, 'Unauthorized access. You do not have permission to access this resource.');
+            // Jangan tampilkan halaman 403 di admin biasa; alihkan diam-diam ke dashboard
+            return redirect()->route('admin.dashboard');
         }
 
         return $next($request);

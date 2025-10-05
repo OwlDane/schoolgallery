@@ -45,6 +45,7 @@
         <div class="mb-6">
             <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Pengaturan</h3>
             <ul class="space-y-2">
+                @if(Auth::guard('admin')->user()->role === 'super_admin')
                 <li>
                     <a href="{{ route('admin.school-profile.edit') }}" class="flex items-center p-2 text-sm font-medium {{ request()->routeIs('admin.school-profile.*') ? 'text-white bg-blue-600' : 'text-gray-700 hover:bg-gray-100' }} rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -54,7 +55,6 @@
                     </a>
                 </li>
                 
-                @if(Auth::guard('admin')->user()->role === 'super_admin')
                 <li>
                     <a href="{{ route('admin.admins.index') }}" class="flex items-center p-2 text-sm font-medium {{ request()->routeIs('admin.admins.*') ? 'text-white bg-red-600' : 'text-gray-700 hover:bg-gray-100' }} rounded-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">

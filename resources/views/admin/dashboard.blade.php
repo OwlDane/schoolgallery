@@ -53,11 +53,13 @@
                 <i class="fas fa-newspaper text-2xl"></i>
             </div>
         </div>
+                @if(Auth::guard('admin')->user()->role === 'super_admin')
                 <div class="mt-4 pt-3 border-t border-gray-100">
                     <a href="{{ route('admin.statistics.detail', 'news') }}" class="text-xs text-blue-600 hover:text-blue-800 flex items-center">
                         Lihat Detail <i class="fas fa-arrow-right ml-1"></i>
                     </a>
                 </div>
+                @endif
     </div>
 
     <!-- Total Galeri -->
@@ -77,11 +79,13 @@
                 <i class="fas fa-images text-2xl"></i>
             </div>
         </div>
+                @if(Auth::guard('admin')->user()->role === 'super_admin')
                 <div class="mt-4 pt-3 border-t border-gray-100">
                     <a href="{{ route('admin.statistics.detail', 'galleries') }}" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center">
                         Lihat Detail <i class="fas fa-arrow-right ml-1"></i>
                     </a>
                 </div>
+                @endif
     </div>
 
     <!-- Total Kunjungan -->
@@ -101,11 +105,13 @@
                 <i class="fas fa-users text-2xl"></i>
             </div>
         </div>
+                @if(Auth::guard('admin')->user()->role === 'super_admin')
                 <div class="mt-4 pt-3 border-t border-gray-100">
                     <a href="{{ route('admin.statistics.detail', 'visitors') }}" class="text-xs text-green-600 hover:text-green-800 flex items-center">
                         Lihat Detail <i class="fas fa-arrow-right ml-1"></i>
                     </a>
                 </div>
+                @endif
     </div>
 </div>
 
@@ -222,6 +228,7 @@
     </div>
 </div>
 
+@if(Auth::guard('admin')->user()->role === 'super_admin')
 <!-- Tambahan Statistik -->
 <div class="mt-8">
     <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
@@ -253,7 +260,8 @@
             </div>
         </div>
 
-        <!-- Profil Sekolah Card -->
+        @if(Auth::guard('admin')->user()->role === 'super_admin')
+        <!-- Profil Sekolah Card (Super Admin Only) -->
         <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 border-b-4 border-purple-500">
             <div class="p-6">
                 <div class="flex items-center justify-between">
@@ -275,6 +283,7 @@
                 </div>
             </div>
         </div>
+        @endif
 
         @if(Auth::guard('admin')->user()->role === 'super_admin')
         <!-- Admin Card (Super Admin Only) -->
@@ -301,32 +310,10 @@
                 </div>
             </div>
         </div>
-        @else
-        <!-- Kontak & Sosial Media Card (Admin Biasa) -->
-        <div class="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 border-b-4 border-yellow-500">
-            <div class="p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wider">Kontak & Sosial</h3>
-                        <div class="mt-2">
-                            <p class="text-lg font-bold text-gray-900">Sosial Media</p>
-                            <p class="text-xs text-gray-500 mt-1">Facebook, Instagram, Twitter</p>
-                        </div>
-                    </div>
-                    <div class="p-4 rounded-full bg-yellow-500 bg-opacity-10 text-yellow-600">
-                        <i class="fas fa-share-alt text-2xl"></i>
-                    </div>
-                </div>
-                <div class="mt-4 pt-3 border-t border-gray-100">
-                    <a href="{{ route('admin.school-profile.edit') }}" class="text-xs text-yellow-600 hover:text-yellow-800 flex items-center">
-                        Kelola Kontak <i class="fas fa-arrow-right ml-1"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
         @endif
     </div>
 </div>
+@endif
 
 @if(Auth::guard('admin')->user()->role === 'super_admin')
 <!-- Super Admin Section -->

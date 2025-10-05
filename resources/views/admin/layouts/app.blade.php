@@ -79,9 +79,11 @@
                 </a>
                 
                 <p class="text-xs font-semibold text-blue-200 uppercase tracking-wider px-4 mb-2 mt-6">Pengaturan</p>
+                @if(Auth::guard('admin')->user()->role === 'super_admin')
                 <a href="{{ route('admin.school-profile.edit') }}" class="sidebar-item flex items-center px-4 py-3 mb-2 {{ request()->routeIs('admin.school-profile.*') ? 'active' : '' }}">
                     <i class="fas fa-school mr-3 w-5 text-center"></i> Profil Sekolah
                 </a>
+                @endif
                 <form action="{{ route('admin.logout') }}" method="POST" class="px-2 mt-6">
                     @csrf
                     <button type="submit" class="w-full sidebar-item flex items-center px-4 py-3 mb-2 text-red-200 hover:text-red-100">
