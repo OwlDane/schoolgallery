@@ -221,9 +221,25 @@
                 <!-- Right: Profile/Login -->
                 <div class="hidden md:flex items-center justify-end flex-1">
                     @auth
-                        <a href="{{ route('profile.edit') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center gap-2">
-                            <i class="fas fa-user text-blue-500"></i><span>{{ Auth::user()->name }}</span>
-                        </a>
+                        <div class="relative group">
+                            <button class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center gap-2">
+                                <i class="fas fa-user text-blue-500"></i>
+                                <span>{{ Auth::user()->name }}</span>
+                                <i class="fas fa-chevron-down text-xs ml-1"></i>
+                            </button>
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                                    <i class="fas fa-user-edit mr-2"></i> Profil Saya
+                                </a>
+                                <div class="border-t border-gray-100 my-1"></div>
+                                <form action="{{ route('guest.logout') }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors">
+                                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     @else
                         <a href="{{ route('guest.login') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center gap-2">
                             <i class="fas fa-sign-in-alt text-blue-500"></i><span>Login</span>
@@ -262,10 +278,19 @@
                 
                 <!-- Guest Authentication Mobile -->
                 @auth
-                    <div class="border-t border-gray-200 pt-2 mt-2">
+                    <div class="border-t border-gray-200 pt-2 mt-2 space-y-1">
+                        <div class="px-3 py-2 text-sm text-gray-500 font-medium">
+                            <i class="fas fa-user mr-2"></i> {{ Auth::user()->name }}
+                        </div>
                         <a href="{{ route('profile.edit') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all">
-                            <i class="fas fa-user-edit mr-2"></i> Profil
+                            <i class="fas fa-user-edit mr-2"></i> Profil Saya
                         </a>
+                        <form action="{{ route('guest.logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="w-full text-left py-2 px-3 text-red-600 hover:bg-red-50 rounded-md transition-all">
+                                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                            </button>
+                        </form>
                     </div>
                 @else
                     <div class="border-t border-gray-200 pt-2 mt-2">

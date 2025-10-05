@@ -36,6 +36,15 @@ class HomeController extends Controller
         }
 
         $galleries = $query->paginate(12);
+        
+        // Tambahkan informasi apakah user sudah like setiap galeri
+        if (auth()->check()) {
+            $galleries->getCollection()->transform(function ($gallery) {
+                $gallery->user_has_liked = $gallery->likes()->where('user_id', auth()->id())->exists();
+                return $gallery;
+            });
+        }
+        
         $schoolProfile = SchoolProfile::getProfile();
 
         return view('gallery', compact('galleries', 'schoolProfile'));
@@ -60,6 +69,14 @@ class HomeController extends Controller
             ->withCount(['likes', 'comments' => function($q){ $q->where('is_approved', true); }])
             ->latest()
             ->paginate(12);
+
+        // Tambahkan informasi apakah user sudah like setiap galeri
+        if (auth()->check()) {
+            $galleries->getCollection()->transform(function ($gallery) {
+                $gallery->user_has_liked = $gallery->likes()->where('user_id', auth()->id())->exists();
+                return $gallery;
+            });
+        }
 
         $schoolProfile = SchoolProfile::getProfile();
 
@@ -172,7 +189,20 @@ class HomeController extends Controller
     {
         $schoolProfile = SchoolProfile::getProfile();
         $teachers = Teacher::active()->ordered()->get();
-        return view('about', compact('schoolProfile', 'teachers'));
+        
+        // Ambil galeri fasilitas dari kategori "Fasilitas Sekolah"
+        $fasilitasKategori = \App\Models\Kategori::where('slug', 'fasilitas-sekolah')->first();
+        $facilities = collect();
+        
+        if ($fasilitasKategori) {
+            $facilities = Gallery::where('kategori_id', $fasilitasKategori->id)
+                ->published()
+                ->latest()
+                ->take(3)
+                ->get();
+        }
+        
+        return view('about', compact('schoolProfile', 'teachers', 'facilities'));
     }
 
     public function teachers(Request $request)

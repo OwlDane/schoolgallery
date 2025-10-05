@@ -224,10 +224,14 @@
                                 </div>
                                 <div class="mt-3 flex items-center justify-between text-sm text-gray-600">
                                     @auth
+                                        @php
+                                            $userHasLiked = $gallery->user_has_liked ?? false;
+                                        @endphp
                                         <button onclick="toggleLike({{ $gallery->id }})" 
-                                                class="like-btn inline-flex items-center text-gray-500 hover:text-pink-700"
-                                                data-gallery-id="{{ $gallery->id }}">
-                                            <i class="far fa-heart mr-1"></i>
+                                                class="like-btn inline-flex items-center transition-colors duration-200 {{ $userHasLiked ? 'text-pink-600' : 'text-gray-500 hover:text-pink-600' }}"
+                                                data-gallery-id="{{ $gallery->id }}"
+                                                data-liked="{{ $userHasLiked ? 'true' : 'false' }}">
+                                            <i class="{{ $userHasLiked ? 'fas' : 'far' }} fa-heart mr-1"></i>
                                             <span class="like-count">{{ $gallery->likes_count ?? 0 }}</span>
                                         </button>
                                     @else
@@ -236,8 +240,9 @@
                                             <span>{{ $gallery->likes_count ?? 0 }}</span>
                                         </div>
                                     @endauth
-                                    <a href="{{ route('gallery.detail', $gallery->id) }}#comments" class="inline-flex items-center">
+                                    <a href="{{ route('gallery.detail', $gallery->id) }}#comments" class="inline-flex items-center text-gray-500 hover:text-blue-600">
                                         <i class="far fa-comment mr-1"></i>
+                                        <span>{{ $gallery->comments_count ?? 0 }}</span>
                                     </a>
                                 </div>
                             </div>
@@ -288,6 +293,10 @@
     // Like functionality
     async function toggleLike(galleryId) {
         try {
+            const likeBtn = document.querySelector(`[data-gallery-id="${galleryId}"]`);
+            if (!likeBtn) return;
+            likeBtn.disabled = true;
+
             const response = await fetch(`/gallery/${galleryId}/like`, {
                 method: 'POST',
                 headers: {
@@ -305,16 +314,17 @@
             
             if (data.success) {
                 // Update like button
-                const likeBtn = document.querySelector(`[data-gallery-id="${galleryId}"]`);
                 const likeIcon = likeBtn.querySelector('i');
                 const likeCount = likeBtn.querySelector('.like-count');
                 
                 if (data.liked) {
                     likeIcon.className = 'fas fa-heart mr-1';
                     likeBtn.className = 'like-btn inline-flex items-center text-pink-600 hover:text-pink-700';
+                    likeBtn.dataset.liked = 'true';
                 } else {
                     likeIcon.className = 'far fa-heart mr-1';
                     likeBtn.className = 'like-btn inline-flex items-center text-gray-500 hover:text-pink-700';
+                    likeBtn.dataset.liked = 'false';
                 }
                 
                 likeCount.textContent = data.likes_count;
@@ -322,6 +332,9 @@
         } catch (error) {
             console.error('Error toggling like:', error);
             showNotification('Terjadi kesalahan saat like/unlike', 'error');
+        } finally {
+            const likeBtn = document.querySelector(`[data-gallery-id="${galleryId}"]`);
+            if (likeBtn) likeBtn.disabled = false;
         }
     }
 </script>

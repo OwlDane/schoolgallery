@@ -270,32 +270,26 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white rounded-xl overflow-hidden shadow-lg" data-aos="fade-up" data-aos-delay="0">
-                    <img src="https://images.unsplash.com/photo-1588072432836-e10032774350?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
-                         alt="Ruang Kelas" class="w-full h-48 object-cover">
+                @forelse($facilities as $index => $facility)
+                <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group" data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
+                    <div class="relative overflow-hidden h-48">
+                        <img src="{{ asset('storage/' . $facility->image) }}" 
+                             alt="{{ $facility->title }}" 
+                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    </div>
                     <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2 text-gray-800">Ruang Kelas Modern</h3>
-                        <p class="text-gray-600">Dilengkapi dengan fasilitas multimedia, AC, dan perabotan yang nyaman untuk belajar</p>
+                        <h3 class="text-xl font-bold mb-2 text-gray-800">{{ $facility->title }}</h3>
+                        <p class="text-gray-600">{{ $facility->description ?: 'Fasilitas modern untuk mendukung kegiatan belajar mengajar' }}</p>
                     </div>
                 </div>
-
-                <div class="bg-white rounded-xl overflow-hidden shadow-lg" data-aos="fade-up" data-aos-delay="100">
-                    <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
-                         alt="Perpustakaan" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2 text-gray-800">Perpustakaan</h3>
-                        <p class="text-gray-600">Koleksi buku yang lengkap dan ruang baca yang nyaman untuk menunjang pembelajaran</p>
+                @empty
+                <div class="col-span-3 text-center py-8">
+                    <div class="bg-white rounded-xl overflow-hidden shadow-lg p-8">
+                        <i class="fas fa-building text-gray-300 text-5xl mb-4"></i>
+                        <p class="text-gray-500">Galeri fasilitas belum tersedia. Silakan tambahkan foto fasilitas di halaman admin.</p>
                     </div>
                 </div>
-
-                <div class="bg-white rounded-xl overflow-hidden shadow-lg" data-aos="fade-up" data-aos-delay="200">
-                    <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
-                         alt="Laboratorium" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2 text-gray-800">Laboratorium</h3>
-                        <p class="text-gray-600">Lab komputer, sains, dan bahasa yang dilengkapi dengan peralatan terkini</p>
-                    </div>
-                </div>
+                @endforelse
             </div>
 
             <div class="text-center mt-8">
