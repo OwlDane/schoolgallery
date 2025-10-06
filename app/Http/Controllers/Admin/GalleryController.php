@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\GalleryComment;
 use App\Models\Gallery;
+use App\Models\GallerySubmission;
+use App\Models\GallerySubmissionImage;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -14,17 +16,17 @@ class GalleryController extends Controller
     public function index(Request $request, $kategoriSlug = null)
     {
         $query = Gallery::with('admin', 'kategori');
-        
+
         // Filter by category if kategoriSlug is provided
         if ($kategoriSlug) {
-            $query->whereHas('kategori', function($q) use ($kategoriSlug) {
+            $query->whereHas('kategori', function ($q) use ($kategoriSlug) {
                 $q->where('slug', $kategoriSlug);
             });
         }
-        
+
         $galleries = $query->latest()->paginate(12);
         $kategoris = Kategori::where('is_active', true)->get();
-        
+
         return view('admin.galleries.index', compact('galleries', 'kategoris', 'kategoriSlug'));
     }
 
@@ -32,7 +34,6 @@ class GalleryController extends Controller
     {
         $kategoris = Kategori::where('is_active', true)->get();
         $selectedKategori = $request->query('kategori');
-        
         return view('admin.galleries.create', compact('kategoris', 'selectedKategori'));
     }
 
@@ -77,7 +78,7 @@ class GalleryController extends Controller
     {
         $kategoris = Kategori::where('is_active', true)->get();
         $selectedKategori = $request->query('kategori');
-        
+
         return view('admin.galleries.edit', compact('gallery', 'kategoris', 'selectedKategori'));
     }
 
@@ -102,7 +103,6 @@ class GalleryController extends Controller
 
         $gallery->update($data);
 
-        // Redirect back to the category page if it came from there
         if ($request->has('kategori')) {
             return redirect()->route('admin.galleries.kategori', $request->kategori)
                 ->with('success', 'Galeri berhasil diperbarui.');
@@ -119,9 +119,16 @@ class GalleryController extends Controller
         }
 
         $kategoriSlug = $gallery->kategori->slug ?? null;
+        $submissionId = $gallery->submission_id;
+
         $gallery->delete();
 
-        // Redirect back to the category page if it came from there
+        // Sync submission status if linked
+        if ($submissionId) {
+            $this->syncSubmissionStatus($submissionId);
+            $this->purgeSubmissionIfEmpty($submissionId);
+        }
+
         if ($kategoriSlug) {
             return redirect()->route('admin.galleries.kategori', $kategoriSlug)
                 ->with('success', 'Galeri berhasil dihapus.');
@@ -137,6 +144,10 @@ class GalleryController extends Controller
             'is_published' => !$gallery->is_published
         ]);
 
+        if ($gallery->submission_id) {
+            $this->syncSubmissionStatus($gallery->submission_id);
+        }
+
         $status = $gallery->is_published ? 'dipublikasikan' : 'disembunyikan';
         return redirect()->back()->with('success', "Galeri berhasil {$status}.");
     }
@@ -150,5 +161,50 @@ class GalleryController extends Controller
         }
 
         return redirect()->back()->with('error', 'Tidak ada gambar untuk dihapus.');
+    }
+
+    private function syncSubmissionStatus(int $submissionId): void
+    {
+        $publishedCount = Gallery::where('submission_id', $submissionId)
+            ->where('is_published', true)
+            ->count();
+
+        $submission = GallerySubmission::find($submissionId);
+        if ($submission) {
+            if ($publishedCount === 0) {
+                $submission->update([
+                    'status' => 'pending',
+                    'reviewed_by' => null,
+                    'reviewed_at' => null,
+                ]);
+            } elseif ($submission->status !== 'approved') {
+                $submission->update([
+                    'status' => 'approved',
+                    'reviewed_by' => auth('admin')->id(),
+                    'reviewed_at' => now(),
+                ]);
+            }
+        }
+    }
+
+    private function purgeSubmissionIfEmpty(int $submissionId): void
+    {
+        $remaining = Gallery::where('submission_id', $submissionId)->count();
+        if ($remaining === 0) {
+            $submission = GallerySubmission::with('images')->find($submissionId);
+            if (!$submission) return;
+
+            foreach ($submission->images as $img) {
+                $path = $img->path;
+                if (str_starts_with($path, 'public/')) {
+                    Storage::disk('public')->delete(substr($path, 7));
+                } else {
+                    Storage::delete($path);
+                }
+            }
+
+            GallerySubmissionImage::where('submission_id', $submissionId)->delete();
+            $submission->delete();
+        }
     }
 }

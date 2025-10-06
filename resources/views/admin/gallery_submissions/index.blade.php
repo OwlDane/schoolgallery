@@ -47,6 +47,16 @@
           <span class="text-gray-600">Kategori: <strong>{{ $sub->kategori->nama ?? '-' }}</strong></span>
           <a href="{{ route('admin.gallery-submissions.show', $sub) }}" class="text-blue-600 hover:text-blue-800">Detail <i class="fas fa-arrow-right ml-1"></i></a>
         </div>
+        @if(($sub->images ?? collect())->count())
+          <div class="mt-3 flex -space-x-2">
+            @foreach($sub->images->take(4) as $img)
+              <img src="{{ Storage::url($img->path) }}" class="h-10 w-10 object-cover rounded ring-2 ring-white border" alt="thumb">
+            @endforeach
+            @if($sub->images->count() > 4)
+              <div class="h-10 w-10 rounded bg-gray-100 text-gray-700 text-xs flex items-center justify-center ring-2 ring-white">+{{ $sub->images->count()-4 }}</div>
+            @endif
+          </div>
+        @endif
       </div>
     </div>
   </div>

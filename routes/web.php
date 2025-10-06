@@ -146,6 +146,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('gallery-submissions/{submission}', [\App\Http\Controllers\Admin\GallerySubmissionController::class, 'show'])->name('gallery-submissions.show');
         Route::post('gallery-submissions/{submission}/approve', [\App\Http\Controllers\Admin\GallerySubmissionController::class, 'approve'])->name('gallery-submissions.approve');
         Route::post('gallery-submissions/{submission}/reject', [\App\Http\Controllers\Admin\GallerySubmissionController::class, 'reject'])->name('gallery-submissions.reject');
+        Route::post('gallery-submissions/{submission}/publish/{image}', [\App\Http\Controllers\Admin\GallerySubmissionController::class, 'publishImage'])->name('gallery-submissions.publish');
 
         // Gallery Comments moderation
         Route::delete('galleries/comments/{comment}', function(App\Models\GalleryComment $comment){

@@ -45,14 +45,60 @@
     </div>
 
     <div class="bg-white border rounded-xl p-5">
-      <h3 class="font-semibold text-gray-800 mb-4">Gambar Diajukan ({{ $submission->images->count() }})</h3>
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="font-semibold text-gray-800">Gambar Pengajuan</h3>
+        <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">{{ $submission->images->count() }} file</span>
+      </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         @foreach($submission->images as $img)
-          <div class="rounded-lg overflow-hidden border">
-            <img src="{{ Storage::url($img->path) }}" class="w-full h-56 object-cover" alt="image">
-            <div class="p-2 text-xs text-gray-600 flex items-center justify-between">
-              <span class="line-clamp-1">{{ $img->original_name }}</span>
-              <span>{{ number_format($img->size/1024, 0) }} KB</span>
+          @php $pub = ($publishedByImage ?? collect())->get($img->id); @endphp
+          <div class="rounded-xl overflow-hidden border bg-white shadow-sm">
+            <div class="relative">
+              @php
+                $rel = preg_replace('/^public\//', '', $img->path);
+                $imgUrl = asset('storage/'.ltrim($rel, '/'));
+              @endphp
+              <img src="{{ $imgUrl }}" class="w-full h-56 object-cover" alt="image">
+              <div class="absolute top-2 left-2 flex items-center gap-2">
+                <span class="text-[10px] px-2 py-0.5 rounded-full {{ $pub ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700' }}">
+                  {{ $pub ? 'Published' : 'Submitted' }}
+                </span>
+                @if($submission->kategori)
+                  <span class="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">{{ $submission->kategori->nama }}</span>
+                @endif
+              </div>
+            </div>
+            <div class="p-3 text-sm">
+              <div class="text-xs text-gray-500 mb-2 flex items-center justify-between">
+                <span class="line-clamp-1">{{ $img->original_name }}</span>
+                <span>{{ number_format($img->size/1024, 0) }} KB</span>
+              </div>
+
+              @if($pub)
+                <div class="flex items-center gap-2">
+                  <form action="{{ route('admin.galleries.toggle-publish', $pub) }}" method="POST" onsubmit="return confirm('Sembunyikan (unpublish) foto ini?')">
+                    @csrf
+                    @method('PATCH')
+                    <button class="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 inline-flex items-center">
+                      <i class="fas fa-eye-slash mr-1"></i> Unpublish
+                    </button>
+                  </form>
+                  <form action="{{ route('admin.galleries.destroy', $pub) }}" method="POST" onsubmit="return confirm('Hapus foto ini dari galeri?')" class="ml-auto">
+                    @csrf
+                    @method('DELETE')
+                    <button class="px-3 py-1.5 rounded-full bg-red-500 hover:bg-red-600 text-white inline-flex items-center">
+                      <i class="fas fa-trash mr-1"></i> Hapus
+                    </button>
+                  </form>
+                </div>
+              @else
+                <form action="{{ route('admin.gallery-submissions.publish', [$submission, $img]) }}" method="POST" onsubmit="return confirm('Publikasikan foto ini ke galeri?')">
+                  @csrf
+                  <button class="px-3 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white inline-flex items-center">
+                    <i class="fas fa-upload mr-1"></i> Publish
+                  </button>
+                </form>
+              @endif
             </div>
           </div>
         @endforeach
@@ -90,84 +136,7 @@
       @endif
     </div>
 
-    @if(isset($published) && $published->count())
-    <div class="bg-white border rounded-xl p-5">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="font-semibold text-gray-800">Telah Dipublikasikan</h3>
-        <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">Live</span>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        @foreach($published as $pub)
-          <div class="border rounded-xl overflow-hidden bg-white shadow-sm">
-            <div class="relative">
-              <img src="{{ asset('storage/'.$pub->image) }}" class="w-full h-44 object-cover" alt="pub">
-              <span class="absolute top-2 left-2 text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">{{ $pub->kategori->nama ?? '-' }}</span>
-            </div>
-            <div class="p-3 text-sm">
-              <div class="font-medium text-gray-800 line-clamp-1">{{ $pub->title }}</div>
-              <div class="text-xs text-gray-500 mb-3 flex items-center space-x-3">
-                <span class="inline-flex items-center"><i class="far fa-calendar-alt mr-1"></i>{{ $pub->created_at->format('d M Y') }}</span>
-                <span class="inline-flex items-center text-pink-600"><i class="fas fa-heart mr-1"></i>{{ $pub->likes()->count() }}</span>
-                <a href="{{ route('admin.galleries.show', $pub) }}#comments" class="inline-flex items-center text-gray-600 hover:text-blue-700"><i class="far fa-comment mr-1"></i>{{ $pub->comments()->count() }}</a>
-              </div>
-              <div class="flex items-center gap-2">
-                <form action="{{ route('admin.galleries.toggle-publish', $pub) }}" method="POST" onsubmit="return confirm('Sembunyikan (unpublish) item ini?')">
-                  @csrf
-                  @method('PATCH')
-                  <button class="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800"><i class="fas fa-eye-slash mr-1"></i>Unpublish</button>
-                </form>
-                <form action="{{ route('admin.galleries.destroy', $pub) }}" method="POST" onsubmit="return confirm('Hapus item galeri ini?')" class="ml-auto">
-                  @csrf
-                  @method('DELETE')
-                  <button class="px-3 py-1.5 rounded-full bg-red-500 hover:bg-red-600 text-white"><i class="fas fa-trash mr-1"></i>Hapus</button>
-                </form>
-              </div>
-            </div>
-          </div>
-        @endforeach
-      </div>
-    </div>
-    @endif
-
-    @if((isset($published) && $published->isEmpty()) && (isset($maybe) && $maybe->count()))
-    <div class="bg-white border rounded-xl p-5">
-      <div class="flex items-center justify-between mb-1">
-        <h3 class="font-semibold text-gray-800">Kemungkinan Sudah Dipublikasikan</h3>
-        <span class="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">Kandidat</span>
-      </div>
-      <p class="text-sm text-gray-500 mb-4">Cocokkan judul/kategori. Kamu tetap bisa Unpublish/Hapus dari sini.</p>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        @foreach($maybe as $pub)
-          <div class="border rounded-xl overflow-hidden bg-white shadow-sm">
-            <div class="relative">
-              <img src="{{ asset('storage/'.$pub->image) }}" class="w-full h-44 object-cover" alt="pub">
-              <span class="absolute top-2 left-2 text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">{{ $pub->kategori->nama ?? '-' }}</span>
-            </div>
-            <div class="p-3 text-sm">
-              <div class="font-medium text-gray-800 line-clamp-1">{{ $pub->title }}</div>
-              <div class="text-xs text-gray-500 mb-3 flex items-center space-x-3">
-                <span class="inline-flex items-center"><i class="far fa-calendar-alt mr-1"></i>{{ $pub->created_at->format('d M Y') }}</span>
-                <span class="inline-flex items-center text-pink-600"><i class="fas fa-heart mr-1"></i>{{ $pub->likes()->count() }}</span>
-                <a href="{{ route('admin.galleries.show', $pub) }}#comments" class="inline-flex items-center text-gray-600 hover:text-blue-700"><i class="far fa-comment mr-1"></i>{{ $pub->comments()->count() }}</a>
-              </div>
-              <div class="flex items-center gap-2">
-                <form action="{{ route('admin.galleries.toggle-publish', $pub) }}" method="POST" onsubmit="return confirm('Sembunyikan (unpublish) item ini?')">
-                  @csrf
-                  @method('PATCH')
-                  <button class="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800"><i class="fas fa-eye-slash mr-1"></i>Unpublish</button>
-                </form>
-                <form action="{{ route('admin.galleries.destroy', $pub) }}" method="POST" onsubmit="return confirm('Hapus item galeri ini?')" class="ml-auto">
-                  @csrf
-                  @method('DELETE')
-                  <button class="px-3 py-1.5 rounded-full bg-red-500 hover:bg-red-600 text-white"><i class="fas fa-trash mr-1"></i>Hapus</button>
-                </form>
-              </div>
-            </div>
-          </div>
-        @endforeach
-      </div>
-    </div>
-    @endif
+    
   </div>
 </div>
 @endsection

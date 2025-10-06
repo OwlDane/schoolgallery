@@ -18,6 +18,7 @@ class Gallery extends Model
         'admin_id',
         'kategori_id',
         'submission_id',
+        'submission_image_id',
     ];
 
     protected function casts(): array
@@ -29,12 +30,22 @@ class Gallery extends Model
 
     public function admin()
     {
-        return $this->belongsTo(Admin::class);
+        return $this->belongsTo(Admin::class, 'admin_id');
     }
 
     public function kategori()
     {
-        return $this->belongsTo(Kategori::class);
+        return $this->belongsTo(Kategori::class, 'kategori_id');
+    }
+
+    public function submission()
+    {
+        return $this->belongsTo(GallerySubmission::class, 'submission_id');
+    }
+
+    public function submissionImage()
+    {
+        return $this->belongsTo(GallerySubmissionImage::class, 'submission_image_id');
     }
 
     public function likes()
