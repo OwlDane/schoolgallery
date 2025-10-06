@@ -165,6 +165,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::resource('admins', AdminManagementController::class);
             Route::post('admins/{admin}/reset-password', [AdminManagementController::class, 'resetPassword'])->name('admins.reset-password');
             Route::patch('admins/{admin}/toggle-active', [AdminManagementController::class, 'toggleActive'])->name('admins.toggle-active');
+
+            // Users Management (Super Admin Only)
+            Route::get('users', [\App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.index');
+            Route::get('users/{user}/edit', [\App\Http\Controllers\Admin\UsersController::class, 'edit'])->name('users.edit');
+            Route::put('users/{user}', [\App\Http\Controllers\Admin\UsersController::class, 'update'])->name('users.update');
+            Route::patch('users/{user}/toggle-active', [\App\Http\Controllers\Admin\UsersController::class, 'toggleActive'])->name('users.toggle-active');
         });
 
         // Teacher Management

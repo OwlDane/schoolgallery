@@ -2,7 +2,7 @@
     <div class="p-4 border-b border-gray-200">
         <h1 class="text-xl font-bold text-gray-800">Galeri Sekolah</h1>
         <p class="text-xs text-gray-500">
-            {{ Auth::guard('admin')->user()->role === 'super_admin' ? 'Super Admin Panel' : 'Admin Panel' }}
+            {{ Auth::guard('admin')->user()->role === 'super_admin' ? 'Monitoring Pengguna' : 'Admin Panel' }}
         </p>
         <div class="mt-2">
             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ Auth::guard('admin')->user()->role === 'super_admin' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800' }}">
@@ -61,6 +61,14 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                         </svg>
                         Manajemen Admin
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('admin.users.index') }}" class="flex items-center p-2 text-sm font-medium {{ request()->routeIs('admin.users.*') ? 'text-white bg-blue-600' : 'text-gray-700 hover:bg-gray-100' }} rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-1a6 6 0 00-9-5.197M9 20H4v-1a6 6 0 019-5.197M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Pengelolaan Pengguna
                     </a>
                 </li>
                 @endif

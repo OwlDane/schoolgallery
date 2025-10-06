@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\News;
 use App\Models\Gallery;
 use App\Models\Admin;
+use App\Models\User;
 use App\Models\SchoolProfile;
 use App\Models\ActivityLog;
 use Illuminate\Support\Facades\DB;
@@ -33,6 +34,14 @@ class DashboardController extends Controller
             $stats['inactive_admins'] = Admin::where('is_active', false)->count();
             $stats['super_admins'] = Admin::where('role', 'super_admin')->count();
             $stats['regular_admins'] = Admin::where('role', 'admin')->count();
+
+            // User monitoring
+            $userStats = [
+                'total_users' => User::count(),
+                'active_users' => User::where('is_active', true)->count(),
+                'inactive_users' => User::where('is_active', false)->count(),
+            ];
+            $recentUserLogins = User::orderByDesc('last_login_at')->take(5)->get(['id','name','email','last_login_at','role','is_active']);
         }
 
         // Statistik kunjungan dengan detail
@@ -99,7 +108,9 @@ class DashboardController extends Controller
             'recentBerita',
             'recentActivities',
             'schoolProfile',
-            'chartData'
+            'chartData',
+            'userStats',
+            'recentUserLogins'
         ));
     }
 

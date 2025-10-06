@@ -30,8 +30,21 @@ class AuthController extends Controller
 
         $credentials = $request->only('email', 'password');
 
+        // Cek user inactive sebelum attempt
+        $user = User::where('email', $request->email)->first();
+        if ($user && isset($user->is_active) && !$user->is_active) {
+            throw ValidationException::withMessages([
+                'email' => ['Akun Anda dinonaktifkan. Silakan hubungi admin.'],
+            ]);
+        }
+
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
+
+            // Catat last_login_at
+            if (Auth::user()) {
+                Auth::user()->forceFill(['last_login_at' => now()])->save();
+            }
             
             return redirect()->intended(route('home'))->with('success', 'Selamat datang kembali!');
         }

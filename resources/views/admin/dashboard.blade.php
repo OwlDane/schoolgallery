@@ -229,6 +229,57 @@
 </div>
 
 @if(Auth::guard('admin')->user()->role === 'super_admin')
+<!-- Users Monitoring (Super Admin Only) -->
+<div class="mt-8">
+    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+        <i class="fas fa-user-friends text-blue-500 mr-2"></i> Monitoring Pengguna
+    </h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-white rounded-xl shadow p-5 border-b-4 border-blue-500">
+            <div class="text-sm text-gray-500">Total Pengguna</div>
+            <div class="mt-2 text-3xl font-bold text-gray-800">{{ $userStats['total_users'] ?? 0 }}</div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-5 border-b-4 border-green-500">
+            <div class="text-sm text-gray-500">Aktif</div>
+            <div class="mt-2 text-3xl font-bold text-gray-800">{{ $userStats['active_users'] ?? 0 }}</div>
+        </div>
+        <div class="bg-white rounded-xl shadow p-5 border-b-4 border-gray-400">
+            <div class="text-sm text-gray-500">Nonaktif</div>
+            <div class="mt-2 text-3xl font-bold text-gray-800">{{ $userStats['inactive_users'] ?? 0 }}</div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="p-2 rounded-lg bg-blue-500 text-white mr-3">
+                    <i class="fas fa-sign-in-alt"></i>
+                </div>
+                <h4 class="text-md font-semibold text-gray-800">Login Terakhir Pengguna</h4>
+            </div>
+            <a href="{{ route('admin.users.index') }}" class="text-sm text-blue-600 hover:text-blue-800">Kelola Pengguna</a>
+        </div>
+        <div class="divide-y divide-gray-100">
+            @forelse(($recentUserLogins ?? []) as $u)
+                <div class="px-6 py-3 flex items-center justify-between">
+                    <div>
+                        <div class="font-medium text-gray-800">{{ $u->name }}</div>
+                        <div class="text-xs text-gray-500">{{ $u->email }}</div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs px-2 py-1 rounded-full {{ $u->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600' }}">{{ $u->is_active ? 'Aktif' : 'Nonaktif' }}</span>
+                        <div class="text-xs text-gray-500 flex items-center"><i class="far fa-clock mr-1"></i> {{ $u->last_login_at ? \Carbon\Carbon::parse($u->last_login_at)->diffForHumans() : 'Belum pernah' }}</div>
+                    </div>
+                </div>
+            @empty
+                <div class="px-6 py-8 text-center text-gray-500">Belum ada data login pengguna.</div>
+            @endforelse
+        </div>
+    </div>
+</div>
+@endif
+
+@if(Auth::guard('admin')->user()->role === 'super_admin')
 <!-- Tambahan Statistik -->
 <div class="mt-8">
     <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">

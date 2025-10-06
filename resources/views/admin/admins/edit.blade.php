@@ -9,8 +9,8 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
                 <h1 class="text-3xl font-bold text-gray-800 flex items-center">
-                    <span class="bg-gradient-to-r from-amber-500 to-amber-600 p-2 rounded-lg text-white mr-3 shadow-lg">
-                        <i class="fas fa-user-edit"></i>
+                    <span class="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-lg text-white mr-3 shadow-lg">
+                        <i class="fas fa-user-shield"></i>
                     </span>
                     Edit Admin
                 </h1>
@@ -19,9 +19,14 @@
                     Kelola informasi dan status akun administrator
                 </p>
             </div>
-            <a href="{{ route('admin.admins.index') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 rounded-lg flex items-center transition-all duration-300 shadow-sm">
-                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Daftar
-            </a>
+            <div class="flex items-center gap-3">
+                <a href="{{ route('admin.dashboard') }}" class="bg-white border hover:bg-gray-50 text-gray-700 px-5 py-2 rounded-lg flex items-center transition-all duration-300 shadow-sm">
+                    <i class="fas fa-home mr-2"></i> Dashboard
+                </a>
+                <a href="{{ route('admin.admins.index') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 rounded-lg flex items-center transition-all duration-300 shadow-sm">
+                    <i class="fas fa-arrow-left mr-2"></i> Kembali ke Daftar
+                </a>
+            </div>
         </div>
     </div>
 
@@ -31,7 +36,7 @@
             <!-- Form Header -->
             <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
                 <h3 class="font-semibold text-gray-800 flex items-center">
-                    <i class="fas fa-user-edit text-amber-500 mr-2"></i>
+                    <i class="fas fa-user-edit text-blue-500 mr-2"></i>
                     Edit Informasi Admin
                 </h3>
             </div>
@@ -43,9 +48,9 @@
                     @method('PUT')
 
                     <!-- Personal Information Section -->
-                    <div class="bg-amber-50 rounded-xl p-6 border border-amber-100">
-                        <h4 class="text-lg font-medium text-amber-800 mb-4 flex items-center">
-                            <i class="fas fa-id-card text-amber-500 mr-2"></i> Informasi Personal
+                    <div class="bg-blue-50 rounded-xl p-6 border border-blue-100">
+                        <h4 class="text-lg font-medium text-blue-800 mb-4 flex items-center">
+                            <i class="fas fa-id-card text-blue-500 mr-2"></i> Informasi Personal
                         </h4>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -56,7 +61,7 @@
                                         <i class="fas fa-user text-gray-400"></i>
                                     </div>
                                     <input id="name" name="name" type="text" required value="{{ old('name', $admin->name) }}" 
-                                        class="pl-10 block w-full rounded-lg border-gray-300 focus:border-amber-500 focus:ring focus:ring-amber-200 focus:ring-opacity-50 transition-all" 
+                                        class="pl-10 block w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all" 
                                         placeholder="Masukkan nama lengkap"/>
                                 </div>
                                 @error('name')<p class="text-sm text-red-600 mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>@enderror
@@ -69,7 +74,7 @@
                                         <i class="fas fa-envelope text-gray-400"></i>
                                     </div>
                                     <input id="email" name="email" type="email" required value="{{ old('email', $admin->email) }}" 
-                                        class="pl-10 block w-full rounded-lg border-gray-300 focus:border-amber-500 focus:ring focus:ring-amber-200 focus:ring-opacity-50 transition-all" 
+                                        class="pl-10 block w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all" 
                                         placeholder="contoh@email.com"/>
                                 </div>
                                 @error('email')<p class="text-sm text-red-600 mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>@enderror
@@ -122,7 +127,7 @@
                         <a href="{{ route('admin.admins.index') }}" class="inline-flex items-center px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg transition-all mr-4">
                             <i class="fas fa-times mr-2"></i> Batal
                         </a>
-                        <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-lg shadow transition-all">
+                        <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg shadow transition-all">
                             <i class="fas fa-save mr-2"></i> Simpan Perubahan
                         </button>
                     </div>
@@ -190,7 +195,7 @@
                     <form action="{{ route('admin.admins.toggle-active', $admin) }}" method="POST" onsubmit="return confirm('Ubah status aktif akun ini?');">
                         @csrf
                         @method('PATCH')
-                        <button class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg {{ $admin->is_active ? 'bg-gray-500 hover:bg-gray-600' : 'bg-green-600 hover:bg-green-700' }} text-white transition-all shadow-sm">
+                        <button class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg {{ $admin->is_active ? 'bg-blue-500 hover:bg-blue-600' : 'bg-blue-600 hover:bg-blue-700' }} text-white transition-all shadow-sm">
                             <i class="fas {{ $admin->is_active ? 'fa-user-slash' : 'fa-user-check' }} mr-2"></i> {{ $admin->is_active ? 'Nonaktifkan Akun' : 'Aktifkan Akun' }}
                         </button>
                     </form>
@@ -198,7 +203,7 @@
                     <!-- Reset Password Button -->
                     <form action="{{ route('admin.admins.reset-password', $admin) }}" method="POST" onsubmit="return confirm('Reset password akun ini? Password baru akan digenerate secara otomatis.');">
                         @csrf
-                        <button class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-white transition-all shadow-sm">
+                        <button class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-white border border-blue-600 text-blue-700 hover:bg-blue-50 transition-all shadow-sm">
                             <i class="fas fa-key mr-2"></i> Reset Password
                         </button>
                     </form>
