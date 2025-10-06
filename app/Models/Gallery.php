@@ -17,6 +17,7 @@ class Gallery extends Model
         'is_published',
         'admin_id',
         'kategori_id',
+        'submission_id',
     ];
 
     protected function casts(): array

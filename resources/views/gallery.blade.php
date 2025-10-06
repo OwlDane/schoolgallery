@@ -68,6 +68,11 @@
             <i class="fas fa-exclamation-circle mr-2"></i> {{ session('error') }}
         </div>
     @endif
+    @if(session('success'))
+        <div class="toast success show">
+            <i class="fas fa-check-circle mr-2"></i> {{ session('success') }}
+        </div>
+    @endif
     <!-- Hero Section -->
     <section class="relative overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-700 to-purple-800 text-white py-16">
         <div class="max-w-7xl mx-auto px-4 relative z-10">
@@ -270,9 +275,15 @@
                     <p class="text-blue-100">Bagikan momen berharga di sekolah dengan mengirimkan foto kegiatan untuk ditampilkan di galeri kami.</p>
                 </div>
                 <div class="md:w-1/3 text-center md:text-right" data-aos="fade-left">
-                    <a href="{{ route('contact') }}" class="btn-hover inline-block bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold shadow-lg">
-                        <i class="fas fa-paper-plane mr-2"></i> Kirim Foto
-                    </a>
+                    @auth
+                        <a href="{{ route('gallery.submit') }}" class="btn-hover inline-block bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold shadow-lg">
+                            <i class="fas fa-paper-plane mr-2"></i> Kirim Foto
+                        </a>
+                    @else
+                        <a href="{{ route('guest.login') }}" class="btn-hover inline-block bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold shadow-lg">
+                            <i class="fas fa-sign-in-alt mr-2"></i> Login untuk Kirim
+                        </a>
+                    @endauth
                 </div>
             </div>
         </div>

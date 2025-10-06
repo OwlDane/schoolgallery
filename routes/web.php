@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\AdminManagementController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Guest\AuthController as GuestAuthController;
+use App\Http\Controllers\Guest\GallerySubmissionController as GuestGallerySubmissionController;
 use App\Http\Controllers\Guest\InteractionController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +24,11 @@ use App\Http\Controllers\SitemapController;
 Route::middleware('track.visits')->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/gallery', [HomeController::class, 'gallery'])->name('gallery');
+    // Kirim Foto harus didefinisikan sebelum /gallery/{id} agar tidak tertangkap oleh route dinamis tersebut
+    Route::middleware('auth')->group(function () {
+        Route::get('/gallery/submit', [GuestGallerySubmissionController::class, 'create'])->name('gallery.submit');
+        Route::post('/gallery/submit', [GuestGallerySubmissionController::class, 'store'])->name('gallery.submit.store');
+    });
     Route::get('/gallery/category/{category}', [HomeController::class, 'galleryByCategory'])->name('gallery.category');
     Route::get('/gallery/{id}', [HomeController::class, 'galleryDetail'])->name('gallery.detail');
     Route::get('/gallery/download/{id}', [HomeController::class, 'download'])->name('gallery.download');
@@ -73,6 +79,7 @@ Route::middleware(['auth', 'track.visits'])->group(function () {
     // User profile
     Route::get('/profile', [UserProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [UserProfileController::class, 'update'])->name('profile.update');
+    // (dipindah ke atas sebelum /gallery/{id})
 });
 
 // Guest Authentication Routes
@@ -133,6 +140,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('galleries/{gallery}', [GalleryController::class, 'destroy'])->name('galleries.destroy');
         Route::patch('galleries/{gallery}/toggle-publish', [GalleryController::class, 'togglePublish'])->name('galleries.toggle-publish');
         Route::delete('galleries/{gallery}/remove-image', [GalleryController::class, 'removeImage'])->name('galleries.remove-image');
+
+        // Gallery Submissions (User uploads) Management
+        Route::get('gallery-submissions', [\App\Http\Controllers\Admin\GallerySubmissionController::class, 'index'])->name('gallery-submissions.index');
+        Route::get('gallery-submissions/{submission}', [\App\Http\Controllers\Admin\GallerySubmissionController::class, 'show'])->name('gallery-submissions.show');
+        Route::post('gallery-submissions/{submission}/approve', [\App\Http\Controllers\Admin\GallerySubmissionController::class, 'approve'])->name('gallery-submissions.approve');
+        Route::post('gallery-submissions/{submission}/reject', [\App\Http\Controllers\Admin\GallerySubmissionController::class, 'reject'])->name('gallery-submissions.reject');
 
         // Gallery Comments moderation
         Route::delete('galleries/comments/{comment}', function(App\Models\GalleryComment $comment){

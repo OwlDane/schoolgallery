@@ -39,6 +39,14 @@
                         Galeri Foto
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('admin.gallery-submissions.index') }}" class="flex items-center p-2 text-sm font-medium {{ request()->routeIs('admin.gallery-submissions.*') ? 'text-white bg-blue-600' : 'text-gray-700 hover:bg-gray-100' }} rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18" />
+                        </svg>
+                        Pengajuan Galeri
+                    </a>
+                </li>
             </ul>
         </div>
         
