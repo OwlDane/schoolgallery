@@ -32,18 +32,25 @@ class GallerySubmissionController extends Controller
 
         $user = Auth::user();
         $uuid = (string) Str::uuid();
+        $kategoriId = (int) $request->input('kategori_id');
+
+        // Extra guard: kategori_id must be present (DB column is NOT NULL)
+        if (!$kategoriId) {
+            return back()->withErrors(['kategori_id' => 'Kategori wajib dipilih.'])->withInput();
+        }
 
         $submission = GallerySubmission::create([
             'user_id' => $user->id,
-            'kategori_id' => $request->kategori_id,
+            'kategori_id' => $kategoriId,
             'title' => $request->title,
             'description' => $request->description,
             'status' => 'pending',
         ]);
 
-        $basePath = "public/submissions/{$uuid}";
+        // Save directly to public disk so URL is always asset('storage/'.$path)
+        $basePath = "submissions/{$uuid}";
         foreach ($request->file('images', []) as $file) {
-            $path = $file->store($basePath);
+            $path = $file->store($basePath, 'public');
             GallerySubmissionImage::create([
                 'submission_id' => $submission->id,
                 'path' => $path,

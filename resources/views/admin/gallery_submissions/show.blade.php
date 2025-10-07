@@ -11,7 +11,6 @@
     </h1>
     <p class="text-sm text-gray-500 mt-1">Periksa detail sebelum approve atau reject.</p>
   </div>
-  <a href="{{ url()->previous() === url()->current() ? route('admin.gallery-submissions.index', ['status'=>'pending']) : url()->previous() }}" class="inline-flex items-center px-4 py-2 rounded-lg bg-white border shadow-sm text-gray-700 hover:bg-gray-50"><i class="fas fa-arrow-left mr-2"></i>Kembali</a>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -55,7 +54,8 @@
           <div class="rounded-xl overflow-hidden border bg-white shadow-sm">
             <div class="relative">
               @php
-                $rel = preg_replace('/^public\//', '', $img->path);
+                $path = str_replace('\\', '/', $img->path);
+                $rel = preg_replace('/^public\//', '', $path);
                 $imgUrl = asset('storage/'.ltrim($rel, '/'));
               @endphp
               <img src="{{ $imgUrl }}" class="w-full h-56 object-cover" alt="image">

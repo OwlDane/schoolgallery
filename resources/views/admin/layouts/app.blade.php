@@ -102,9 +102,11 @@
                         <button id="sidebar-toggle" class="mr-4 text-gray-500 hover:text-blue-600 lg:hidden">
                             <i class="fas fa-bars"></i>
                         </button>
-                        <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('admin.dashboard') }}" class="mr-3 inline-flex items-center px-3 py-1.5 rounded-md border text-gray-700 hover:bg-gray-50">
-                            <i class="fas fa-arrow-left mr-2"></i> Kembali
-                        </a>
+                        @unless (request()->routeIs('admin.dashboard'))
+                            <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('admin.dashboard') }}" class="mr-3 inline-flex items-center px-3 py-1.5 rounded-md border text-gray-700 hover:bg-gray-50">
+                                <i class="fas fa-arrow-left mr-2"></i> Kembali
+                            </a>
+                        @endunless
                         <h1 class="text-xl font-semibold text-gray-800">@yield('title', 'Dashboard')</h1>
                     </div>
                     <div class="flex items-center space-x-4">

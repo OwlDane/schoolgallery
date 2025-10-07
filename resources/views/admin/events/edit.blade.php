@@ -4,7 +4,6 @@
 
 @section('content')
 <div class="p-6 max-w-3xl">
-    <a href="{{ route('admin.events.index') }}" class="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4"><i class="fas fa-arrow-left mr-2"></i>Kembali</a>
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Edit Acara</h2>
 
     @if ($errors->any())
