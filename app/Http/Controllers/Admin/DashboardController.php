@@ -16,6 +16,9 @@ class DashboardController extends Controller
     public function index()
     {
         $admin = auth('admin')->user();
+        // Initialize optional variables to avoid undefined when compacting for non-super admins
+        $userStats = null;
+        $recentUserLogins = collect();
         
         // Statistik dasar dengan detail
         $stats = [

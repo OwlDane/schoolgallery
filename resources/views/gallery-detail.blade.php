@@ -152,16 +152,7 @@
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="py-16 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <h2 class="text-3xl font-bold mb-6">Punya Foto Kegiatan Sekolah?</h2>
-            <p class="text-xl mb-8 max-w-3xl mx-auto">Bagikan momen berharga di sekolah dengan mengirimkan foto kegiatan untuk ditampilkan di galeri kami.</p>
-            <a href="{{ route('contact') }}" class="btn-hover inline-block bg-white text-blue-700 px-8 py-3 rounded-lg font-semibold text-lg shadow-lg">
-                <i class="fas fa-paper-plane mr-2"></i> Kirim Foto
-            </a>
-        </div>
-    </section>
+    
 @endsection
 
 @push('scripts')
