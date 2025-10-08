@@ -73,9 +73,13 @@
                     <!-- Comment Form - Only for authenticated users -->
                     <div class="bg-white rounded-xl shadow p-4 sm:p-6 mb-6">
                         <div class="flex items-center space-x-3 mb-4">
-                            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
-                                {{ auth()->user()->name[0] }}
-                            </div>
+                            @if(auth()->user()->avatar)
+                                <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" class="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                            @else
+                                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
+                                    {{ auth()->user()->name[0] }}
+                                </div>
+                            @endif
                             <div class="min-w-0 flex-1">
                                 <p class="font-semibold text-gray-800 truncate">{{ auth()->user()->name }}</p>
                                 <p class="text-sm text-gray-500">Berikan komentar Anda</p>
@@ -316,9 +320,13 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="bg-white rounded-xl shadow p-4 ${comment.depth > 0 ? 'ml-4 sm:ml-8 border-l-4 border-blue-200' : ''}">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-2 space-y-2 sm:space-y-0">
                     <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
-                            ${comment.name.charAt(0).toUpperCase()}
-                        </div>
+                        ${comment.avatar_url ? `
+                            <img src="${comment.avatar_url}" alt="${comment.name}" class="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                        ` : `
+                            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
+                                ${comment.name.charAt(0).toUpperCase()}
+                            </div>
+                        `}
                         <div class="min-w-0 flex-1">
                             <p class="font-semibold text-gray-800 truncate">${comment.name}</p>
                             <p class="text-xs text-gray-500"><span class="timeago" data-time="${comment.created_at_iso}">${comment.created_at}</span></p>
@@ -339,9 +347,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         ${comment.replies.map(reply => `
                             <div class="bg-gray-50 rounded-lg p-3">
                                 <div class="flex items-center space-x-3 mb-2">
-                                    <div class="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
-                                        ${reply.name.charAt(0).toUpperCase()}
-                                    </div>
+                                    ${reply.avatar_url ? `
+                                        <img src="${reply.avatar_url}" alt="${reply.name}" class="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                                    ` : `
+                                        <div class="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                                            ${reply.name.charAt(0).toUpperCase()}
+                                        </div>
+                                    `}
                                     <div class="min-w-0 flex-1">
                                         <p class="font-medium text-gray-800 text-sm truncate">${reply.name}</p>
                                         <p class="text-xs text-gray-500"><span class="timeago" data-time="${reply.created_at_iso}">${reply.created_at}</span></p>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Gallery;
 use App\Models\GalleryComment;
 use App\Models\GalleryLike;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -136,7 +137,8 @@ class InteractionController extends Controller
                 'depth' => $comment->depth,
                 'created_at' => $comment->created_at->format('d M Y H:i'),
                 'created_at_iso' => $comment->created_at->toIso8601String(),
-                'is_reply' => $comment->parent_id ? true : false
+                'is_reply' => $comment->parent_id ? true : false,
+                'avatar_url' => $user->avatar ? asset('storage/'.$user->avatar) : null,
             ]
         ]);
     }
@@ -149,6 +151,7 @@ class InteractionController extends Controller
         $gallery = Gallery::findOrFail($galleryId);
         
         $comments = $gallery->comments()->with('replies')->get()->map(function ($comment) {
+            $commentUser = $comment->email ? User::where('email', $comment->email)->first() : null;
             return [
                 'id' => $comment->id,
                 'name' => $comment->name,
@@ -156,7 +159,9 @@ class InteractionController extends Controller
                 'depth' => $comment->depth,
                 'created_at' => $comment->created_at->format('d M Y H:i'),
                 'created_at_iso' => $comment->created_at->toIso8601String(),
+                'avatar_url' => $commentUser && $commentUser->avatar ? asset('storage/'.$commentUser->avatar) : null,
                 'replies' => $comment->replies->map(function ($reply) {
+                    $replyUser = $reply->email ? User::where('email', $reply->email)->first() : null;
                     return [
                         'id' => $reply->id,
                         'name' => $reply->name,
@@ -164,6 +169,7 @@ class InteractionController extends Controller
                         'depth' => $reply->depth,
                         'created_at' => $reply->created_at->format('d M Y H:i'),
                         'created_at_iso' => $reply->created_at->toIso8601String(),
+                        'avatar_url' => $replyUser && $replyUser->avatar ? asset('storage/'.$replyUser->avatar) : null,
                     ];
                 })
             ];
@@ -407,6 +413,7 @@ class InteractionController extends Controller
         $news = \App\Models\News::findOrFail($newsId);
         
         $comments = $news->comments()->with('replies')->get()->map(function ($comment) {
+            $commentUser = User::where('name', $comment->name)->first();
             return [
                 'id' => $comment->id,
                 'name' => $comment->name,
@@ -414,7 +421,9 @@ class InteractionController extends Controller
                 'depth' => $comment->depth,
                 'created_at' => $comment->created_at->format('d M Y H:i'),
                 'created_at_iso' => $comment->created_at->toIso8601String(),
+                'avatar_url' => $commentUser && $commentUser->avatar ? asset('storage/'.$commentUser->avatar) : null,
                 'replies' => $comment->replies->map(function ($reply) {
+                    $replyUser = User::where('name', $reply->name)->first();
                     return [
                         'id' => $reply->id,
                         'name' => $reply->name,
@@ -422,6 +431,7 @@ class InteractionController extends Controller
                         'depth' => $reply->depth,
                         'created_at' => $reply->created_at->format('d M Y H:i'),
                         'created_at_iso' => $reply->created_at->toIso8601String(),
+                        'avatar_url' => $replyUser && $replyUser->avatar ? asset('storage/'.$replyUser->avatar) : null,
                     ];
                 })
             ];

@@ -134,9 +134,13 @@
         @auth
             <div class="bg-gray-50 rounded-xl p-4 mb-6">
                 <div class="flex items-center space-x-3 mb-4">
-                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
-                        {{ substr(auth()->user()->name, 0, 1) }}
-                    </div>
+                    @if(auth()->user()->avatar)
+                        <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" class="w-10 h-10 rounded-full object-cover" />
+                    @else
+                        <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+                            {{ substr(auth()->user()->name, 0, 1) }}
+                        </div>
+                    @endif
                     <div>
                         <p class="font-semibold text-gray-800">{{ auth()->user()->name }}</p>
                         <p class="text-sm text-gray-500">Berikan komentar Anda</p>
@@ -289,9 +293,13 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="bg-white rounded-xl shadow p-4 ${comment.depth > 0 ? 'ml-8 border-l-4 border-blue-200' : ''}">
                 <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
-                            ${comment.name.charAt(0).toUpperCase()}
-                        </div>
+                        ${comment.avatar_url ? `
+                            <img src="${comment.avatar_url}" alt="${comment.name}" class="w-10 h-10 rounded-full object-cover" />
+                        ` : `
+                            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+                                ${comment.name.charAt(0).toUpperCase()}
+                            </div>
+                        `}
                         <div>
                             <p class="font-semibold text-gray-800">${comment.name}</p>
                             <p class="text-xs text-gray-500"><span class="timeago" data-time="${comment.created_at_iso}">${comment.created_at}</span></p>
@@ -312,9 +320,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         ${comment.replies.map(reply => `
                             <div class="bg-gray-50 rounded-lg p-3">
                                 <div class="flex items-center space-x-3 mb-2">
-                                    <div class="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                                        ${reply.name.charAt(0).toUpperCase()}
-                                    </div>
+                                    ${reply.avatar_url ? `
+                                        <img src="${reply.avatar_url}" alt="${reply.name}" class="w-8 h-8 rounded-full object-cover" />
+                                    ` : `
+                                        <div class="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                                            ${reply.name.charAt(0).toUpperCase()}
+                                        </div>
+                                    `}
                                     <div>
                                         <p class="font-medium text-gray-800 text-sm">${reply.name}</p>
                                         <p class="text-xs text-gray-500"><span class="timeago" data-time="${reply.created_at_iso}">${reply.created_at}</span></p>
