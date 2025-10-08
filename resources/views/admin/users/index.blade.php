@@ -53,8 +53,12 @@
         @forelse(($superAdmins ?? []) as $sa)
         <div class="bg-white border rounded-xl p-4 shadow-sm hover:shadow transition">
             <div class="flex items-center">
-                <div class="h-10 w-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center mr-3 font-semibold">
-                    {{ strtoupper(substr($sa->name,0,1)) }}
+                <div class="h-10 w-10 rounded-full overflow-hidden bg-red-100 text-red-600 flex items-center justify-center mr-3 font-semibold">
+                    @if($sa->avatar)
+                        <img src="{{ asset('storage/' . $sa->avatar) }}" alt="{{ $sa->name }}" class="w-full h-full object-cover">
+                    @else
+                        {{ strtoupper(substr($sa->name,0,1)) }}
+                    @endif
                 </div>
                 <div class="flex-1">
                     <div class="flex items-center gap-2">
@@ -84,8 +88,12 @@
         @forelse(($admins ?? []) as $admin)
         <div class="bg-white border rounded-xl p-4 shadow-sm hover:shadow transition">
             <div class="flex items-start">
-                <div class="h-10 w-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 font-semibold">
-                    {{ strtoupper(substr($admin->name,0,1)) }}
+                <div class="h-10 w-10 rounded-full overflow-hidden bg-blue-100 text-blue-600 flex items-center justify-center mr-3 font-semibold">
+                    @if($admin->avatar)
+                        <img src="{{ asset('storage/' . $admin->avatar) }}" alt="{{ $admin->name }}" class="w-full h-full object-cover">
+                    @else
+                        {{ strtoupper(substr($admin->name,0,1)) }}
+                    @endif
                 </div>
                 <div class="flex-1">
                     <div class="flex items-center justify-between">
@@ -120,8 +128,12 @@
         @forelse($users as $user)
         <div class="bg-white border rounded-xl p-4 shadow-sm hover:shadow transition">
             <div class="flex items-start">
-                <div class="h-10 w-10 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center mr-3 font-semibold">
-                    {{ strtoupper(substr($user->name,0,1)) }}
+                <div class="h-10 w-10 rounded-full overflow-hidden bg-gray-100 text-gray-600 flex items-center justify-center mr-3 font-semibold">
+                    @if($user->avatar)
+                        <img src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}" class="w-full h-full object-cover">
+                    @else
+                        {{ strtoupper(substr($user->name,0,1)) }}
+                    @endif
                 </div>
                 <div class="flex-1">
                     <div class="flex items-center justify-between">

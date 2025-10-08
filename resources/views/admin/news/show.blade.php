@@ -98,8 +98,13 @@
             @forelse($news->comments as $comment)
                 <div class="border rounded-lg p-4 flex items-start justify-between hover:bg-gray-50 transition">
                     <div class="flex items-start gap-3 flex-1">
-                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                            {{ strtoupper(substr($comment->name, 0, 1)) }}
+                        @php($__user = \App\Models\User::where('name', $comment->name)->first())
+                        <div class="w-10 h-10 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                            @if($__user && $__user->avatar)
+                                <img src="{{ asset('storage/' . $__user->avatar) }}" alt="{{ $comment->name }}" class="w-full h-full object-cover">
+                            @else
+                                {{ strtoupper(substr($comment->name, 0, 1)) }}
+                            @endif
                         </div>
                         <div class="flex-1">
                             <div class="flex items-center gap-2 mb-1">

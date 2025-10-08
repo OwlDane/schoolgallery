@@ -94,8 +94,12 @@
             @forelse($gallery->likes()->with('user')->latest()->get() as $like)
                 <div class="border-b border-gray-100 last:border-0 p-4 flex items-center justify-between hover:bg-gray-50 transition">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 font-bold">
-                            {{ strtoupper(substr($like->user->name ?? 'U', 0, 1)) }}
+                        <div class="w-10 h-10 rounded-full overflow-hidden bg-pink-100 flex items-center justify-center text-pink-600 font-bold">
+                            @if(optional($like->user)->avatar)
+                                <img src="{{ asset('storage/' . $like->user->avatar) }}" alt="{{ $like->user->name }}" class="w-full h-full object-cover">
+                            @else
+                                {{ strtoupper(substr($like->user->name ?? 'U', 0, 1)) }}
+                            @endif
                         </div>
                         <div>
                             <p class="font-medium text-gray-900">{{ $like->user->name ?? 'User Terhapus' }}</p>
@@ -128,8 +132,13 @@
             @forelse($gallery->comments as $comment)
                 <div class="border rounded-lg p-4 flex items-start justify-between hover:bg-gray-50 transition">
                     <div class="flex items-start gap-3 flex-1">
-                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                            {{ strtoupper(substr($comment->name, 0, 1)) }}
+                        @php($__user = $comment->email ? \App\Models\User::where('email', $comment->email)->first() : null)
+                        <div class="w-10 h-10 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                            @if($__user && $__user->avatar)
+                                <img src="{{ asset('storage/' . $__user->avatar) }}" alt="{{ $comment->name }}" class="w-full h-full object-cover">
+                            @else
+                                {{ strtoupper(substr($comment->name, 0, 1)) }}
+                            @endif
                         </div>
                         <div class="flex-1">
                             <div class="flex items-center gap-2 mb-1">

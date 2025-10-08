@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\NewsComment;
 use App\Models\GalleryComment;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class CommentsController extends Controller
@@ -29,6 +30,8 @@ class CommentsController extends Controller
             }
             
             $newsComments = $newsQuery->get()->map(function($comment) {
+                // Try to resolve user by name (NewsComment doesn't store email)
+                $user = User::where('name', $comment->name)->first();
                 return [
                     'id' => $comment->id,
                     'type' => 'news',
@@ -41,6 +44,7 @@ class CommentsController extends Controller
                     'item_title' => $comment->news->title ?? 'Berita Terhapus',
                     'item_slug' => $comment->news->slug ?? null,
                     'model' => $comment,
+                    'user_avatar_url' => $user && $user->avatar ? asset('storage/'.$user->avatar) : null,
                 ];
             });
         }
@@ -57,6 +61,8 @@ class CommentsController extends Controller
             }
             
             $galleryComments = $galleryQuery->get()->map(function($comment) {
+                // Resolve user by email for gallery comments
+                $user = $comment->email ? User::where('email', $comment->email)->first() : null;
                 return [
                     'id' => $comment->id,
                     'type' => 'gallery',
@@ -69,6 +75,7 @@ class CommentsController extends Controller
                     'item_title' => $comment->gallery->title ?? 'Galeri Terhapus',
                     'item_slug' => $comment->gallery->slug ?? null,
                     'model' => $comment,
+                    'user_avatar_url' => $user && $user->avatar ? asset('storage/'.$user->avatar) : null,
                 ];
             });
         }
