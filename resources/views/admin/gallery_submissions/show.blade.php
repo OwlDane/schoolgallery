@@ -28,7 +28,16 @@
         </div>
         <div>
           <div class="text-gray-500">Pengaju</div>
-          <div class="font-medium">{{ $submission->user->name ?? '-' }} ({{ $submission->user->email ?? '-' }})</div>
+          <div class="mt-1 flex items-center gap-2 font-medium">
+            <span class="inline-flex h-8 w-8 rounded-full overflow-hidden items-center justify-center bg-blue-100 text-blue-700 text-sm">
+              @if(optional($submission->user)->avatar_url)
+                <img src="{{ $submission->user->avatar_url }}" alt="avatar" class="w-full h-full object-cover">
+              @else
+                {{ strtoupper(substr($submission->user->name ?? 'U',0,1)) }}
+              @endif
+            </span>
+            <span>{{ $submission->user->name ?? '-' }} (<span class="text-gray-600">{{ $submission->user->email ?? '-' }}</span>)</span>
+          </div>
         </div>
         <div>
           <div class="text-gray-500">Dikirim</div>

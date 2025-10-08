@@ -34,7 +34,13 @@
   @forelse($submissions as $sub)
   <div class="bg-white border rounded-xl p-4 shadow-sm hover:shadow transition">
     <div class="flex items-start gap-3">
-      <div class="h-10 w-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold">{{ strtoupper(substr($sub->user->name ?? 'U',0,1)) }}</div>
+      <div class="h-10 w-10 rounded-full overflow-hidden flex items-center justify-center bg-blue-100 text-blue-700 font-bold">
+        @if(optional($sub->user)->avatar_url)
+          <img src="{{ $sub->user->avatar_url }}" alt="avatar" class="w-full h-full object-cover">
+        @else
+          {{ strtoupper(substr($sub->user->name ?? 'U',0,1)) }}
+        @endif
+      </div>
       <div class="flex-1">
         <div class="flex items-center justify-between">
           <div>

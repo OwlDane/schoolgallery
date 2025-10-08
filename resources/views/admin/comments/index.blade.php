@@ -83,8 +83,19 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition">
             <div class="flex items-start justify-between mb-3">
                 <div class="flex items-start gap-3 flex-1">
-                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                        {{ strtoupper(substr($comment['name'], 0, 1)) }}
+                    <div class="w-10 h-10 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                        @php
+                            $email = $comment['email'] ?? null;
+                            $gravatar = $email ? 'https://www.gravatar.com/avatar/'.md5(strtolower(trim($email))).'?s=80&d=mp' : null;
+                            $avatarUrl = $comment['user_avatar_url'] ?? null; // allow controller to pass avatar if available
+                        @endphp
+                        @if(!empty($avatarUrl))
+                            <img src="{{ $avatarUrl }}" alt="avatar" class="w-full h-full object-cover">
+                        @elseif($gravatar)
+                            <img src="{{ $gravatar }}" alt="avatar" class="w-full h-full object-cover">
+                        @else
+                            {{ strtoupper(substr($comment['name'], 0, 1)) }}
+                        @endif
                     </div>
                     <div class="flex-1">
                         <div class="flex items-center gap-2 mb-1">

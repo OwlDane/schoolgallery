@@ -167,7 +167,19 @@
     </style>
 </head>
 <body class="bg-gray-50">
+    @php
+        $authRoutes = [
+            'guest.login',
+            'guest.register',
+            'guest.password.request',
+            'guest.password.reset',
+            // alias used by Laravel notifications
+            'password.reset',
+        ];
+        $hideNavbar = in_array(optional(Route::current())->getName(), $authRoutes, true);
+    @endphp
     <!-- Navigation -->
+    @unless($hideNavbar)
     <nav class="bg-white shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex items-center justify-between h-16">
@@ -303,3 +315,4 @@
             </div>
         </div>
     </nav>
+@endunless

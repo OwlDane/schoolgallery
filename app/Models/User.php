@@ -48,4 +48,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // Accessor for avatar URL
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if (!empty($this->avatar)) {
+            // Ensure forward slashes for Windows paths stored in DB
+            $path = str_replace('\\', '/', $this->avatar);
+            return asset('storage/' . ltrim($path, '/'));
+        }
+        return null;
+    }
 }

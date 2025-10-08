@@ -43,6 +43,12 @@ class UserProfileController extends Controller
 
         $user->save();
 
+        // If user clicked the explicit save button with redirect instruction, go to home
+        if ($request->input('redirect') === 'home') {
+            return redirect()->route('home')->with('status', 'Profil berhasil diperbarui.');
+        }
+
+        // Default: stay on profile (useful for auto-submit avatar or partial edits)
         return back()->with('status', 'Profil berhasil diperbarui.');
     }
 }
