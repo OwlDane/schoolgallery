@@ -109,9 +109,6 @@
                         <i class="fas {{ $user->is_active ? 'fa-user-slash' : 'fa-user-check' }} mr-2"></i> {{ $user->is_active ? 'Nonaktifkan Akun' : 'Aktifkan Akun' }}
                     </button>
                 </form>
-                <a href="{{ route('admin.users.index') }}" class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 transition-all shadow-sm">
-                    <i class="fas fa-arrow-left mr-2"></i> Kembali ke Monitoring
-                </a>
             </div>
         </div>
     </div>

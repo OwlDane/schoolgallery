@@ -75,26 +75,8 @@
                     </div>
                     <div>
                         <p class="text-sm text-gray-500 mb-1">Terakhir diperbarui:</p>
-                        <p class="text-gray-700">{{ $news->updated_at->format('d M Y, H:i') }}</p>
-                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div class="mt-6">
-        <a href="{{ route('admin.news.index') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
-            <i class="fas fa-arrow-left mr-1"></i> Kembali ke Daftar Berita
-        </a>
-    </div>
-
-    <!-- Comments Section -->
-    <div id="comments" class="mt-10">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-            <i class="fas fa-comments text-blue-600 mr-2"></i>
-            Komentar ({{ $news->comments()->count() }})
-        </h3>
-        <div class="space-y-3">
             @forelse($news->comments as $comment)
                 <div class="border rounded-lg p-4 flex items-start justify-between hover:bg-gray-50 transition">
                     <div class="flex items-start gap-3 flex-1">

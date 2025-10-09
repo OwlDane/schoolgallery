@@ -100,16 +100,7 @@
             <p class="text-sm text-gray-500 mt-1">Jika tidak dicentang, foto akan disimpan sebagai draft</p>
         </div>
 
-        <div class="flex justify-between">
-            @if(request()->has('kategori'))
-                <a href="{{ route('admin.galleries.kategori', request('kategori')) }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
-                    <i class="fas fa-arrow-left mr-1"></i> Kembali ke {{ App\Models\Kategori::where('slug', request('kategori'))->first()->nama ?? 'Kategori' }}
-                </a>
-            @else
-                <a href="{{ route('admin.galleries.index') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
-                    <i class="fas fa-arrow-left mr-1"></i> Kembali ke Semua Galeri
-                </a>
-            @endif
+        <div class="flex justify-end">
             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                 <i class="fas fa-save mr-1"></i> Simpan Perubahan
             </button>

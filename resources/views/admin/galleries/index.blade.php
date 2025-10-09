@@ -50,15 +50,17 @@
     @else
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($galleries as $gallery)
-                <div class="border rounded-lg overflow-hidden bg-white shadow-sm">
-                    <div class="relative">
-                        <img src="{{ $gallery->image ? asset('storage/'.$gallery->image) : 'https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&w=800&q=60' }}" alt="{{ $gallery->title }}" class="w-full h-48 object-cover">
+                <div class="border rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
+                    <a href="{{ route('admin.galleries.show', $gallery) }}" class="block relative group">
+                        <img src="{{ $gallery->image ? asset('storage/'.$gallery->image) : 'https://images.unsplash.com/photo-1588072432836-e10032774350?auto=format&fit=crop&w=800&q=60' }}" alt="{{ $gallery->title }}" class="w-full h-48 object-cover group-hover:opacity-90 transition-opacity">
                         @if(!$gallery->is_published)
                             <span class="absolute top-2 right-2 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Draft</span>
                         @endif
-                    </div>
+                    </a>
                     <div class="p-4">
-                        <h3 class="font-semibold text-gray-800 mb-2">{{ $gallery->title }}</h3>
+                        <a href="{{ route('admin.galleries.show', $gallery) }}" class="block">
+                            <h3 class="font-semibold text-gray-800 mb-2 hover:text-blue-600 transition-colors">{{ $gallery->title }}</h3>
+                        </a>
                         @if($gallery->kategori)
                             <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">{{ $gallery->kategori->nama }}</span>
                         @endif
@@ -67,7 +69,7 @@
                         <div class="flex items-center space-x-4 text-sm text-gray-600 mb-2">
                             <span class="inline-flex items-center"><i class="fas fa-user mr-1"></i>{{ $gallery->admin->name ?? 'Admin' }}</span>
                             <span class="inline-flex items-center text-pink-600"><i class="fas fa-heart mr-1"></i>{{ $gallery->likes()->count() }}</span>
-                            <a href="{{ route('admin.galleries.show', $gallery) }}#comments" class="inline-flex items-center text-gray-600 hover:text-blue-700"><i class="far fa-comment mr-1"></i>{{ $gallery->comments()->count() }}</a>
+                            <span class="inline-flex items-center text-gray-600"><i class="far fa-comment mr-1"></i>{{ $gallery->comments()->count() }}</span>
                             <span class="inline-flex items-center"><i class="far fa-calendar-alt mr-1"></i>{{ $gallery->created_at->format('d M Y') }}</span>
                         </div>
 

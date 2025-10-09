@@ -14,9 +14,6 @@
             <p class="text-gray-500 mt-1">Atur acara sekolah dengan tampilan modern yang konsisten</p>
         </div>
         <div class="flex items-center gap-3">
-            <a href="{{ route('admin.dashboard') }}" class="px-4 py-2 rounded-lg border border-blue-600 text-blue-700 hover:bg-blue-50 transition">
-                <i class="fas fa-arrow-left mr-2"></i>Kembali
-            </a>
             <a href="{{ route('admin.events.create') }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center">
                 <i class="fas fa-plus mr-2"></i>Tambah Acara
             </a>

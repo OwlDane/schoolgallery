@@ -3,33 +3,114 @@
 @section('title', $gallery->title)
 
 @section('content')
-<div class="bg-white rounded-lg shadow-sm p-6">
-    <div class="mb-6 flex justify-between items-center">
-        <h2 class="text-xl font-semibold text-gray-800">Detail Foto</h2>
-        <div class="flex space-x-2">
-            <a href="{{ route('admin.galleries.edit', $gallery) }}" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                <i class="fas fa-edit mr-1"></i> Edit
-            </a>
-            <form action="{{ route('admin.galleries.destroy', $gallery) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus foto ini?');">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
-                    <i class="fas fa-trash mr-1"></i> Hapus
-                </button>
-            </form>
+<div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <!-- Header Actions -->
+    <div class="bg-gray-50 px-6 py-4 border-b flex justify-between items-center">
+        <a href="{{ route('admin.galleries.index') }}" class="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i> Kembali
+        </a>
+    </div>
+
+    <!-- Main Image -->
+    <div class="bg-gray-900">
+        <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}" class="w-full h-auto object-cover" style="max-height: 600px; object-fit: contain;">
+    </div>
+
+    <!-- Action Buttons Below Image -->
+    <div class="px-6 py-4 bg-gray-50 border-b flex justify-center space-x-3">
+        <a href="{{ route('admin.galleries.edit', $gallery) }}" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors inline-flex items-center">
+            <i class="fas fa-edit mr-2"></i> Edit
+        </a>
+        <form action="{{ route('admin.galleries.destroy', $gallery) }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus foto ini?');">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors inline-flex items-center">
+                <i class="fas fa-trash mr-2"></i> Hapus
+            </button>
+        </form>
+    </div>
+
+    <!-- Photo Details -->
+    <div class="p-6">
+        <!-- Title & Status -->
+        <div class="flex items-start justify-between mb-4">
+            <div class="flex-1">
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ $gallery->title }}</h1>
+                @if($gallery->kategori)
+                    <span class="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
+                        {{ $gallery->kategori->nama }}
+                    </span>
+                @endif
+            </div>
+            @if($gallery->is_published)
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    <i class="fas fa-check-circle mr-1"></i> Published
+                </span>
+            @else
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                    <i class="fas fa-clock mr-1"></i> Draft
+                </span>
+            @endif
         </div>
 
+        <!-- Stats Row - Clickable Buttons -->
+        <div class="flex flex-wrap items-center gap-3 mb-6 pb-6 border-b">
+            <button onclick="toggleSection('likes')" class="inline-flex items-center px-4 py-2 rounded-lg bg-pink-50 text-pink-700 font-medium hover:bg-pink-100 transition-colors cursor-pointer">
+                <i class="fas fa-heart mr-2"></i>
+                <span class="text-lg">{{ $gallery->likes()->count() }}</span>
+                <span class="ml-1 text-sm">Suka</span>
+            </button>
+            <button onclick="toggleSection('favorites')" class="inline-flex items-center px-4 py-2 rounded-lg bg-blue-50 text-blue-700 font-medium hover:bg-blue-100 transition-colors cursor-pointer">
+                <i class="far fa-bookmark mr-2"></i>
+                <span class="text-lg">{{ $gallery->favorites()->count() }}</span>
+                <span class="ml-1 text-sm">Disimpan</span>
+            </button>
+            <button onclick="toggleSection('comments')" class="inline-flex items-center px-4 py-2 rounded-lg bg-gray-50 text-gray-700 font-medium hover:bg-gray-100 transition-colors cursor-pointer">
+                <i class="far fa-comment mr-2"></i>
+                <span class="text-lg">{{ $gallery->comments()->count() }}</span>
+                <span class="ml-1 text-sm">Komentar</span>
+            </button>
+            <button onclick="toggleSection('views')" class="inline-flex items-center px-4 py-2 rounded-lg bg-indigo-50 text-indigo-700 font-medium hover:bg-indigo-100 transition-colors cursor-pointer">
+                <i class="far fa-eye mr-2"></i>
+                <span class="text-lg">{{ $gallery->view_count ?? 0 }}</span>
+                <span class="ml-1 text-sm">Dilihat</span>
+            </button>
+        </div>
+
+        <!-- Description & Meta -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div class="lg:col-span-2">
+                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Deskripsi</h3>
+                <p class="text-gray-700 leading-relaxed">{{ $gallery->description ?? 'Tidak ada deskripsi' }}</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-1">Ditambahkan oleh</p>
+                    <p class="text-gray-900">{{ $gallery->admin->name ?? 'Admin' }}</p>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-1">Tanggal dibuat</p>
+                    <p class="text-gray-900">{{ $gallery->created_at->format('d M Y, H:i') }}</p>
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-1">Terakhir diperbarui</p>
+                    <p class="text-gray-900">{{ $gallery->updated_at->format('d M Y, H:i') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Favorites Section -->
-    <div class="mt-10">
+    <div id="section-favorites" class="px-6 pb-6 hidden">
         <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
             <i class="far fa-bookmark text-blue-600 mr-2"></i>
             Disimpan oleh ({{ $gallery->favorites()->count() }})
         </h3>
-        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
             @forelse($gallery->favorites()->with('user')->latest()->get() as $fav)
-                <div class="border-b border-gray-100 last:border-0 p-4 flex items-center justify-between hover:bg-gray-50 transition">
+                <div class="border-b border-gray-200 last:border-0 p-4 flex items-center justify-between hover:bg-white transition">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                        <div class="w-10 h-10 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center text-blue-600 font-bold flex-shrink-0">
                             @if(optional($fav->user)->avatar)
                                 <img src="{{ asset('storage/' . $fav->user->avatar) }}" alt="{{ $fav->user->name }}" class="w-full h-full object-cover">
                             @else
@@ -56,93 +137,18 @@
             @endforelse
         </div>
     </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div>
-            <div class="bg-gray-100 p-2 rounded-lg">
-                <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}" class="w-full h-auto rounded-lg">
-            </div>
-        </div>
-        <div>
-            <div class="bg-gray-50 p-6 rounded-lg">
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ $gallery->title }}</h3>
-                
-                <div class="mb-4">
-                    <p class="text-sm text-gray-500 mb-1">Status:</p>
-                    @if($gallery->is_published)
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                            <i class="fas fa-check-circle mr-1"></i> Dipublikasikan
-                        </span>
-                    @else
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                            <i class="fas fa-clock mr-1"></i> Draft
-                        </span>
-                    @endif
-                </div>
-
-                <div class="mb-4">
-                    <p class="text-sm text-gray-500 mb-1">Deskripsi:</p>
-                    <p class="text-gray-700">{{ $gallery->description ?? 'Tidak ada deskripsi' }}</p>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <p class="text-sm text-gray-500 mb-1">Ditambahkan oleh:</p>
-                        <p class="text-gray-700">{{ $gallery->admin->name ?? 'Admin' }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500 mb-1">Kategori:</p>
-                        <p class="text-gray-700">{{ $gallery->kategori->name ?? 'Tidak ada kategori' }}</p>
-                    </div>
-                </div>
-
-                <div class="mb-4 flex items-center gap-3">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-pink-100 text-pink-700 text-sm">
-                        <i class="fas fa-heart mr-1"></i>{{ $gallery->likes()->count() }} Suka
-                    </span>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm">
-                        <i class="far fa-bookmark mr-1"></i>{{ $gallery->favorites()->count() }} Disimpan
-                    </span>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm">
-                        <i class="far fa-comment mr-1"></i>{{ $gallery->comments()->count() }} Komentar
-                    </span>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-sm">
-                        <i class="far fa-eye mr-1"></i>{{ $gallery->view_count ?? 0 }} Dilihat
-                    </span>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-sm text-gray-500 mb-1">Tanggal dibuat:</p>
-                        <p class="text-gray-700">{{ $gallery->created_at->format('d M Y, H:i') }}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500 mb-1">Terakhir diperbarui:</p>
-                        <p class="text-gray-700">{{ $gallery->updated_at->format('d M Y, H:i') }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="mt-6">
-        <a href="{{ route('admin.galleries.index') }}" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
-            <i class="fas fa-arrow-left mr-1"></i> Kembali ke Daftar Galeri
-        </a>
-    </div>
 
     <!-- Likes Section -->
-    <div class="mt-10">
+    <div id="section-likes" class="px-6 pb-6 hidden">
         <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
             <i class="fas fa-heart text-pink-600 mr-2"></i>
             Disukai oleh ({{ $gallery->likes()->count() }})
         </h3>
-        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div class="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
             @forelse($gallery->likes()->with('user')->latest()->get() as $like)
-                <div class="border-b border-gray-100 last:border-0 p-4 flex items-center justify-between hover:bg-gray-50 transition">
+                <div class="border-b border-gray-200 last:border-0 p-4 flex items-center justify-between hover:bg-white transition">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full overflow-hidden bg-pink-100 flex items-center justify-center text-pink-600 font-bold">
+                        <div class="w-10 h-10 rounded-full overflow-hidden bg-pink-100 flex items-center justify-center text-pink-600 font-bold flex-shrink-0">
                             @if(optional($like->user)->avatar)
                                 <img src="{{ asset('storage/' . $like->user->avatar) }}" alt="{{ $like->user->name }}" class="w-full h-full object-cover">
                             @else
@@ -171,9 +177,9 @@
     </div>
 
     <!-- Comments Section -->
-    <div id="comments" class="mt-10">
+    <div id="section-comments" class="px-6 pb-6 hidden">
         <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-            <i class="fas fa-comments text-blue-600 mr-2"></i>
+            <i class="fas fa-comments text-gray-600 mr-2"></i>
             Komentar ({{ $gallery->comments()->count() }})
         </h3>
         <div class="space-y-3">
@@ -215,5 +221,41 @@
             @endforelse
         </div>
     </div>
+
+    <!-- Views Info Section (Static - no user list) -->
+    <div id="section-views" class="px-6 pb-6 hidden">
+        <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-8 text-center">
+            <i class="far fa-eye text-5xl text-indigo-400 mb-3"></i>
+            <p class="text-2xl font-bold text-indigo-900">{{ $gallery->view_count ?? 0 }}</p>
+            <p class="text-sm text-indigo-700 mt-1">Total tayangan foto ini</p>
+        </div>
+    </div>
 </div>
+
+@push('scripts')
+<script>
+function toggleSection(section) {
+    const sectionId = 'section-' + section;
+    const element = document.getElementById(sectionId);
+    
+    if (element) {
+        // Toggle visibility
+        if (element.classList.contains('hidden')) {
+            // Hide all sections first
+            document.querySelectorAll('[id^="section-"]').forEach(el => {
+                el.classList.add('hidden');
+            });
+            // Show clicked section
+            element.classList.remove('hidden');
+            // Smooth scroll to section
+            element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+            // Hide if already visible
+            element.classList.add('hidden');
+        }
+    }
+}
+</script>
+@endpush
+
 @endsection
