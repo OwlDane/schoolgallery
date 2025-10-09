@@ -18,6 +18,44 @@
                 </button>
             </form>
         </div>
+
+    <!-- Favorites Section -->
+    <div class="mt-10">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+            <i class="far fa-bookmark text-blue-600 mr-2"></i>
+            Disimpan oleh ({{ $gallery->favorites()->count() }})
+        </h3>
+        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+            @forelse($gallery->favorites()->with('user')->latest()->get() as $fav)
+                <div class="border-b border-gray-100 last:border-0 p-4 flex items-center justify-between hover:bg-gray-50 transition">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                            @if(optional($fav->user)->avatar)
+                                <img src="{{ asset('storage/' . $fav->user->avatar) }}" alt="{{ $fav->user->name }}" class="w-full h-full object-cover">
+                            @else
+                                {{ strtoupper(substr($fav->user->name ?? 'U', 0, 1)) }}
+                            @endif
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-900">{{ $fav->user->name ?? 'User Terhapus' }}</p>
+                            <p class="text-xs text-gray-500">{{ $fav->user->email ?? '-' }}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-gray-600">
+                            <i class="far fa-clock mr-1"></i>{{ $fav->created_at->diffForHumans() }}
+                        </p>
+                        <p class="text-xs text-gray-500">{{ $fav->created_at->format('d M Y, H:i') }}</p>
+                    </div>
+                </div>
+            @empty
+                <div class="p-8 text-center text-gray-500">
+                    <i class="far fa-bookmark text-4xl text-gray-300 mb-2"></i>
+                    <p>Belum ada yang menyimpan foto ini.</p>
+                </div>
+            @endforelse
+        </div>
+    </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -60,8 +98,18 @@
                 </div>
 
                 <div class="mb-4 flex items-center gap-3">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-pink-100 text-pink-700 text-sm"><i class="fas fa-heart mr-1"></i>{{ $gallery->likes()->count() }} Suka</span>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm"><i class="far fa-comment mr-1"></i>{{ $gallery->comments()->count() }} Komentar</span>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-pink-100 text-pink-700 text-sm">
+                        <i class="fas fa-heart mr-1"></i>{{ $gallery->likes()->count() }} Suka
+                    </span>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm">
+                        <i class="far fa-bookmark mr-1"></i>{{ $gallery->favorites()->count() }} Disimpan
+                    </span>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm">
+                        <i class="far fa-comment mr-1"></i>{{ $gallery->comments()->count() }} Komentar
+                    </span>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-sm">
+                        <i class="far fa-eye mr-1"></i>{{ $gallery->view_count ?? 0 }} Dilihat
+                    </span>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">

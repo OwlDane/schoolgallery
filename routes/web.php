@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Guest\AuthController as GuestAuthController;
 use App\Http\Controllers\Guest\GallerySubmissionController as GuestGallerySubmissionController;
 use App\Http\Controllers\Guest\InteractionController;
+use App\Http\Controllers\Guest\FavoriteController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatbotController;
@@ -54,6 +55,9 @@ Route::middleware('track.visits')->group(function () {
     
     // Photo submission for guests
     Route::post('/submit-photo', [InteractionController::class, 'submitPhoto'])->name('photo.submit');
+
+    // Favorites status can be read by everyone (returns favorited=false for guests)
+    Route::get('/gallery/{id}/favorite-status', [FavoriteController::class, 'status'])->name('gallery.favorite-status');
 });
 
 // Authenticated User Interaction Routes (login required)
@@ -62,6 +66,10 @@ Route::middleware(['auth', 'track.visits'])->group(function () {
     Route::post('/gallery/{id}/like', [InteractionController::class, 'toggleLike'])->name('gallery.like');
     Route::post('/gallery/{id}/comment', [InteractionController::class, 'addComment'])->name('gallery.comment');
     Route::get('/gallery/{id}/like-status', [InteractionController::class, 'checkLikeStatus'])->name('gallery.like-status');
+
+    // Favorites (MVP)
+    Route::post('/gallery/{id}/favorite', [FavoriteController::class, 'toggle'])->name('gallery.favorite');
+    Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
     
     // News interactions for authenticated users
     Route::post('/news/{id}/comment', [InteractionController::class, 'addNewsComment'])->name('news.comment');

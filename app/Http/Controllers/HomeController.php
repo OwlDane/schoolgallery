@@ -29,7 +29,11 @@ class HomeController extends Controller
 
     public function gallery(Request $request)
     {
-        $query = Gallery::published()->withCount(['likes', 'comments' => function($q){ $q->where('is_approved', true); }])->latest();
+        $query = Gallery::published()->withCount([
+            'likes', 
+            'comments' => function($q){ $q->where('is_approved', true); },
+            'favorites'
+        ])->latest();
 
         if ($request->has('search')) {
             $query->where('title', 'like', '%' . $request->search . '%');
@@ -41,6 +45,7 @@ class HomeController extends Controller
         if (auth()->check()) {
             $galleries->getCollection()->transform(function ($gallery) {
                 $gallery->user_has_liked = $gallery->likes()->where('user_id', auth()->id())->exists();
+                $gallery->user_has_favorited = $gallery->favorites()->where('user_id', auth()->id())->exists();
                 return $gallery;
             });
         }
@@ -66,7 +71,7 @@ class HomeController extends Controller
         $galleries = Gallery::with('kategori')
             ->where('kategori_id', $kategori->id)
             ->published()
-            ->withCount(['likes', 'comments' => function($q){ $q->where('is_approved', true); }])
+            ->withCount(['likes', 'comments' => function($q){ $q->where('is_approved', true); }, 'favorites'])
             ->latest()
             ->paginate(12);
 
@@ -74,6 +79,7 @@ class HomeController extends Controller
         if (auth()->check()) {
             $galleries->getCollection()->transform(function ($gallery) {
                 $gallery->user_has_liked = $gallery->likes()->where('user_id', auth()->id())->exists();
+                $gallery->user_has_favorited = $gallery->favorites()->where('user_id', auth()->id())->exists();
                 return $gallery;
             });
         }
@@ -90,7 +96,7 @@ class HomeController extends Controller
 
     public function galleryDetail($id)
     {
-        $gallery = Gallery::published()->with(['likes', 'comments' => function($q){ 
+        $gallery = Gallery::published()->with(['likes', 'favorites', 'comments' => function($q){ 
             $q->where('is_approved', true)->mainComments()->with('replies'); 
         }])->findOrFail($id);
         $relatedGalleries = Gallery::published()
@@ -99,6 +105,13 @@ class HomeController extends Controller
             ->take(4)
             ->get();
         $schoolProfile = SchoolProfile::getProfile();
+
+        // Increment per-gallery view count once per session
+        $sessionKey = 'viewed_gallery_' . $gallery->id;
+        if (!session()->has($sessionKey)) {
+            \DB::table('galleries')->where('id', $gallery->id)->increment('view_count');
+            session([$sessionKey => true]);
+        }
 
         return view('gallery-detail', compact('gallery', 'relatedGalleries', 'schoolProfile'));
     }

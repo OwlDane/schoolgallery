@@ -228,23 +228,39 @@
                                     </a>
                                 </div>
                                 <div class="mt-3 flex items-center justify-between text-sm text-gray-600">
-                                    @auth
-                                        @php
-                                            $userHasLiked = $gallery->user_has_liked ?? false;
-                                        @endphp
-                                        <button onclick="toggleLike({{ $gallery->id }})" 
-                                                class="like-btn inline-flex items-center transition-colors duration-200 {{ $userHasLiked ? 'text-pink-600' : 'text-gray-500 hover:text-pink-600' }}"
-                                                data-gallery-id="{{ $gallery->id }}"
-                                                data-liked="{{ $userHasLiked ? 'true' : 'false' }}">
-                                            <i class="{{ $userHasLiked ? 'fas' : 'far' }} fa-heart mr-1"></i>
-                                            <span class="like-count">{{ $gallery->likes_count ?? 0 }}</span>
-                                        </button>
-                                    @else
-                                        <div class="inline-flex items-center text-gray-400">
-                                            <i class="far fa-heart mr-1"></i>
-                                            <span>{{ $gallery->likes_count ?? 0 }}</span>
-                                        </div>
-                                    @endauth
+                                    <div class="flex items-center gap-4">
+                                        @auth
+                                            @php
+                                                $userHasLiked = $gallery->user_has_liked ?? false;
+                                                $userHasFav = $gallery->user_has_favorited ?? false;
+                                            @endphp
+                                            <button onclick="toggleLike({{ $gallery->id }})" 
+                                                    class="like-btn inline-flex items-center transition-colors duration-200 {{ $userHasLiked ? 'text-pink-600' : 'text-gray-500 hover:text-pink-600' }}"
+                                                    data-gallery-id="{{ $gallery->id }}"
+                                                    data-liked="{{ $userHasLiked ? 'true' : 'false' }}">
+                                                <i class="{{ $userHasLiked ? 'fas' : 'far' }} fa-heart mr-1"></i>
+                                                <span class="like-count">{{ $gallery->likes_count ?? 0 }}</span>
+                                            </button>
+                                            <button onclick="toggleFavoriteList({{ $gallery->id }})"
+                                                    class="fav-btn inline-flex items-center px-2 py-1 rounded transition-colors duration-200 {{ $userHasFav ? 'text-blue-700 bg-blue-50 ring-1 ring-blue-200' : 'text-gray-500 hover:text-blue-700 hover:bg-blue-50' }}"
+                                                    data-gallery-id="{{ $gallery->id }}"
+                                                    data-favorited="{{ $userHasFav ? 'true' : 'false' }}"
+                                                    aria-pressed="{{ $userHasFav ? 'true' : 'false' }}"
+                                                    title="{{ $userHasFav ? 'Tersimpan' : 'Simpan ke favorit' }}">
+                                                <i class="{{ $userHasFav ? 'fas' : 'far' }} fa-bookmark mr-1"></i>
+                                                <span class="fav-count">{{ $gallery->favorites_count ?? 0 }}</span>
+                                            </button>
+                                        @else
+                                            <div class="inline-flex items-center text-gray-400">
+                                                <i class="far fa-heart mr-1"></i>
+                                                <span>{{ $gallery->likes_count ?? 0 }}</span>
+                                            </div>
+                                            <div class="inline-flex items-center text-gray-400">
+                                                <i class="far fa-bookmark mr-1"></i>
+                                                <span>{{ $gallery->favorites_count ?? 0 }}</span>
+                                            </div>
+                                        @endauth
+                                    </div>
                                     <a href="{{ route('gallery.detail', $gallery->id) }}#comments" class="inline-flex items-center text-gray-500 hover:text-blue-600">
                                         <i class="far fa-comment mr-1"></i>
                                         <span>{{ $gallery->comments_count ?? 0 }}</span>
@@ -348,6 +364,80 @@
             if (likeBtn) likeBtn.disabled = false;
         }
     }
+
+    // Favorite functionality for list
+    async function toggleFavoriteList(galleryId) {
+        try {
+            const favBtn = document.querySelector(`.fav-btn[data-gallery-id="${galleryId}"]`);
+            if (!favBtn) return;
+            favBtn.disabled = true;
+
+            const response = await fetch(`/gallery/${galleryId}/favorite`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                }
+            });
+
+            const data = await response.json();
+            if (data && data.success) {
+                const icon = favBtn.querySelector('i');
+                const countEl = favBtn.querySelector('.fav-count');
+                if (data.favorited) {
+                    favBtn.className = 'fav-btn inline-flex items-center text-blue-700';
+                    icon.className = 'fas fa-bookmark mr-1';
+                    favBtn.dataset.favorited = 'true';
+                } else {
+                    favBtn.className = 'fav-btn inline-flex items-center text-gray-500 hover:text-blue-700';
+                    icon.className = 'far fa-bookmark mr-1';
+                    favBtn.dataset.favorited = 'false';
+                }
+                if (countEl && typeof data.favorite_count !== 'undefined') {
+                    countEl.textContent = data.favorite_count;
+                }
+            }
+        } catch (e) {
+            console.error('Error toggling favorite:', e);
+        } finally {
+            const favBtn = document.querySelector(`.fav-btn[data-gallery-id="${galleryId}"]`);
+            if (favBtn) favBtn.disabled = false;
+        }
+    }
+
+    // On load, for guests we still want latest favorite counts
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.fav-btn, .fav-count').forEach(async (node) => {
+            const card = node.closest('[data-aos]');
+            const idBtn = document.querySelector('.fav-btn', card);
+        });
+        // Fetch counts for all cards (works for auth or guest)
+        document.querySelectorAll('[data-gallery-id]').forEach(async (btn) => {
+            const id = btn.getAttribute('data-gallery-id');
+            if (!id) return;
+            try {
+                const res = await fetch(`/gallery/${id}/favorite-status`);
+                const data = await res.json();
+                const favBtn = document.querySelector(`.fav-btn[data-gallery-id="${id}"]`);
+                const countEl = favBtn ? favBtn.querySelector('.fav-count') : document.querySelector(`.fav-count[data-gallery-id="${id}"]`);
+                if (countEl && typeof data.favorite_count !== 'undefined') {
+                    countEl.textContent = data.favorite_count;
+                }
+                if (favBtn && data.success && typeof data.favorited !== 'undefined') {
+                    const icon = favBtn.querySelector('i');
+                    if (data.favorited) {
+                        favBtn.className = 'fav-btn inline-flex items-center text-blue-700';
+                        icon.className = 'fas fa-bookmark mr-1';
+                        favBtn.dataset.favorited = 'true';
+                    } else {
+                        favBtn.className = 'fav-btn inline-flex items-center text-gray-500 hover:text-blue-700';
+                        icon.className = 'far fa-bookmark mr-1';
+                        favBtn.dataset.favorited = 'false';
+                    }
+                }
+            } catch (e) {}
+        });
+    });
 </script>
 @endpush
 

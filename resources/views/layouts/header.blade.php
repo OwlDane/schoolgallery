@@ -226,6 +226,7 @@
                     </div>
 
                     <a href="{{ route('gallery') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center gap-2"><i class="fas fa-images text-blue-500"></i><span>Galeri</span></a>
+                    
                     <a href="{{ route('contact') }}" class="nav-link py-2 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all inline-flex items-center gap-2"><i class="fas fa-envelope text-blue-500"></i><span>Kontak</span></a>
                     
                 </div>
@@ -243,6 +244,7 @@
                                 <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
                                     <i class="fas fa-user-edit mr-2"></i> Profil Saya
                                 </a>
+                                
                                 <div class="border-t border-gray-100 my-1"></div>
                                 <form action="{{ route('guest.logout') }}" method="POST">
                                     @csrf
@@ -297,6 +299,7 @@
                         <a href="{{ route('profile.edit') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all">
                             <i class="fas fa-user-edit mr-2"></i> Profil Saya
                         </a>
+                        
                         <form action="{{ route('guest.logout') }}" method="POST">
                             @csrf
                             <button type="submit" class="w-full text-left py-2 px-3 text-red-600 hover:bg-red-50 rounded-md transition-all">

@@ -53,6 +53,11 @@ class Gallery extends Model
         return $this->hasMany(GalleryLike::class);
     }
 
+    public function favorites()
+    {
+        return $this->hasMany(GalleryFavorite::class);
+    }
+
     public function comments()
     {
         return $this->hasMany(GalleryComment::class)->mainComments()->latest();

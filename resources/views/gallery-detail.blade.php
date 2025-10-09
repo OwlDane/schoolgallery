@@ -25,30 +25,39 @@
                 <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}" class="w-full h-auto">
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-4">
-                        <div>
-                            <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-semibold">
-                                {{ $gallery->kategori->name ?? 'Umum' }}
-                            </span>
-                        </div>
+                        <div></div>
                         <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0 items-start sm:items-center">
                             @auth
-                                @php
-                                    $userLiked = $gallery->likes->where('user_id', auth()->id())->isNotEmpty();
-                                @endphp
-                                <button id="likeBtn" 
-                                        data-gallery-id="{{ $gallery->id }}" 
-                                        data-liked="{{ $userLiked ? 'true' : 'false' }}"
-                                        class="inline-flex items-center {{ $userLiked ? 'text-pink-600' : 'text-gray-500' }} hover:text-pink-700 transition-colors px-3 py-2 rounded-lg hover:bg-pink-50">
-                                    <i class="{{ $userLiked ? 'fas' : 'far' }} fa-heart mr-2"></i>
-                                    <span id="likeText" class="font-medium">{{ $userLiked ? 'Batalkan' : 'Suka' }}</span>
-                                    <span id="likeCount" class="ml-2 text-sm bg-gray-100 px-2 py-1 rounded-full">({{ $gallery->likes->count() }})</span>
-                                        </button>
+                            @php
+                                $userLiked = $gallery->likes->where('user_id', auth()->id())->isNotEmpty();
+                                $userFavorited = $gallery->favorites->where('user_id', auth()->id())->isNotEmpty();
+                            @endphp
+                            <button id="likeBtn" 
+                                    data-gallery-id="{{ $gallery->id }}" 
+                                    data-liked="{{ $userLiked ? 'true' : 'false' }}"
+                                    class="inline-flex items-center {{ $userLiked ? 'text-pink-600' : 'text-gray-500' }} hover:text-pink-700 transition-colors px-3 py-2 rounded-lg hover:bg-pink-50">
+                                <i class="{{ $userLiked ? 'fas' : 'far' }} fa-heart mr-2"></i>
+                                <span id="likeText" class="font-medium">{{ $userLiked ? 'Batalkan' : 'Suka' }}</span>
+                                <span id="likeCount" class="ml-2 text-sm bg-gray-100 px-2 py-1 rounded-full">({{ $gallery->likes->count() }})</span>
+                                    </button>
+                                <!-- Favorite Button -->
+                                <button id="favBtn"
+                                        data-gallery-id="{{ $gallery->id }}"
+                                        class="inline-flex items-center text-gray-500 hover:text-blue-700 transition-colors px-3 py-2 rounded-lg hover:bg-blue-50">
+                                    <i id="favIcon" class="{{ $userFavorited ? 'fas' : 'far' }} fa-bookmark mr-2"></i>
+                                    <span id="favText" class="font-medium">{{ $userFavorited ? 'Hapus dari Favorit' : 'Simpan' }}</span>
+                                    <span id="favCount" class="ml-2 text-sm bg-gray-100 px-2 py-1 rounded-full">({{ $gallery->favorites->count() }})</span>
+                                </button>
                             @else
-                                <a href="{{ route('guest.login') }}" class="inline-flex items-center text-gray-500 hover:text-pink-700 transition-colors px-3 py-2 rounded-lg hover:bg-pink-50">
-                                    <i class="far fa-heart mr-2"></i>
-                                    <span class="font-medium">Suka</span>
-                                    <span class="ml-2 text-sm bg-gray-100 px-2 py-1 rounded-full">({{ $gallery->likes->count() }})</span>
-                                </a>
+                            <a href="{{ route('guest.login') }}" class="inline-flex items-center text-gray-500 hover:text-pink-700 transition-colors px-3 py-2 rounded-lg hover:bg-pink-50">
+                                <i class="far fa-heart mr-2"></i>
+                                <span class="font-medium">Suka</span>
+                                <span class="ml-2 text-sm bg-gray-100 px-2 py-1 rounded-full">({{ $gallery->likes->count() }})</span>
+                            </a>
+                            <a href="{{ route('guest.login') }}" class="inline-flex items-center text-gray-500 hover:text-blue-700 transition-colors px-3 py-2 rounded-lg hover:bg-blue-50">
+                                <i class="far fa-bookmark mr-2"></i>
+                                <span class="font-medium">Simpan</span>
+                            </a>
                             @endauth
                             <a href="{{ asset('storage/' . $gallery->image) }}" 
                                class="text-blue-600 hover:text-blue-800" download>
@@ -170,8 +179,14 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Gallery ID:', galleryId);
     console.log('Is Authenticated:', isAuthenticated);
     
-    // Load comments for everyone (authenticated and guest)
+    // Load favorite status (for authenticated) and comments
     loadComments();
+    if (isAuthenticated) {
+        loadFavoriteStatus();
+    } else {
+        // For guests still show count
+        loadFavoriteCountOnly();
+    }
     
     // Only initialize interactive features for authenticated users
     if (isAuthenticated) {
@@ -202,6 +217,15 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         } else {
             console.log('Comment form not found');
+        }
+
+        // Favorite button handler
+        const favBtn = document.getElementById('favBtn');
+        if (favBtn) {
+            favBtn.addEventListener('click', function(e){
+                e.preventDefault();
+                toggleFavorite();
+            });
         }
     }
     
@@ -489,6 +513,67 @@ function updateRelativeTimes() {
             duration /= division.amount;
             value = value / division.amount;
         }
+
+    // Load favorite status
+    function loadFavoriteStatus() {
+        fetch(`/gallery/${galleryId}/favorite-status`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    updateFavoriteButton(data.favorited, data.favorite_count);
+                }
+            })
+            .catch(err => console.error('Error favorite status:', err));
+    }
+
+    function loadFavoriteCountOnly() {
+        fetch(`/gallery/${galleryId}/favorite-status`)
+            .then(r => r.json())
+            .then(data => {
+                const favCount = document.getElementById('favCount');
+                if (favCount && typeof data.favorite_count !== 'undefined') {
+                    favCount.textContent = `(${data.favorite_count})`;
+                }
+            })
+            .catch(()=>{});
+    }
+
+    function toggleFavorite() {
+        const favBtn = document.getElementById('favBtn');
+        if (!favBtn) return;
+        favBtn.disabled = true;
+        fetch(`/gallery/${galleryId}/favorite`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                updateFavoriteButton(data.favorited, data.favorite_count);
+                showNotification(data.message, 'success');
+            } else {
+                showNotification(data.message || 'Terjadi kesalahan', 'error');
+            }
+        })
+        .catch(() => showNotification('Terjadi kesalahan', 'error'))
+        .finally(() => favBtn.disabled = false);
+    }
+
+    function updateFavoriteButton(favorited, count) {
+        const favIcon = document.getElementById('favIcon');
+        const favText = document.getElementById('favText');
+        const favCount = document.getElementById('favCount');
+        const favBtn = document.getElementById('favBtn');
+        if (!favIcon || !favText || !favBtn) return;
+        favIcon.className = favorited ? 'fas fa-bookmark mr-2' : 'far fa-bookmark mr-2';
+        favText.textContent = favorited ? 'Tersimpan' : 'Simpan';
+        favBtn.className = favorited
+            ? 'inline-flex items-center text-blue-700 transition-colors px-3 py-2 rounded-lg bg-blue-50 hover:bg-blue-100'
+            : 'inline-flex items-center text-gray-500 hover:text-blue-700 transition-colors px-3 py-2 rounded-lg hover:bg-blue-50';
+        if (favCount) favCount.textContent = `(${count})`;
+    }
 
         // Round appropriately
         const rounded = Math.round(value);

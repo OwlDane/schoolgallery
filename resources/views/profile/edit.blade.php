@@ -83,6 +83,9 @@
                                     <button type="submit" name="redirect" value="home" class="px-6 py-2.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center">
                                         <i class="fas fa-edit mr-2"></i> Simpan Perubahan
                                     </button>
+                                    <a href="{{ route('favorites.index') }}" class="px-6 py-2.5 bg-white text-blue-700 rounded-md hover:bg-blue-50 transition-colors flex items-center border border-blue-200" title="Lihat foto yang kamu simpan">
+                                        <i class="far fa-bookmark mr-2"></i> Favorit Saya
+                                    </a>
                                     <span id="unsavedBadge" class="hidden text-sm text-amber-700 bg-amber-100 border border-amber-200 px-3 py-1 rounded">Perubahan belum disimpan</span>
                                 </div>
                             </div>
