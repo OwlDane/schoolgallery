@@ -240,11 +240,16 @@
                                 <span>{{ Auth::user()->name }}</span>
                                 <i class="fas fa-chevron-down text-xs ml-1"></i>
                             </button>
-                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                                <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
-                                    <i class="fas fa-user-edit mr-2"></i> Profil Saya
+                            <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                <a href="{{ route('profile.edit', ['tab' => 'akun']) }}" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                                    <i class="fas fa-user mr-2"></i> Pengaturan Akun
                                 </a>
-                                
+                                <a href="{{ route('profile.edit', ['tab' => 'aktivitas']) }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="fas fa-history mr-2"></i> Aktivitas
+                                </a>
+                                <a href="{{ route('profile.edit', ['tab' => 'favorit']) }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <i class="far fa-bookmark mr-2"></i> Favorit Saya
+                                </a>
                                 <div class="border-t border-gray-100 my-1"></div>
                                 <form action="{{ route('guest.logout') }}" method="POST">
                                     @csrf

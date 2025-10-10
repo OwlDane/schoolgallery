@@ -5,13 +5,71 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Models\GalleryFavorite;
+use App\Models\GalleryLike;
+use App\Models\GalleryComment;
 
 class UserProfileController extends Controller
 {
-    public function edit()
+    public function edit(Request $request)
     {
         $user = Auth::user();
-        return view('profile.edit', compact('user'));
+        $tab = $request->get('tab', 'akun');
+
+        $favorites = collect();
+        $activities = collect();
+
+        if ($tab === 'favorit') {
+            $favorites = GalleryFavorite::with(['gallery' => function($q){
+                $q->select('id','title','image','created_at');
+            }])
+            ->where('user_id', $user->id)
+            ->orderByDesc('id')
+            ->take(50)
+            ->get();
+        }
+
+        if ($tab === 'aktivitas') {
+            // Likes by user
+            $likes = GalleryLike::with(['gallery' => function($q){
+                $q->select('id','title','image','created_at');
+            }])
+            ->where('user_id', $user->id)
+            ->orderByDesc('id')
+            ->get()
+            ->map(function($like){
+                return [
+                    'type' => 'like',
+                    'at' => $like->created_at,
+                    'gallery' => $like->gallery,
+                ];
+            });
+
+            // Comments by user (identified by email)
+            $comments = GalleryComment::with(['gallery' => function($q){
+                $q->select('id','title','image','created_at');
+            }])
+            ->where('email', $user->email)
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(function($comment){
+                return [
+                    'type' => 'comment',
+                    'at' => $comment->created_at,
+                    'gallery' => $comment->gallery,
+                    'excerpt' => str($comment->content)->limit(80),
+                ];
+            });
+
+            $activities = $likes->merge($comments)->sortByDesc('at')->values();
+        }
+
+        return view('profile.edit', [
+            'user' => $user,
+            'tab' => $tab,
+            'favorites' => $favorites,
+            'activities' => $activities,
+        ]);
     }
 
     public function update(Request $request)
