@@ -20,7 +20,10 @@
 
     <!-- Gallery Detail Section -->
     <section class="py-12 bg-white">
-        <div class="max-w-3xl mx-auto px-4">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left/Main: image and details -->
+                <div class="lg:col-span-2">
             <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 mb-8">
                 <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}" class="w-full h-auto">
                 <div class="p-6">
@@ -74,9 +77,16 @@
                 </div>
             </div>
 
-            <!-- Comments Section -->
-            <div id="comments" class="mt-10">
-                <h3 class="text-2xl font-bold text-gray-900 mb-4">Komentar</h3>
+            </div> <!-- end left/main -->
+
+            <!-- Right/Aside: Comments -->
+            <aside id="comments" class="lg:col-span-1 mt-0">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-2xl font-bold text-gray-900">Komentar <span id="commentCount" class="text-gray-500 text-base font-normal"></span></h3>
+                    <button id="commentsToggle" type="button" class="p-2 rounded-md hover:bg-gray-100 text-gray-600" aria-label="Toggle comments">
+                        <svg id="commentsChevron" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 011.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                    </button>
+                </div>
 
                 @auth
                     <!-- Comment Form - Only for authenticated users -->
@@ -125,8 +135,8 @@
                     </div>
                 @endauth
 
-                <!-- Comments List -->
-                <div id="commentsList" class="space-y-4">
+                <!-- Comments List (sidebar) -->
+                <div id="commentsList" class="space-y-4 pr-2">
                     <!-- Comments will be loaded here via JavaScript -->
                             </div>
 
@@ -135,29 +145,38 @@
                     <i class="fas fa-spinner fa-spin text-blue-500"></i>
                     <span class="ml-2 text-gray-600">Memuat komentar...</span>
                 </div>
-            </div>
+                
+            </aside>
 
             @if($relatedGalleries->isNotEmpty())
-                <div class="mt-12">
+                <div class="mt-12 lg:col-span-3">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-2xl font-bold text-gray-900">Galeri Lainnya</h3>
                         <a href="{{ route('gallery') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium">Lihat lainnya</a>
                     </div>
-                    <div class="overflow-x-auto scrollbar-thin">
-                        <div class="flex gap-4 snap-x snap-mandatory">
-                            @foreach($relatedGalleries as $related)
-                                <a href="{{ route('gallery.detail', $related->id) }}" class="group block snap-start shrink-0 w-64">
-                                    <div class="relative overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-all">
-                                        <div class="w-full" style="aspect-ratio: 16 / 9;">
-                                            <img src="{{ asset('storage/' . $related->image) }}" alt="{{ $related->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <div class="overflow-x-auto scrollbar-thin scroll-smooth pb-2 -mb-2">
+                        <div class="flex gap-4 snap-x snap-mandatory min-w-max pr-4">
+                            @php
+                                $count = $relatedGalleries->count();
+                                // Tampilkan berulang agar selalu ada konten yang bisa discroll jika item sedikit
+                                $repeat = $count > 0 ? max(1, (int) ceil(8 / $count)) : 1;
+                            @endphp
+                            @for ($r = 0; $r < $repeat; $r++)
+                                @foreach($relatedGalleries as $related)
+                                    <a href="{{ route('gallery.detail', $related->id) }}" class="group block snap-start shrink-0 w-72">
+                                        <div class="relative overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-all">
+                                            <div class="w-full" style="aspect-ratio: 16 / 9;">
+                                                <img src="{{ asset('storage/' . $related->image) }}" alt="{{ $related->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                            </div>
+                                            <div class="p-3">
+                                                <h4 class="text-gray-800 font-semibold text-sm line-clamp-2">{{ $related->title }}</h4>
+                                                <p class="text-gray-500 text-xs mt-1">{{ $related->created_at->format('d M Y') }}</p>
+                                            </div>
                                         </div>
-                                        <div class="p-3">
-                                            <h4 class="text-gray-800 font-semibold text-sm line-clamp-2">{{ $related->title }}</h4>
-                                            <p class="text-gray-500 text-xs mt-1">{{ $related->created_at->format('d M Y') }}</p>
-                                        </div>
-                                    </div>
-                                </a>
-                            @endforeach
+                                    </a>
+                                @endforeach
+                            @endfor
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -179,15 +198,48 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Gallery ID:', galleryId);
     console.log('Is Authenticated:', isAuthenticated);
     
-    // Load favorite status (for authenticated) and comments
+    // Load comments first; favorite status will be initialized after functions are defined below
     loadComments();
-    if (isAuthenticated) {
-        loadFavoriteStatus();
-    } else {
-        // For guests still show count
-        loadFavoriteCountOnly();
-    }
     
+    // Toggle comments expand/collapse (sidebar)
+    const commentsListEl = document.getElementById('commentsList');
+    const commentsToggleBtn = document.getElementById('commentsToggle');
+    const commentsChevron = document.getElementById('commentsChevron');
+    let commentsExpanded = false;
+
+    function setCommentsExpanded(expanded){
+        commentsExpanded = expanded;
+        if (!commentsListEl) return;
+        // Reset classes
+        commentsListEl.classList.remove('max-h-32','overflow-hidden','max-h-[60vh]','overflow-y-auto');
+        if (expanded){
+            commentsListEl.classList.add('max-h-[60vh]','overflow-y-auto');
+            if (commentsChevron) commentsChevron.style.transform = 'rotate(180deg)';
+        } else {
+            commentsListEl.classList.add('max-h-32','overflow-hidden');
+            if (commentsChevron) commentsChevron.style.transform = 'rotate(0deg)';
+        }
+
+    // Related slider controls
+    (function(){
+        const slider = document.getElementById('relatedSlider');
+        const prev = document.getElementById('relPrev');
+        const next = document.getElementById('relNext');
+        if (!slider || !prev || !next) return;
+        prev.classList.remove('hidden');
+        next.classList.remove('hidden');
+        const step = 300; // px per click
+        prev.addEventListener('click', () => slider.scrollBy({ left: -step, behavior: 'smooth' }));
+        next.addEventListener('click', () => slider.scrollBy({ left: step, behavior: 'smooth' }));
+    })();
+    }
+
+    if (commentsToggleBtn){
+        commentsToggleBtn.addEventListener('click', function(){
+            setCommentsExpanded(!commentsExpanded);
+        });
+    }
+
     // Only initialize interactive features for authenticated users
     if (isAuthenticated) {
         // Initialize like status
@@ -205,6 +257,68 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             console.log('Like button not found');
         }
+
+    // Favorite helpers
+    function loadFavoriteStatus() {
+        fetch(`/gallery/${galleryId}/favorite-status`)
+            .then(r => r.json())
+            .then(data => {
+                if (data && data.success) {
+                    updateFavoriteButton(data.favorited, data.favorite_count);
+                }
+            })
+            .catch(err => console.error('Error favorite status:', err));
+    }
+
+    function loadFavoriteCountOnly() {
+        fetch(`/gallery/${galleryId}/favorite-status`)
+            .then(r => r.json())
+            .then(data => {
+                const favCount = document.getElementById('favCount');
+                if (favCount && typeof data.favorite_count !== 'undefined') {
+                    favCount.textContent = `(${data.favorite_count})`;
+                }
+            })
+            .catch(() => {});
+    }
+
+    function toggleFavorite() {
+        const favBtn = document.getElementById('favBtn');
+        if (!favBtn) return;
+        favBtn.disabled = true;
+        fetch(`/gallery/${galleryId}/favorite`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data && data.success) {
+                updateFavoriteButton(data.favorited, data.favorite_count);
+                showNotification(data.message || 'Berhasil', 'success');
+            } else {
+                showNotification((data && data.message) || 'Terjadi kesalahan', 'error');
+            }
+        })
+        .catch(() => showNotification('Terjadi kesalahan', 'error'))
+        .finally(() => { favBtn.disabled = false; });
+    }
+
+    function updateFavoriteButton(favorited, count) {
+        const favIcon = document.getElementById('favIcon');
+        const favText = document.getElementById('favText');
+        const favCount = document.getElementById('favCount');
+        const favBtn = document.getElementById('favBtn');
+        if (!favIcon || !favText || !favBtn) return;
+        favIcon.className = favorited ? 'fas fa-bookmark mr-2' : 'far fa-bookmark mr-2';
+        favText.textContent = favorited ? 'Tersimpan' : 'Simpan';
+        favBtn.className = favorited
+            ? 'inline-flex items-center text-blue-700 transition-colors px-3 py-2 rounded-lg bg-blue-50 hover:bg-blue-100'
+            : 'inline-flex items-center text-gray-500 hover:text-blue-700 transition-colors px-3 py-2 rounded-lg hover:bg-blue-50';
+        if (typeof count !== 'undefined' && favCount) favCount.textContent = `(${count})`;
+    }
         
         // Comment form handler
         const commentForm = document.getElementById('commentForm');
@@ -251,7 +365,8 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(`/gallery/${galleryId}/like`, {
             method: 'POST',
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
             }
         })
         .then(response => {
@@ -296,6 +411,10 @@ document.addEventListener('DOMContentLoaded', function() {
         likeCountSpan.textContent = `(${likeCount})`;
     }
     
+    // Comments state (use var to avoid TDZ issues if referenced earlier)
+    var allComments = [];
+    var renderedCount = 0;
+
     // Load comments
     function loadComments() {
         console.log('Loading comments for gallery:', galleryId);
@@ -313,8 +432,13 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 console.log('Comments data received:', data);
                 if (data.success) {
-                    console.log('Comments count:', data.comments.length);
-                    displayComments(data.comments);
+                    allComments = Array.isArray(data.comments) ? data.comments : [];
+                    console.log('Comments count:', allComments.length);
+                    // Update count label
+                    const countEl = document.getElementById('commentCount');
+                    if (countEl) countEl.textContent = `(${allComments.length})`;
+                    // Render all comments into scrollable panel
+                    displayComments(allComments);
                 } else {
                     console.error('Failed to load comments:', data.message);
                     document.getElementById('commentsLoading').innerHTML = 
@@ -328,7 +452,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
     
-    // Display comments
+    // Display comments (replace list)
     function displayComments(comments) {
         const commentsList = document.getElementById('commentsList');
         const loading = document.getElementById('commentsLoading');
@@ -391,6 +515,63 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `).join('');
 
+        updateRelativeTimes();
+        // Start collapsed like the sample, expand via chevron
+        setCommentsExpanded(false);
+    }
+
+    // Append comments (add to existing list)
+    function appendComments(comments) {
+        const commentsList = document.getElementById('commentsList');
+        const html = comments.map(comment => `
+            <div class="bg-white rounded-xl shadow p-4 ${comment.depth > 0 ? 'ml-4 sm:ml-8 border-l-4 border-blue-200' : ''}">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-2 space-y-2 sm:space-y-0">
+                    <div class="flex items-center space-x-3">
+                        ${comment.avatar_url ? `
+                            <img src="${comment.avatar_url}" alt="${comment.name}" class="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                        ` : `
+                            <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0">
+                                ${comment.name.charAt(0).toUpperCase()}
+                            </div>
+                        `}
+                        <div class="min-w-0 flex-1">
+                            <p class="font-semibold text-gray-800 truncate">${comment.name}</p>
+                            <p class="text-xs text-gray-500"><span class="timeago" data-time="${comment.created_at_iso}">${comment.created_at}</span></p>
+                        </div>
+                    </div>
+                    ${isAuthenticated ? `
+                        <button onclick="replyToComment(${comment.id}, '${comment.name}')" 
+                                class="text-blue-600 hover:text-blue-800 text-sm font-medium px-2 py-1 rounded hover:bg-blue-50 transition-colors">
+                            <i class="fas fa-reply mr-1"></i>Balas
+                        </button>
+                    ` : ''}
+                </div>
+                <p class="text-gray-700 ml-12 break-words">${comment.content}</p>
+                ${comment.replies && comment.replies.length > 0 ? `
+                    <div class="mt-3 ml-8 sm:ml-12 space-y-3">
+                        ${comment.replies.map(reply => `
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    ${reply.avatar_url ? `
+                                        <img src="${reply.avatar_url}" alt="${reply.name}" class="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                                    ` : `
+                                        <div class="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                                            ${reply.name.charAt(0).toUpperCase()}
+                                        </div>
+                                    `}
+                                    <div class="min-w-0 flex-1">
+                                        <p class="font-medium text-gray-800 text-sm truncate">${reply.name}</p>
+                                        <p class="text-xs text-gray-500"><span class="timeago" data-time="${reply.created_at_iso}">${reply.created_at}</span></p>
+                                    </div>
+                                </div>
+                                <p class="text-gray-700 text-sm ml-11 break-words">${reply.content}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        `).join('');
+        commentsList.insertAdjacentHTML('beforeend', html);
         updateRelativeTimes();
     }
     
@@ -513,67 +694,6 @@ function updateRelativeTimes() {
             duration /= division.amount;
             value = value / division.amount;
         }
-
-    // Load favorite status
-    function loadFavoriteStatus() {
-        fetch(`/gallery/${galleryId}/favorite-status`)
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    updateFavoriteButton(data.favorited, data.favorite_count);
-                }
-            })
-            .catch(err => console.error('Error favorite status:', err));
-    }
-
-    function loadFavoriteCountOnly() {
-        fetch(`/gallery/${galleryId}/favorite-status`)
-            .then(r => r.json())
-            .then(data => {
-                const favCount = document.getElementById('favCount');
-                if (favCount && typeof data.favorite_count !== 'undefined') {
-                    favCount.textContent = `(${data.favorite_count})`;
-                }
-            })
-            .catch(()=>{});
-    }
-
-    function toggleFavorite() {
-        const favBtn = document.getElementById('favBtn');
-        if (!favBtn) return;
-        favBtn.disabled = true;
-        fetch(`/gallery/${galleryId}/favorite`, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                updateFavoriteButton(data.favorited, data.favorite_count);
-                showNotification(data.message, 'success');
-            } else {
-                showNotification(data.message || 'Terjadi kesalahan', 'error');
-            }
-        })
-        .catch(() => showNotification('Terjadi kesalahan', 'error'))
-        .finally(() => favBtn.disabled = false);
-    }
-
-    function updateFavoriteButton(favorited, count) {
-        const favIcon = document.getElementById('favIcon');
-        const favText = document.getElementById('favText');
-        const favCount = document.getElementById('favCount');
-        const favBtn = document.getElementById('favBtn');
-        if (!favIcon || !favText || !favBtn) return;
-        favIcon.className = favorited ? 'fas fa-bookmark mr-2' : 'far fa-bookmark mr-2';
-        favText.textContent = favorited ? 'Tersimpan' : 'Simpan';
-        favBtn.className = favorited
-            ? 'inline-flex items-center text-blue-700 transition-colors px-3 py-2 rounded-lg bg-blue-50 hover:bg-blue-100'
-            : 'inline-flex items-center text-gray-500 hover:text-blue-700 transition-colors px-3 py-2 rounded-lg hover:bg-blue-50';
-        if (favCount) favCount.textContent = `(${count})`;
-    }
 
         // Round appropriately
         const rounded = Math.round(value);
