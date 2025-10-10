@@ -273,9 +273,55 @@
 
                 <!-- Pagination -->
                 @if($galleries->hasPages())
-                    <div class="mt-8">
-                        {{ $galleries->withQueryString()->links() }}
+                    <div class="mt-8 flex items-center justify-between gap-4">
+                        @php
+                            // Preserve active query parameters (search, category, etc.)
+                            $p = $galleries->appends(request()->query());
+                            $prevUrl = $p->previousPageUrl();
+                            $nextUrl = $p->nextPageUrl();
+                            $current = $galleries->currentPage();
+                            $totalPages = $galleries->lastPage();
+                        @endphp
+
+                        <div class="flex-1">
+                            <a href="{{ $prevUrl ?: '#' }}"
+                               class="inline-flex items-center px-4 py-2 rounded-md border text-sm font-medium transition-colors
+                                      {{ $prevUrl ? 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' }}"
+                               {{ $prevUrl ? '' : 'aria-disabled=true' }}>
+                                <span class="mr-2">&larr;</span> Previous page
+                            </a>
+                        </div>
+
+                        <div class="text-sm text-gray-600 whitespace-nowrap">
+                            Page <span class="font-semibold">{{ $current }}</span> of <span class="font-semibold">{{ $totalPages }}</span>
+                        </div>
+
+                        <div class="flex-1 flex justify-end">
+                            <a href="{{ $nextUrl ?: '#' }}"
+                               class="inline-flex items-center px-4 py-2 rounded-md border text-sm font-medium transition-colors
+                                      {{ $nextUrl ? 'bg-green-600 text-white border-green-600 hover:bg-green-700' : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' }}"
+                               {{ $nextUrl ? '' : 'aria-disabled=true' }}>
+                                Next page <span class="ml-2">&rarr;</span>
+                            </a>
+                        </div>
                     </div>
+                    <!-- Keyboard shortcuts for pagination: Left/Right arrows -->
+                    <script>
+                        (function(){
+                            const prevUrl = @json($prevUrl);
+                            const nextUrl = @json($nextUrl);
+                            document.addEventListener('keydown', function(e){
+                                const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+                                // avoid when typing in inputs/textareas
+                                if (tag === 'input' || tag === 'textarea') return;
+                                if (e.key === 'ArrowLeft' && prevUrl) {
+                                    window.location.href = prevUrl;
+                                } else if (e.key === 'ArrowRight' && nextUrl) {
+                                    window.location.href = nextUrl;
+                                }
+                            });
+                        })();
+                    </script>
                 @endif
             @endif
         </div>

@@ -39,7 +39,7 @@ class HomeController extends Controller
             $query->where('title', 'like', '%' . $request->search . '%');
         }
 
-        $galleries = $query->paginate(12);
+        $galleries = $query->paginate(20);
         
         // Tambahkan informasi apakah user sudah like setiap galeri
         if (auth()->check()) {
@@ -73,7 +73,7 @@ class HomeController extends Controller
             ->published()
             ->withCount(['likes', 'comments' => function($q){ $q->where('is_approved', true); }, 'favorites'])
             ->latest()
-            ->paginate(12);
+            ->paginate(20);
 
         // Tambahkan informasi apakah user sudah like setiap galeri
         if (auth()->check()) {
