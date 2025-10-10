@@ -175,7 +175,7 @@
                             $isActive = isset($activeCategory) && $activeCategory === $kategori->slug;
                         @endphp
                         <a href="{{ route('gallery.category', $kategori->slug) }}" 
-                           class="px-4 py-2 rounded-full {{ $isActive ? 'bg-' . explode('-', $style['from'])[1] . '-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100' }} font-medium transition-all duration-200 shadow-sm">
+                           class="px-4 py-2 rounded-full {{ $isActive ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100' }} font-medium transition-all duration-200 shadow-sm">
                             {{ $kategori->nama }}
                         </a>
                     @endforeach
@@ -286,7 +286,7 @@
                         <div class="flex-1">
                             <a href="{{ $prevUrl ?: '#' }}"
                                class="inline-flex items-center px-4 py-2 rounded-md border text-sm font-medium transition-colors
-                                      {{ $prevUrl ? 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50' : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' }}"
+                                      {{ $prevUrl ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' }}"
                                {{ $prevUrl ? '' : 'aria-disabled=true' }}>
                                 <span class="mr-2">&larr;</span> Previous page
                             </a>
@@ -299,7 +299,7 @@
                         <div class="flex-1 flex justify-end">
                             <a href="{{ $nextUrl ?: '#' }}"
                                class="inline-flex items-center px-4 py-2 rounded-md border text-sm font-medium transition-colors
-                                      {{ $nextUrl ? 'bg-green-600 text-white border-green-600 hover:bg-green-700' : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' }}"
+                                      {{ $nextUrl ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' }}"
                                {{ $nextUrl ? '' : 'aria-disabled=true' }}>
                                 Next page <span class="ml-2">&rarr;</span>
                             </a>
