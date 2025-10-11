@@ -10,6 +10,12 @@ use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use App\Models\NewsComment;
+use App\Models\GalleryFavorite;
+use App\Models\GalleryLike;
+use App\Models\GalleryComment;
 
 class ReportController extends Controller
 {
@@ -176,7 +182,7 @@ class ReportController extends Controller
      */
     private function getContentStatistics($startDate, $endDate)
     {
-        // News statistics
+        // News statistics (ringkasan)
         $newsStats = [
             'total' => News::whereBetween('created_at', [$startDate, $endDate])->count(),
             'published' => News::whereBetween('created_at', [$startDate, $endDate])->where('is_published', true)->count(),
@@ -188,7 +194,7 @@ class ReportController extends Controller
                 ->get()
         ];
 
-        // Gallery statistics
+        // Gallery statistics (ringkasan)
         $galleryStats = [
             'total' => Gallery::whereBetween('created_at', [$startDate, $endDate])->count(),
             'published' => Gallery::whereBetween('created_at', [$startDate, $endDate])->where('is_published', true)->count(),
@@ -200,7 +206,136 @@ class ReportController extends Controller
                 ->get()
         ];
 
-        // Admin activity for content
+        // Detail per item - News
+        $newsItems = News::with('newsCategory')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->select('id','title','news_category_id','is_published','created_at','views')
+            ->orderByDesc('created_at')
+            ->get();
+
+        $newsCommentsCounts = DB::table('news_comments')
+            ->selectRaw('news_id, COUNT(*) as total')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy('news_id')
+            ->pluck('total','news_id');
+
+        $newsItemsTransformed = $newsItems->map(function($n) use ($newsCommentsCounts) {
+            return [
+                'id' => $n->id,
+                'title' => $n->title,
+                'category' => optional($n->newsCategory)->name ?? optional($n->newsCategory)->nama ?? '-',
+                'status' => $n->is_published ? 'Published' : 'Draft',
+                'created_at' => $n->created_at,
+                'views' => (int) ($n->views ?? 0),
+                'comments' => (int) ($newsCommentsCounts[$n->id] ?? 0),
+            ];
+        });
+
+        // Berita per kategori agregat (total, published, draft, comments)
+        $newsByCategoryAgg = $newsItemsTransformed
+            ->groupBy(function($item){ return $item['category'] ?: '-'; })
+            ->map(function($items){
+                return [
+                    'category' => $items->first()['category'] ?: '-',
+                    'total' => $items->count(),
+                    'published' => $items->where('status','Published')->count(),
+                    'draft' => $items->where('status','Draft')->count(),
+                    'total_comments' => $items->sum('comments'),
+                ];
+            })
+            ->values();
+
+        // Detail per item - Gallery
+        $galleryItems = Gallery::with('kategori')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->select('id','title','kategori_id','is_published','created_at','views')
+            ->orderByDesc('created_at')
+            ->get();
+
+        $galleryCommentsCounts = DB::table('gallery_comments')
+            ->selectRaw('gallery_id, COUNT(*) as total')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy('gallery_id')
+            ->pluck('total','gallery_id');
+
+        $galleryLikesCounts = DB::table('gallery_likes')
+            ->selectRaw('gallery_id, COUNT(*) as total')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy('gallery_id')
+            ->pluck('total','gallery_id');
+
+        $galleryFavoritesCounts = DB::table('gallery_favorites')
+            ->selectRaw('gallery_id, COUNT(*) as total')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy('gallery_id')
+            ->pluck('total','gallery_id');
+
+        $galleryItemsTransformed = $galleryItems->map(function($g) use ($galleryCommentsCounts, $galleryLikesCounts, $galleryFavoritesCounts) {
+            return [
+                'id' => $g->id,
+                'title' => $g->title,
+                'category' => optional($g->kategori)->nama ?? optional($g->kategori)->name ?? '-',
+                'status' => $g->is_published ? 'Published' : 'Draft',
+                'created_at' => $g->created_at,
+                'views' => (int) ($g->views ?? 0),
+                'likes' => (int) ($galleryLikesCounts[$g->id] ?? 0),
+                'comments' => (int) ($galleryCommentsCounts[$g->id] ?? 0),
+                'favorites' => (int) ($galleryFavoritesCounts[$g->id] ?? 0),
+            ];
+        });
+
+        // Galeri per kategori agregat (dengan like/comment/favorite, views=sum)
+        $galleryByCategoryAgg = $galleryItemsTransformed
+            ->groupBy(function($item){ return $item['category'] ?: '-'; })
+            ->map(function($items){
+                return [
+                    'category' => $items->first()['category'] ?: '-',
+                    'total' => $items->count(),
+                    'total_views' => $items->sum('views'),
+                    'total_likes' => $items->sum('likes'),
+                    'total_comments' => $items->sum('comments'),
+                    'total_favorites' => $items->sum('favorites'),
+                ];
+            })
+            ->values();
+
+        // Konten terpopuler (gabungan) - top 5
+        $popularCombined = collect();
+        $popularCombined = $popularCombined
+            ->merge($newsItemsTransformed->map(function($n){
+                return [
+                    'type' => 'news',
+                    'id' => $n['id'],
+                    'title' => $n['title'],
+                    'views' => $n['views'],
+                    'likes' => 0,
+                    'comments' => $n['comments'],
+                    'engagement' => $n['comments'],
+                ];
+            }))
+            ->merge($galleryItemsTransformed->map(function($g){
+                $eng = ($g['likes'] + $g['comments'] + $g['favorites']);
+                return [
+                    'type' => 'gallery',
+                    'id' => $g['id'],
+                    'title' => $g['title'],
+                    'views' => $g['views'],
+                    'likes' => $g['likes'],
+                    'comments' => $g['comments'],
+                    'engagement' => $eng,
+                ];
+            }))
+            ->sort(function($a,$b){
+                // Prioritaskan views (semua 0 sekarang), fallback engagement
+                if ($a['views'] === $b['views']) {
+                    return $b['engagement'] <=> $a['engagement'];
+                }
+                return $b['views'] <=> $a['views'];
+            })
+            ->take(5)
+            ->values();
+
+        // Admin activity for content (ringkasan)
         $adminContentActivity = DB::table('activity_logs')
             ->join('admins', 'activity_logs.admin_id', '=', 'admins.id')
             ->whereBetween('activity_logs.created_at', [$startDate, $endDate])
@@ -210,8 +345,15 @@ class ReportController extends Controller
             ->get();
 
         return [
-            'news' => $newsStats,
-            'galleries' => $galleryStats,
+            'news' => array_merge($newsStats, [
+                'items' => $newsItemsTransformed,
+                'by_category_agg' => $newsByCategoryAgg,
+            ]),
+            'galleries' => array_merge($galleryStats, [
+                'items' => $galleryItemsTransformed,
+                'by_category_agg' => $galleryByCategoryAgg,
+            ]),
+            'popular' => $popularCombined,
             'admin_activity' => $adminContentActivity,
             'period' => [
                 'start' => $startDate,
@@ -342,13 +484,44 @@ class ReportController extends Controller
      */
     private function exportContentStatsExcel($data, $schoolProfile, $startDate, $endDate)
     {
+        // Build detailed CSV: Type, ID, Title, Category, CreatedAt, Status, Views, Likes, Comments, Favorites
         $csvData = [];
-        $csvData[] = ['Jenis Konten', 'Total', 'Dipublikasikan', 'Draft'];
-        $csvData[] = ['Berita', $data['news']['total'], $data['news']['published'], $data['news']['draft']];
-        $csvData[] = ['Galeri', $data['galleries']['total'], $data['galleries']['published'], $data['galleries']['draft']];
+        $csvData[] = ['Type','ID','Title','Category','CreatedAt','Status','Views','Likes','Comments','Favorites'];
 
-        $filename = 'laporan-statistik-konten-' . $startDate . '-to-' . $endDate . '.csv';
-        
+        // News items
+        foreach (($data['news']['items'] ?? collect()) as $item) {
+            $csvData[] = [
+                'news',
+                $item['id'],
+                $item['title'],
+                $item['category'],
+                optional($item['created_at'])->toDateTimeString(),
+                $item['status'],
+                $item['views'] ?? 0,
+                0,
+                $item['comments'] ?? 0,
+                0,
+            ];
+        }
+
+        // Gallery items
+        foreach (($data['galleries']['items'] ?? collect()) as $item) {
+            $csvData[] = [
+                'gallery',
+                $item['id'],
+                $item['title'],
+                $item['category'],
+                optional($item['created_at'])->toDateTimeString(),
+                $item['status'],
+                $item['views'] ?? 0,
+                $item['likes'] ?? 0,
+                $item['comments'] ?? 0,
+                $item['favorites'] ?? 0,
+            ];
+        }
+
+        $filename = 'laporan-statistik-konten-detail-' . $startDate . '-to-' . $endDate . '.csv';
+
         $callback = function() use ($csvData) {
             $file = fopen('php://output', 'w');
             foreach ($csvData as $row) {

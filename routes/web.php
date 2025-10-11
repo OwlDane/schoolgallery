@@ -21,6 +21,7 @@ use App\Http\Controllers\UserProfileController;
 use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\SitemapController;
 
+
 // Public Routes (tracked visits)
 Route::middleware('track.visits')->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');

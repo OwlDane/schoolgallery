@@ -135,8 +135,11 @@
 <body>
     <!-- Header -->
     <div class="header">
-        <div class="school-name">{{ $schoolProfile->school_name ?? 'Sekolah' }}</div>
-        <div class="report-title">Laporan Statistik Konten Website</div>
+        <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:8px;">
+            <img src="{{ public_path('images/2.png') }}" alt="SpotEdu" style="height:40px;">
+            <div class="school-name">SpotEdu</div>
+        </div>
+        <div class="report-title">Laporan Statistik Konten</div>
         <div class="report-period">
             Periode: {{ \Carbon\Carbon::parse($startDate)->format('d F Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d F Y') }}
         </div>
@@ -145,17 +148,25 @@
         </div>
     </div>
 
-    <!-- Summary Statistics -->
+    <!-- 1) Summary Statistics -->
     <div class="section">
         <div class="section-title">Ringkasan Statistik Konten</div>
         <div class="summary-box">
             <div class="summary-title">Total Konten: {{ number_format($data['news']['total'] + $data['galleries']['total']) }}</div>
             <div>Berita: {{ number_format($data['news']['total']) }} | Galeri: {{ number_format($data['galleries']['total']) }}</div>
             <div>Dipublikasikan: {{ number_format($data['news']['published'] + $data['galleries']['published']) }} | Draft: {{ number_format($data['news']['draft'] + $data['galleries']['draft']) }}</div>
+            <div>Persentase Publikasi Keseluruhan: 
+                {{ ($data['news']['total'] + $data['galleries']['total']) > 0 
+                    ? number_format((($data['news']['published'] + $data['galleries']['published']) / ($data['news']['total'] + $data['galleries']['total'])) * 100, 2) 
+                    : 0 }}%
+            </div>
+            <div style="margin-top:6px; font-size:11px; color:#6b7280;">
+                Catatan: Laporan ini mencakup seluruh konten aktif (berita dan galeri) yang diunggah oleh pihak sekolah selama periode yang dipilih.
+            </div>
         </div>
     </div>
 
-    <!-- News Statistics -->
+    <!-- 2) News Statistics -->
     <div class="section">
         <div class="section-title">Statistik Berita</div>
         <div class="stats-grid">
@@ -174,9 +185,39 @@
                 </div>
             </div>
         </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Judul</th>
+                    <th>Kategori</th>
+                    <th>Status</th>
+                    <th>Tanggal Publish</th>
+                    <th>Jumlah Pembaca</th>
+                    <th>Jumlah Komentar</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($data['news']['items']->take(50) as $i => $item)
+                <tr>
+                    <td>{{ $i+1 }}</td>
+                    <td>{{ $item['title'] }}</td>
+                    <td>{{ $item['category'] }}</td>
+                    <td>{{ $item['status'] }}</td>
+                    <td>{{ \Carbon\Carbon::parse($item['created_at'])->format('d M Y') }}</td>
+                    <td>{{ number_format($item['views']) }}</td>
+                    <td>{{ number_format($item['comments']) }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+        <div class="summary-box">
+            <div class="summary-title">Analisis</div>
+            <div>Rata-rata tingkat keterbacaan berita mencapai {{ number_format(($data['news']['items']->avg('views') ?? 0), 1) }} pembaca per artikel.</div>
+        </div>
     </div>
 
-    <!-- Gallery Statistics -->
+    <!-- 3) Gallery Statistics -->
     <div class="section">
         <div class="section-title">Statistik Galeri</div>
         <div class="stats-grid">
@@ -197,33 +238,9 @@
         </div>
     </div>
 
-    <!-- News by Category -->
-    @if($data['news']['by_category']->count() > 0)
-    <div class="section">
-        <div class="section-title">Berita per Kategori</div>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Kategori</th>
-                    <th>Jumlah Berita</th>
-                    <th>Persentase</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($data['news']['by_category'] as $category)
-                <tr>
-                    <td>{{ $category->newsCategory->nama ?? 'Tidak ada kategori' }}</td>
-                    <td>{{ number_format($category->total) }}</td>
-                    <td>{{ $data['news']['total'] > 0 ? number_format(($category->total / $data['news']['total']) * 100, 2) : 0 }}%</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-    @endif
 
-    <!-- Galleries by Category -->
-    @if($data['galleries']['by_category']->count() > 0)
+    <!-- 4) Galleries by Category -->
+    @if(($data['galleries']['by_category_agg'] ?? collect())->count() > 0)
     <div class="section">
         <div class="section-title">Galeri per Kategori</div>
         <table class="table">
@@ -231,15 +248,23 @@
                 <tr>
                     <th>Kategori</th>
                     <th>Jumlah Galeri</th>
+                    <th>Total Views</th>
+                    <th>Total Like</th>
+                    <th>Total Komentar</th>
+                    <th>Total Disimpan</th>
                     <th>Persentase</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($data['galleries']['by_category'] as $category)
+                @foreach($data['galleries']['by_category_agg'] as $row)
                 <tr>
-                    <td>{{ $category->kategori->nama ?? 'Tidak ada kategori' }}</td>
-                    <td>{{ number_format($category->total) }}</td>
-                    <td>{{ $data['galleries']['total'] > 0 ? number_format(($category->total / $data['galleries']['total']) * 100, 2) : 0 }}%</td>
+                    <td>{{ $row['category'] }}</td>
+                    <td>{{ number_format($row['total']) }}</td>
+                    <td>{{ number_format($row['total_views']) }}</td>
+                    <td>{{ number_format($row['total_likes']) }}</td>
+                    <td>{{ number_format($row['total_comments']) }}</td>
+                    <td>{{ number_format($row['total_favorites']) }}</td>
+                    <td>{{ $data['galleries']['total'] > 0 ? number_format(($row['total'] / $data['galleries']['total']) * 100, 2) : 0 }}%</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -247,6 +272,57 @@
     </div>
     @endif
 
+    <!-- 5) Konten Terpopuler (Top 5) -->
+    <div class="section">
+        <div class="section-title">Konten Terpopuler (Top 5)</div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Peringkat</th>
+                    <th>Jenis</th>
+                    <th>Judul</th>
+                    <th>Views</th>
+                    <th>Like</th>
+                    <th>Komentar</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($data['popular'] as $i => $p)
+                <tr>
+                    <td>{{ $i+1 }}</td>
+                    <td>{{ $p['type']==='news' ? 'Berita' : 'Galeri' }}</td>
+                    <td>{{ $p['title'] }}</td>
+                    <td>{{ number_format($p['views']) }}</td>
+                    <td>{{ number_format($p['likes']) }}</td>
+                    <td>{{ number_format($p['comments']) }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 6) Analisis Umum -->
+    <div class="section">
+        <div class="section-title">Analisis Umum</div>
+        <div class="summary-box">
+            <div class="summary-title">Ringkasan</div>
+            <div>Berdasarkan hasil analisis periode ini, konten berbasis visual (galeri) memiliki tingkat keterlibatan yang tinggi.</div>
+            <div>Berita tetap menjadi elemen penting dalam publikasi, namun dapat dioptimalkan dalam promosi dan tampilan untuk meningkatkan keterbacaan.</div>
+            <div>Tingkat publikasi konten mencapai {{
+                ($data['news']['total'] + $data['galleries']['total']) > 0
+                ? number_format((($data['news']['published'] + $data['galleries']['published']) / ($data['news']['total'] + $data['galleries']['total'])) * 100, 2)
+                : 0
+            }}% pada periode ini.</div>
+        </div>
+    </div>
+
+    <!-- 7) Kesimpulan -->
+    <div class="section">
+        <div class="section-title">Kesimpulan</div>
+        <div class="summary-box">
+            <div>Konten visual (galeri) cenderung memiliki engagement terbaik. Berita perlu penguatan promosi untuk menarik lebih banyak pembaca.</div>
+        </div>
+    </div>
     <!-- Admin Activity for Content -->
     @if($data['admin_activity']->count() > 0)
     <div class="section">
@@ -274,8 +350,9 @@
 
     <!-- Footer -->
     <div class="footer">
-        <p>Laporan ini dihasilkan secara otomatis oleh sistem Galeri Sekolah</p>
-        <p>{{ $schoolProfile->school_name ?? 'Sekolah' }} - {{ $generatedAt->format('d F Y H:i:s') }}</p>
+        <p>Laporan ini dihasilkan secara otomatis oleh sistem SpotEdu</p>
+        <p>D’spot Technologies © 2025 | www.spotedu.id</p>
+        <p>Laporan ini disusun berdasarkan data aktivitas dan publikasi konten pada periode {{ \Carbon\Carbon::parse($startDate)->format('d F Y') }} hingga {{ \Carbon\Carbon::parse($endDate)->format('d F Y') }}. Seluruh data yang tercantum telah diperoleh secara otomatis dari sistem SpotEdu dan mencerminkan kondisi aktual pada rentang waktu tersebut.</p>
     </div>
 </body>
 </html>

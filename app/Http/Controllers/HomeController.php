@@ -106,10 +106,10 @@ class HomeController extends Controller
             ->get();
         $schoolProfile = SchoolProfile::getProfile();
 
-        // Increment per-gallery view count once per session
+        // Increment per-gallery view count once per session (use 'views' column)
         $sessionKey = 'viewed_gallery_' . $gallery->id;
         if (!session()->has($sessionKey)) {
-            \DB::table('galleries')->where('id', $gallery->id)->increment('view_count');
+            $gallery->increment('views');
             session([$sessionKey => true]);
         }
 
@@ -175,6 +175,13 @@ class HomeController extends Controller
         $schoolProfile = SchoolProfile::getProfile();
         $upcomingEvents = Event::published()->upcoming()->orderBy('start_at')->take(5)->get();
         $latestNews = News::published()->latest()->take(5)->get();
+
+        // Increment per-news view count once per session (use 'views' column)
+        $sessionKey = 'viewed_news_' . $news->id;
+        if (!session()->has($sessionKey)) {
+            $news->increment('views');
+            session([$sessionKey => true]);
+        }
 
         return view('news-detail', compact('news', 'relatedNews', 'schoolProfile', 'upcomingEvents', 'latestNews'));
     }
