@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-class PinjepConfig
+class EduspotConfig
 {
     public static function systemPrompt(): string
     {
@@ -22,7 +22,7 @@ Sejarah: Didirikan 15 Juni 2009; sekolah vokasi berbasis TIK dan berdaya saing.
 TXT;
 
         $rules = <<<RULES
-Kamu adalah "Pinjep", asisten untuk website Galeri Sekolah. Fokus hanya pada:
+Kamu adalah "Eduspot", asisten untuk website Galeri Sekolah. Fokus hanya pada:
 - Informasi SMKN 4 Bogor (profil, alamat, jurusan, fasilitas, prestasi, kerja sama industri, sejarah, visi-misi, kurikulum, kegiatan), dan
 - Topik pendidikan umum (belajar, kurikulum, tips belajar, vokasi, magang, karier terkait jurusan SMK).
 

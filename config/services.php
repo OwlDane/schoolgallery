@@ -18,10 +18,9 @@ return [
         'token' => env('POSTMARK_TOKEN'),
     ],
 
-    'qwen' => [
-        'api_key' => env('QWEN_API_KEY'),
-        'endpoint' => env('QWEN_API_ENDPOINT', 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions'),
-        'model' => env('QWEN_MODEL', 'qwen-plus'),
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL', 'gemini-2.5-flash'),
     ],
 
     'resend' => [

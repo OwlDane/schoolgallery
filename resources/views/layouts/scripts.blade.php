@@ -31,10 +31,15 @@
     });
     
     // Mobile menu toggle
-    document.getElementById('mobile-menu-button').addEventListener('click', function() {
-        const menu = document.getElementById('mobile-menu');
-        menu.classList.toggle('hidden');
-    });
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    if (mobileMenuButton) {
+        mobileMenuButton.addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) {
+                menu.classList.toggle('hidden');
+            }
+        });
+    }
 
     // Simple hover-intent for desktop dropdown (fallback for keyboard focus)
     const newsDropdownBtn = document.getElementById('newsDropdownBtn');
@@ -195,22 +200,22 @@
     @keyframes sgblink{0%,80%,100%{opacity:.2}40%{opacity:1}}
     @keyframes sgspin{to{transform:rotate(360deg)}}
 </style>
-<button id="sg-chatbot-toggle" aria-label="Buka Pinjep" class="sg-chatbot-button">
+<button id="sg-chatbot-toggle" aria-label="Buka Eduspot" class="sg-chatbot-button">
     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
 </button>
 <div id="sg-chatbot" class="sg-chatbot-panel">
     <div class="sg-chatbot-header">
         <div style="display:flex;align-items:center;gap:8px">
-            <span style="display:inline-flex;width:26px;height:26px;border-radius:50%;background:#fff;color:#2563eb;align-items:center;justify-content:center;font-weight:700">P</span>
+            <span style="display:inline-flex;width:26px;height:26px;border-radius:50%;background:#fff;color:#2563eb;align-items:center;justify-content:center;font-weight:700">E</span>
             <div>
-                <div style="font-weight:700;font-size:14px">Pinjep</div>
+                <div style="font-weight:700;font-size:14px">Eduspot</div>
                 <div style="font-size:12px;opacity:.9">Asisten SMKN 4 Bogor & pendidikan</div>
             </div>
         </div>
         <button id="sg-chatbot-close" style="background:transparent;border:none;color:#fff;cursor:pointer">✕</button>
     </div>
     <div id="sg-chatbot-msgs" class="sg-chatbot-messages">
-        <div class="sg-chatbot-bubble bot">Halo, saya Pinjep! Tanya apa saja seputar SMKN 4 Bogor atau pendidikan ya 😊</div>
+        <div class="sg-chatbot-bubble bot">Halo, saya Eduspot! Tanya apa saja seputar SMKN 4 Bogor atau pendidikan ya 😊</div>
     </div>
     <form id="sg-chatbot-form" class="sg-chatbot-input">
         <input id="sg-chatbot-input" type="text" placeholder="Ketik pertanyaan Anda..." autocomplete="off" required />
