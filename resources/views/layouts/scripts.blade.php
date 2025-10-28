@@ -255,13 +255,59 @@
         toggle.addEventListener('click',()=>{ panel.style.display = panel.style.display==='flex'?'none':'flex'; panel.style.display==='flex' && input.focus(); if(panel.style.display==='flex'){ panel.style.display='flex'; panel.style.flexDirection='column'; } });
         closeBtn.addEventListener('click',()=>{ panel.style.display='none'; });
 
-        form.addEventListener('submit',async(e)=>{
-            e.preventDefault(); const text=input.value.trim(); if(!text) return; addMsg('user',text); input.value=''; setLoading(true);
-            try{
-                const res=await fetch('{{ route('chatbot.ask') }}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':document.querySelector('meta[name=csrf-token]').getAttribute('content')},body:JSON.stringify({message:text,context:history})});
-                const data=await res.json();
+        // Check if user is authenticated
+        async function checkAuth() {
+            try {
+                const response = await fetch('{{ route('profile.edit') }}', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin'
+                });
+                return response.ok;
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                return false;
+            }
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Check authentication first
+            const isAuthenticated = await checkAuth();
+            if (!isAuthenticated) {
+                addMsg('bot', 'Hai! Untuk menggunakan fitur chatbot, silakan login terlebih dahulu ya! 😊');
+                return;
+            }
+            
+            const text = input.value.trim();
+            if (!text) return;
+            
+            addMsg('user', text);
+            input.value = '';
+            setLoading(true);
+            
+            try {
+                const res = await fetch('{{ route('chatbot.ask') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content')
+                    },
+                    body: JSON.stringify({message: text, context: history})
+                });
+                
+                if (res.status === 401) {
+                    throw new Error('Unauthenticated');
+                }
+                
+                const data = await res.json();
                 setLoading(false);
-                if(data && data.success){
+                
+                if (data && data.success) {
                     // Rapikan: hilangkan markdown tebal/miring sederhana
                     let answer = data.answer || '';
                     answer = answer.replace(/\*\*(.*?)\*\*/g,'$1').replace(/_(.*?)_/g,'$1');

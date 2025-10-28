@@ -224,8 +224,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 });
 
-// Chatbot endpoint
-Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
+// Chatbot endpoint - protected by auth middleware
+Route::middleware('auth')->group(function () {
+    Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
+});
 
 // Sitemap
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);

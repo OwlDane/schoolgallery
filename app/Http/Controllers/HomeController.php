@@ -113,6 +113,23 @@ class HomeController extends Controller
             session([$sessionKey => true]);
         }
 
+        // Log page view once per day per session for period reporting
+        $pvKey = 'pv_gallery_' . $gallery->id . '_' . now()->format('Ymd');
+        if (!session()->has($pvKey)) {
+            \DB::table('page_views')->insert([
+                'content_type' => 'gallery',
+                'content_id' => $gallery->id,
+                'session_id' => session()->getId(),
+                'user_id' => auth()->id(),
+                'ip' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+                'occurred_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            session([$pvKey => true]);
+        }
+
         return view('gallery-detail', compact('gallery', 'relatedGalleries', 'schoolProfile'));
     }
 
@@ -181,6 +198,23 @@ class HomeController extends Controller
         if (!session()->has($sessionKey)) {
             $news->increment('views');
             session([$sessionKey => true]);
+        }
+
+        // Log page view once per day per session for period reporting
+        $pvKey = 'pv_news_' . $news->id . '_' . now()->format('Ymd');
+        if (!session()->has($pvKey)) {
+            \DB::table('page_views')->insert([
+                'content_type' => 'news',
+                'content_id' => $news->id,
+                'session_id' => session()->getId(),
+                'user_id' => auth()->id(),
+                'ip' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+                'occurred_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            session([$pvKey => true]);
         }
 
         return view('news-detail', compact('news', 'relatedNews', 'schoolProfile', 'upcomingEvents', 'latestNews'));
