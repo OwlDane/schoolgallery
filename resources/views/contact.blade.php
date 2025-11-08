@@ -222,10 +222,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                // Handle rate limiting (429 Too Many Requests)
+                if (response.status === 429) {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Anda telah mengirim terlalu banyak pesan. Silakan tunggu 30 menit sebelum mengirim pesan lagi.');
+                    });
+                }
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     showNotification(data.message, 'success');
@@ -236,7 +249,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error submitting contact form:', error);
-                showNotification('Terjadi kesalahan saat mengirim pesan', 'error');
+                showNotification(error.message || 'Terjadi kesalahan saat mengirim pesan', 'error');
             })
             .finally(() => {
                 // Re-enable submit button

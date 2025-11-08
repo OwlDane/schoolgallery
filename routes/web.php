@@ -50,12 +50,6 @@ Route::middleware('track.visits')->group(function () {
     
     // News interactions - comments can be viewed by everyone
     Route::get('/news/{id}/comments', [InteractionController::class, 'getNewsComments'])->name('news.comments');
-    
-    // Contact form for guests
-    Route::post('/contact', [InteractionController::class, 'sendContact'])->name('contact.submit');
-    
-    // Photo submission for guests
-    Route::post('/submit-photo', [InteractionController::class, 'submitPhoto'])->name('photo.submit');
 
     // Favorites status can be read by everyone (returns favorited=false for guests)
     Route::get('/gallery/{id}/favorite-status', [FavoriteController::class, 'status'])->name('gallery.favorite-status');
@@ -74,16 +68,20 @@ Route::middleware(['auth', 'verified', 'track.visits'])->group(function () {
     
     // News interactions for authenticated users
     Route::post('/news/{id}/comment', [InteractionController::class, 'addNewsComment'])->name('news.comment');
-    // Bookmark endpoints removed per request
+    
+    // Contact form submission (require login + verified email + rate limited)
+    Route::post('/contact', [InteractionController::class, 'sendContact'])
+        ->middleware('throttle:2,30') // Max 2 requests per 30 minutes
+        ->name('contact.submit');
+    
+    // Photo submission for authenticated users
+    Route::post('/submit-photo', [InteractionController::class, 'submitPhoto'])->name('photo.submit');
 });
 
 // Protected Routes (require login + email verified)
 Route::middleware(['auth', 'verified', 'track.visits'])->group(function () {
     // News interactions
     Route::post('/news/{slug}/comment', [HomeController::class, 'commentNews'])->name('news.comment');
-    
-    // Contact form submission
-    Route::post('/contact', [HomeController::class, 'contactSubmit'])->name('contact.submit');
 
     // User profile
     Route::get('/profile', [UserProfileController::class, 'edit'])->name('profile.edit');

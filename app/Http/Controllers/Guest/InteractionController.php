@@ -7,7 +7,12 @@ use App\Models\Gallery;
 use App\Models\GalleryComment;
 use App\Models\GalleryLike;
 use App\Models\User;
+use App\Notifications\ContactMessageNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use App\Models\NewsBookmark;
@@ -201,9 +206,7 @@ class InteractionController extends Controller
             ], 422);
         }
 
-        // TODO: Implementasi pengiriman email atau simpan ke database
-        // Untuk sementara, kita simpan ke session atau log
-        
+        // Prepare contact data
         $contactData = [
             'name' => $request->name,
             'email' => $request->email,
@@ -213,15 +216,35 @@ class InteractionController extends Controller
             'created_at' => now()
         ];
 
-        // Simpan ke session untuk sementara (bisa diganti dengan database)
-        $contacts = $request->session()->get('guest_contacts', []);
-        $contacts[] = $contactData;
-        $request->session()->put('guest_contacts', $contacts);
+        // Send email notification to school admin
+        try {
+            $recipientEmail = env('CONTACT_EMAIL', config('mail.from.address'));
+            
+            Notification::route('mail', $recipientEmail)
+                ->notify(new ContactMessageNotification($contactData));
+            
+            Log::info('Contact form submitted', [
+                'name' => $request->name,
+                'email' => $request->email,
+                'subject' => $request->subject,
+                'ip' => $request->ip()
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Pesan berhasil dikirim! Terima kasih atas feedback Anda.'
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Pesan berhasil dikirim! Terima kasih atas feedback Anda.'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send contact email', [
+                'error' => $e->getMessage(),
+                'contact_data' => $contactData
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengirim pesan. Silakan coba lagi.'
+            ], 500);
+        }
     }
 
     /**
