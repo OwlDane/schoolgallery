@@ -27,7 +27,7 @@ Route::middleware('track.visits')->group(function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/gallery', [HomeController::class, 'gallery'])->name('gallery');
     // Kirim Foto harus didefinisikan sebelum /gallery/{id} agar tidak tertangkap oleh route dinamis tersebut
-    Route::middleware('auth')->group(function () {
+    Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/gallery/submit', [GuestGallerySubmissionController::class, 'create'])->name('gallery.submit');
         Route::post('/gallery/submit', [GuestGallerySubmissionController::class, 'store'])->name('gallery.submit.store');
     });
@@ -61,8 +61,8 @@ Route::middleware('track.visits')->group(function () {
     Route::get('/gallery/{id}/favorite-status', [FavoriteController::class, 'status'])->name('gallery.favorite-status');
 });
 
-// Authenticated User Interaction Routes (login required)
-Route::middleware(['auth', 'track.visits'])->group(function () {
+// Authenticated User Interaction Routes (login required + email verified)
+Route::middleware(['auth', 'verified', 'track.visits'])->group(function () {
     // Gallery interactions for authenticated users
     Route::post('/gallery/{id}/like', [InteractionController::class, 'toggleLike'])->name('gallery.like');
     Route::post('/gallery/{id}/comment', [InteractionController::class, 'addComment'])->name('gallery.comment');
@@ -77,8 +77,8 @@ Route::middleware(['auth', 'track.visits'])->group(function () {
     // Bookmark endpoints removed per request
 });
 
-// Protected Routes (require login)
-Route::middleware(['auth', 'track.visits'])->group(function () {
+// Protected Routes (require login + email verified)
+Route::middleware(['auth', 'verified', 'track.visits'])->group(function () {
     // News interactions
     Route::post('/news/{slug}/comment', [HomeController::class, 'commentNews'])->name('news.comment');
     
@@ -105,6 +105,15 @@ Route::prefix('guest')->name('guest.')->group(function () {
         Route::get('/reset-password/{token}', [GuestAuthController::class, 'showResetPasswordForm'])->name('password.reset');
         Route::post('/reset-password', [GuestAuthController::class, 'resetPassword'])->name('password.update');
     });
+    
+    // Email Verification Routes
+    Route::get('/verify-email', [GuestAuthController::class, 'showVerificationNotice'])->name('verification.notice');
+    Route::get('/verify-email/{id}/{hash}', [GuestAuthController::class, 'verify'])
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+    Route::post('/resend-verification', [GuestAuthController::class, 'resendVerification'])
+        ->middleware('throttle:6,1')
+        ->name('verification.resend');
     
     Route::middleware('auth')->group(function () {
         Route::post('/logout', [GuestAuthController::class, 'logout'])->name('logout');
@@ -224,8 +233,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 });
 
-// Chatbot endpoint - protected by auth middleware
-Route::middleware('auth')->group(function () {
+// Chatbot endpoint - protected by auth and verified middleware
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])->name('chatbot.ask');
 });
 

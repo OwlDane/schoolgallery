@@ -13,26 +13,31 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create sample users
+        // Create sample users with verified emails (for testing purposes)
         User::create([
             'name' => 'John Doe',
             'email' => 'john@example.com',
             'password' => Hash::make('password123'),
-            'email_verified_at' => now(),
+            'email_verified_at' => now(), // Pre-verified for testing
+            'is_active' => true,
         ]);
 
         User::create([
             'name' => 'Jane Smith',
             'email' => 'jane@example.com',
             'password' => Hash::make('password123'),
-            'email_verified_at' => now(),
+            'email_verified_at' => now(), // Pre-verified for testing
+            'is_active' => true,
         ]);
 
         User::create([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
             'password' => Hash::make('password123'),
-            'email_verified_at' => now(),
+            'email_verified_at' => now(), // Pre-verified for testing
+            'is_active' => true,
         ]);
+
+        $this->command->info('✓ Test users created with verified emails');
     }
 }

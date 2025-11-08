@@ -45,4 +45,8 @@ return [
     ],
 
     'password_timeout' => 10800,
+
+    'verification' => [
+        'expire' => 60, // Email verification link expires in 60 minutes
+    ],
 ];

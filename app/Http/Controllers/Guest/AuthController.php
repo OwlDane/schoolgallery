@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Guest;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 class AuthController extends Controller
 {
@@ -44,6 +46,13 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
+            // Cek apakah email sudah diverifikasi
+            if (!Auth::user()->hasVerifiedEmail()) {
+                Auth::logout();
+                return redirect()->route('guest.verification.notice')
+                    ->with('warning', 'Anda harus memverifikasi email Anda terlebih dahulu sebelum login.');
+            }
+
             // Catat last_login_at
             if (Auth::user()) {
                 Auth::user()->forceFill(['last_login_at' => now()])->save();
@@ -71,9 +80,13 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        Auth::login($user);
+        // Kirim email verifikasi
+        $user->sendEmailVerificationNotification();
 
-        return redirect()->route('home')->with('success', 'Akun berhasil dibuat! Selamat datang!');
+        // Redirect ke halaman notice tanpa auto-login
+        return redirect()->route('guest.verification.notice')
+            ->with('success', 'Akun berhasil dibuat! Silakan cek email Anda untuk verifikasi.')
+            ->with('email', $user->email);
     }
 
     public function logout(Request $request)
@@ -137,5 +150,62 @@ class AuthController extends Controller
         return $status === Password::PASSWORD_RESET
             ? redirect()->route('guest.login')->with('success', __($status))
             : back()->withErrors(['email' => [__($status)]]);
+    }
+
+    // Email Verification Methods
+    public function showVerificationNotice()
+    {
+        // Jika sudah login dan terverifikasi, redirect ke home
+        if (Auth::check() && Auth::user()->hasVerifiedEmail()) {
+            return redirect()->route('home');
+        }
+
+        return view('guest.verify-email');
+    }
+
+    public function verify(Request $request)
+    {
+        $user = User::findOrFail($request->route('id'));
+
+        // Validasi hash
+        if (!hash_equals((string) $request->route('hash'), sha1($user->getEmailForVerification()))) {
+            return redirect()->route('guest.verification.notice')
+                ->with('error', 'Link verifikasi tidak valid.');
+        }
+
+        // Cek apakah sudah terverifikasi
+        if ($user->hasVerifiedEmail()) {
+            return redirect()->route('guest.login')
+                ->with('info', 'Email Anda sudah diverifikasi sebelumnya. Silakan login.');
+        }
+
+        // Mark email as verified
+        if ($user->markEmailAsVerified()) {
+            event(new Verified($user));
+        }
+
+        return redirect()->route('guest.login')
+            ->with('success', 'Email berhasil diverifikasi! Silakan login untuk melanjutkan.');
+    }
+
+    public function resendVerification(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'email' => ['Email tidak ditemukan.'],
+            ]);
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return back()->with('info', 'Email Anda sudah diverifikasi. Silakan login.');
+        }
+
+        $user->sendEmailVerificationNotification();
+
+        return back()->with('success', 'Link verifikasi telah dikirim ulang ke email Anda!');
     }
 }
