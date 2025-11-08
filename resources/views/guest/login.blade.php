@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('head')
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+@endpush
+
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
@@ -85,6 +89,14 @@
                         </label>
                     </div>
                 </div>
+
+                <!-- Google reCAPTCHA -->
+                <div class="flex justify-center">
+                    <div class="g-recaptcha" data-sitekey="{{ config('captcha.sitekey') }}"></div>
+                </div>
+                @error('g-recaptcha-response')
+                    <p class="text-red-500 text-sm text-center">{{ $message }}</p>
+                @enderror
 
                 <div>
                     <button 
