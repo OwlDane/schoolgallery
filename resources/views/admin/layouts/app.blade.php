@@ -110,12 +110,6 @@
                         <h1 class="text-xl font-semibold text-gray-800">@yield('title', 'Dashboard')</h1>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <div class="relative">
-                            <button class="text-gray-500 hover:text-blue-600 focus:outline-none">
-                                <i class="fas fa-bell"></i>
-                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
-                            </button>
-                        </div>
                         <div class="border-l border-gray-200 h-6 mx-2"></div>
                         <div class="flex items-center space-x-2">
                             <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
