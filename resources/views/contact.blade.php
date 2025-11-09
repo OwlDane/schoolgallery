@@ -90,15 +90,15 @@
                             <div>
                                 <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subjek *</label>
                                 <input type="text" id="subject" name="subject" required 
-                                       class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
-                                       placeholder="Masukkan subjek pesan Anda">
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                                    placeholder="Masukkan subjek pesan Anda">
                             </div>
                             
                             <div>
                                 <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Pesan *</label>
                                 <textarea id="message" name="message" rows="5" required 
-                                          class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
-                                          placeholder="Tulis pesan Anda di sini..."></textarea>
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300"
+                                        placeholder="Tulis pesan Anda di sini..."></textarea>
                             </div>
                             
                             <div class="text-right">

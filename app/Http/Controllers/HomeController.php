@@ -21,19 +21,34 @@ class HomeController extends Controller
     public function index()
     {
         $schoolProfile = SchoolProfile::getProfile();
-        $latestNews = News::published()->latest()->take(6)->get();
-        $featuredGalleries = Gallery::published()->latest()->take(8)->get();
+        
+        // Eager load relationships to prevent N+1 queries
+        $latestNews = News::with(['newsCategory', 'admin'])
+            ->published()
+            ->latest()
+            ->take(6)
+            ->get();
+        
+        $featuredGalleries = Gallery::with(['kategori', 'admin'])
+            ->withCount(['likes', 'comments', 'favorites'])
+            ->published()
+            ->latest()
+            ->take(8)
+            ->get();
 
         return view('home', compact('schoolProfile', 'latestNews', 'featuredGalleries'));
     }
 
     public function gallery(Request $request)
     {
-        $query = Gallery::published()->withCount([
-            'likes', 
-            'comments' => function($q){ $q->where('is_approved', true); },
-            'favorites'
-        ])->latest();
+        $query = Gallery::with(['kategori', 'admin'])
+            ->withCount([
+                'likes', 
+                'comments' => function($q){ $q->where('is_approved', true); },
+                'favorites'
+            ])
+            ->published()
+            ->latest();
 
         if ($request->has('search')) {
             $query->where('title', 'like', '%' . $request->search . '%');
@@ -67,8 +82,8 @@ class HomeController extends Controller
             return redirect()->route('gallery');
         }
 
-        // Ambil galeri yang terkait dengan kategori tersebut
-        $galleries = Gallery::with('kategori')
+        // Ambil galeri yang terkait dengan kategori tersebut - with eager loading
+        $galleries = Gallery::with(['kategori', 'admin'])
             ->where('kategori_id', $kategori->id)
             ->published()
             ->withCount(['likes', 'comments' => function($q){ $q->where('is_approved', true); }, 'favorites'])
@@ -96,10 +111,22 @@ class HomeController extends Controller
 
     public function galleryDetail($id)
     {
-        $gallery = Gallery::published()->with(['likes', 'favorites', 'comments' => function($q){ 
-            $q->where('is_approved', true)->mainComments()->with('replies'); 
-        }])->findOrFail($id);
-        $relatedGalleries = Gallery::published()
+        $gallery = Gallery::with([
+                'kategori',
+                'admin',
+                'likes',
+                'favorites',
+                'comments' => function($q){ 
+                    $q->where('is_approved', true)->mainComments()->with(['replies', 'user']); 
+                }
+            ])
+            ->withCount(['likes', 'comments', 'favorites'])
+            ->published()
+            ->findOrFail($id);
+        
+        $relatedGalleries = Gallery::with(['kategori'])
+            ->withCount(['likes', 'comments'])
+            ->published()
             ->where('id', '!=', $gallery->id)
             ->latest()
             ->take(4)
@@ -156,7 +183,10 @@ class HomeController extends Controller
 
     public function news(Request $request)
     {
-        $query = News::with('newsCategory')->published()->latest();
+        $query = News::with(['newsCategory', 'admin'])
+            ->withCount('comments')
+            ->published()
+            ->latest();
 
         if ($request->has('search')) {
             $query->where(function ($q) use ($request) {
@@ -183,8 +213,16 @@ class HomeController extends Controller
 
     public function newsDetail($slug)
     {
-        $news = News::where('slug', $slug)->with(['newsCategory', 'comments'])->published()->firstOrFail();
-        $relatedNews = News::published()
+        $news = News::with(['newsCategory', 'admin', 'comments' => function($q){
+                $q->where('is_approved', true)->latest();
+            }])
+            ->withCount('comments')
+            ->where('slug', $slug)
+            ->published()
+            ->firstOrFail();
+        
+        $relatedNews = News::with(['newsCategory'])
+            ->published()
             ->where('id', '!=', $news->id)
             ->latest()
             ->take(4)
@@ -268,7 +306,7 @@ class HomeController extends Controller
             $search = $request->q;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('position', 'like', "%{$search}%");
+                ->orWhere('position', 'like', "%{$search}%");
             });
         }
 
