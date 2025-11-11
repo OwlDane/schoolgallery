@@ -120,8 +120,9 @@
                     @endauth
                 </div>
                 
-                <div class="md:hidden flex items-center">
-                    <button id="mobile-menu-button" class="text-gray-500 hover:text-blue-600 focus:outline-none">
+                <div class="md:hidden flex items-center relative z-50">
+                    <button id="mobile-menu-button" type="button" aria-controls="mobile-menu" aria-expanded="false" class="text-gray-500 hover:text-blue-600 focus:outline-none"
+                        onclick="(function(){var m=document.getElementById('mobile-menu'); if(!m) return; var hidden=m.classList.contains('hidden'); if(hidden){m.classList.remove('hidden'); this.setAttribute('aria-expanded','true');} else {m.classList.add('hidden'); this.setAttribute('aria-expanded','false');}}).call(this)">
                         <i class="fas fa-bars text-xl"></i>
                     </button>
                 </div>
@@ -134,15 +135,31 @@
                 <a href="{{ route('home') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all"><i class="fas fa-home mr-2 text-blue-500"></i> Beranda</a>
                 <a href="{{ route('about') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all"><i class="fas fa-info-circle mr-2 text-blue-500"></i> Tentang</a>
                 <div>
-                    <button id="mobile-news-toggle" class="w-full flex items-center justify-between py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all">
-                        <span><i class="fas fa-newspaper mr-2 text-blue-500"></i> Berita</span>
-                        <i class="fas fa-chevron-down text-xs"></i>
+                    @php($mobileNewsOpen = request()->routeIs('news'))
+                    <button id="mobile-news-toggle" type="button" aria-controls="mobile-news-submenu" aria-expanded="{{ $mobileNewsOpen ? 'true' : 'false' }}" class="w-full flex items-center justify-between py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all"
+                        onclick="(function(){var sub=document.getElementById('mobile-news-submenu'); if(!sub) return; var isHidden=sub.classList.contains('hidden'); var icon=this.querySelector('i.fas.fa-chevron-down'); if(isHidden){ sub.classList.remove('hidden'); this.setAttribute('aria-expanded','true'); if(icon){ icon.classList.add('transform'); icon.classList.add('rotate-180'); }} else { sub.classList.add('hidden'); this.setAttribute('aria-expanded','false'); if(icon){ icon.classList.remove('rotate-180'); icon.classList.remove('transform'); } } }).call(this)">
+                        <span class="inline-flex items-center"><i class="fas fa-newspaper mr-2 text-blue-500"></i> Berita</span>
+                        <i class="fas fa-chevron-down text-xs {{ $mobileNewsOpen ? 'transform rotate-180' : '' }}"></i>
                     </button>
                     @php($newsCategoriesMobile = \App\Models\NewsCategory::active()->ordered()->get())
-                    <div id="mobile-news-submenu" class="hidden ml-8 mt-1 space-y-1">
-                        <a href="{{ route('news') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all">Semua Berita</a>
+                    <div id="mobile-news-submenu" class="{{ $mobileNewsOpen ? '' : 'hidden' }} mt-1 space-y-1 border border-gray-100 bg-gray-50 rounded-md ">
+                        @php($currentCat = request('category'))
+                        <a href="{{ route('news') }}"
+                           @if(!$currentCat) aria-current="page" @endif
+                           class="block py-2 pl-10 pr-3 rounded-md transition-all
+                           {{ !$currentCat ? 'bg-blue-100 text-blue-700 font-semibold border border-blue-200 shadow-sm' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-100' }}
+                           active:shadow-md">
+                           Semua Berita
+                        </a>
                         @foreach($newsCategoriesMobile as $cat)
-                            <a href="{{ route('news', ['category' => $cat->slug]) }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all">{{ $cat->name }}</a>
+                            @php($isActive = ($currentCat === $cat->slug))
+                            <a href="{{ route('news', ['category' => $cat->slug]) }}"
+                               @if($isActive) aria-current="page" @endif
+                               class="block py-2 pl-10 pr-3 rounded-md transition-all
+                               {{ $isActive ? 'bg-blue-100 text-blue-700 font-semibold border border-blue-200 shadow-sm' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-100' }}
+                               active:shadow-md">
+                               {{ $cat->name }}
+                            </a>
                         @endforeach
                     </div>
                 </div>
@@ -152,19 +169,41 @@
                 <!-- Guest Authentication Mobile -->
                 @auth
                     <div class="border-t border-gray-200 pt-2 mt-2 space-y-1">
-                        <div class="px-3 py-2 text-sm text-gray-500 font-medium">
-                            <i class="fas fa-user mr-2"></i> {{ Auth::user()->name }}
+                        <button id="mobile-account-toggle" type="button" aria-controls="mobile-account-submenu" aria-expanded="false" class="w-full flex items-center justify-between py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md font-medium transition-all">
+                            <span><i class="fas fa-user mr-2 text-blue-500"></i> {{ Auth::user()->name }}</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="mobile-account-submenu" class="hidden ml-8 mt-1 space-y-1">
+                            @php($currentTab = request('tab'))
+                            @php($isAkun = request()->routeIs('profile.edit') && (!$currentTab || $currentTab === 'akun'))
+                            @php($isAktivitas = request()->routeIs('profile.edit') && $currentTab === 'aktivitas')
+                            @php($isFavorit = request()->routeIs('profile.edit') && $currentTab === 'favorit')
+                            <a href="{{ route('profile.edit', ['tab' => 'akun']) }}"
+                               @if($isAkun) aria-current="page" @endif
+                               class="block py-2 px-3 rounded-md transition-all active:shadow-md
+                               {{ $isAkun ? 'bg-blue-100 text-blue-700 font-semibold border border-blue-200 shadow-sm' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' }}">
+                                <i class="fas fa-user-cog mr-2"></i> Pengaturan Akun
+                            </a>
+                            <a href="{{ route('profile.edit', ['tab' => 'aktivitas']) }}"
+                               @if($isAktivitas) aria-current="page" @endif
+                               class="block py-2 px-3 rounded-md transition-all active:shadow-md
+                               {{ $isAktivitas ? 'bg-blue-100 text-blue-700 font-semibold border border-blue-200 shadow-sm' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' }}">
+                                <i class="fas fa-history mr-2"></i> Aktivitas
+                            </a>
+                            <a href="{{ route('profile.edit', ['tab' => 'favorit']) }}"
+                               @if($isFavorit) aria-current="page" @endif
+                               class="block py-2 px-3 rounded-md transition-all active:shadow-md
+                               {{ $isFavorit ? 'bg-blue-100 text-blue-700 font-semibold border border-blue-200 shadow-sm' : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' }}">
+                                <i class="far fa-bookmark mr-2"></i> Favorit Saya
+                            </a>
+                            <div class="border-t border-gray-200"></div>
+                            <form action="{{ route('guest.logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="w-full text-left py-2 px-3 text-red-600 hover:bg-red-50 rounded-md transition-all active:shadow-md">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                </button>
+                            </form>
                         </div>
-                        <a href="{{ route('profile.edit') }}" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all">
-                            <i class="fas fa-user-edit mr-2"></i> Profil Saya
-                        </a>
-                        
-                        <form action="{{ route('guest.logout') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="w-full text-left py-2 px-3 text-red-600 hover:bg-red-50 rounded-md transition-all">
-                                <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                            </button>
-                        </form>
                     </div>
                 @else
                     <div class="border-t border-gray-200 pt-2 mt-2">
@@ -177,4 +216,98 @@
             </div>
         </div>
     </nav>
-@endunless
+    @endunless
+    <script>
+    document.addEventListener('DOMContentLoaded', function(){
+        var mobileMenuBtn = document.getElementById('mobile-menu-button');
+        var mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', function(e){
+                e.preventDefault();
+                var isHidden = mobileMenu.classList.contains('hidden');
+                if (isHidden) {
+                    mobileMenu.classList.remove('hidden');
+                    mobileMenuBtn.setAttribute('aria-expanded', 'true');
+                } else {
+                    mobileMenu.classList.add('hidden');
+                    mobileMenuBtn.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+
+        var newsToggle = document.getElementById('mobile-news-toggle');
+        var newsSub = document.getElementById('mobile-news-submenu');
+        if (newsToggle && newsSub) {
+            newsToggle.addEventListener('click', function(e){
+                e.preventDefault();
+                var isHidden = newsSub.classList.contains('hidden');
+                if (isHidden) {
+                    newsSub.classList.remove('hidden');
+                    newsToggle.setAttribute('aria-expanded', 'true');
+                    var icon = newsToggle.querySelector('i.fas.fa-chevron-down');
+                    if (icon) { icon.classList.add('transform'); icon.classList.add('rotate-180'); }
+                    // Close account submenu when opening news
+                    if (accSub && !accSub.classList.contains('hidden')) {
+                        accSub.classList.add('hidden');
+                        if (accToggle) accToggle.setAttribute('aria-expanded','false');
+                        var aicon = accToggle && accToggle.querySelector('i.fas.fa-chevron-down');
+                        if (aicon) { aicon.classList.remove('rotate-180'); aicon.classList.remove('transform'); }
+                    }
+                } else {
+                    newsSub.classList.add('hidden');
+                    newsToggle.setAttribute('aria-expanded', 'false');
+                    var icon2 = newsToggle.querySelector('i.fas.fa-chevron-down');
+                    if (icon2) { icon2.classList.remove('rotate-180'); icon2.classList.remove('transform'); }
+                }
+            });
+        }
+
+        var accToggle = document.getElementById('mobile-account-toggle');
+        var accSub = document.getElementById('mobile-account-submenu');
+        if (accToggle && accSub) {
+            accToggle.addEventListener('click', function(e){
+                e.preventDefault();
+                // Close news when opening account
+                if (newsSub && !newsSub.classList.contains('hidden')) {
+                    newsSub.classList.add('hidden');
+                    if (newsToggle) newsToggle.setAttribute('aria-expanded','false');
+                    var nicon = newsToggle && newsToggle.querySelector('i.fas.fa-chevron-down');
+                    if (nicon) { nicon.classList.remove('rotate-180'); nicon.classList.remove('transform'); }
+                }
+                var accHidden = accSub.classList.contains('hidden');
+                if (accHidden) {
+                    accSub.classList.remove('hidden');
+                    accToggle.setAttribute('aria-expanded','true');
+                    var aicon2 = accToggle.querySelector('i.fas.fa-chevron-down');
+                    if (aicon2) { aicon2.classList.add('transform'); aicon2.classList.add('rotate-180'); }
+                } else {
+                    accSub.classList.add('hidden');
+                    accToggle.setAttribute('aria-expanded','false');
+                    var aicon3 = accToggle.querySelector('i.fas.fa-chevron-down');
+                    if (aicon3) { aicon3.classList.remove('rotate-180'); aicon3.classList.remove('transform'); }
+                }
+            });
+        }
+
+        // Outside click to close submenus
+        document.addEventListener('click', function(e){
+            var withinMobileMenu = e.target.closest('#mobile-menu');
+            if (!withinMobileMenu) {
+                if (newsSub && !newsSub.classList.contains('hidden')) {
+                    newsSub.classList.add('hidden');
+                    if (newsToggle) newsToggle.setAttribute('aria-expanded','false');
+                    var icon3 = newsToggle && newsToggle.querySelector('i.fas.fa-chevron-down');
+                    if (icon3) { icon3.classList.remove('rotate-180'); icon3.classList.remove('transform'); }
+                }
+                if (accSub && !accSub.classList.contains('hidden')) {
+                    accSub.classList.add('hidden');
+                    if (accToggle) accToggle.setAttribute('aria-expanded','false');
+                    var aicon4 = accToggle && accToggle.querySelector('i.fas.fa-chevron-down');
+                    if (aicon4) { aicon4.classList.remove('rotate-180'); aicon4.classList.remove('transform'); }
+                }
+            }
+        });
+    });
+    </script>
+</body>
+</html>

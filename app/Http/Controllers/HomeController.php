@@ -205,10 +205,8 @@ class HomeController extends Controller
         $news = $query->paginate(10);
         $schoolProfile = SchoolProfile::getProfile();
         $categories = NewsCategory::active()->ordered()->get();
-        $upcomingEvents = Event::published()->upcoming()->orderBy('start_at')->take(5)->get();
-        $latestNews = News::published()->latest()->take(5)->get();
 
-        return view('news', compact('news', 'schoolProfile', 'categories', 'upcomingEvents', 'latestNews'));
+        return view('news', compact('news', 'schoolProfile', 'categories'));
     }
 
     public function newsDetail($slug)
@@ -228,8 +226,6 @@ class HomeController extends Controller
             ->take(4)
             ->get();
         $schoolProfile = SchoolProfile::getProfile();
-        $upcomingEvents = Event::published()->upcoming()->orderBy('start_at')->take(5)->get();
-        $latestNews = News::published()->latest()->take(5)->get();
 
         // Increment per-news view count once per session (use 'views' column)
         $sessionKey = 'viewed_news_' . $news->id;
@@ -255,7 +251,7 @@ class HomeController extends Controller
             session([$pvKey => true]);
         }
 
-        return view('news-detail', compact('news', 'relatedNews', 'schoolProfile', 'upcomingEvents', 'latestNews'));
+        return view('news-detail', compact('news', 'relatedNews', 'schoolProfile'));
     }
 
     public function commentNews(Request $request, $slug)

@@ -63,70 +63,8 @@
 
             <!-- Sidebar -->
 <aside class="lg:col-span-4 space-y-6">
-    <!-- Upcoming Events Card -->
-    <div class="bg-white rounded-xl shadow-lg p-6 sticky top-24 mb-6" style="max-height: calc(100vh - 120px); overflow-y: auto;">
-        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-            <i class="fas fa-calendar-alt text-blue-600 mr-2"></i> Acara Mendatang
-        </h3>
-        @if(isset($upcomingEvents) && $upcomingEvents->isNotEmpty())
-            <ul class="space-y-4">
-                @foreach($upcomingEvents as $event)
-                    <li class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 hover:shadow-md
-                               transition-all duration-300 transform hover:-translate-y-1 border border-blue-100">
-                        <div class="flex items-start gap-3">
-                            @if($event->image)
-                                <img src="{{ asset('storage/' . $event->image) }}"
-                                     alt="{{ $event->title }}"
-                                     class="w-16 h-16 rounded-lg object-cover flex-shrink-0 shadow-md">
-                            @else
-                                <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500
-                                            text-white flex items-center justify-center flex-shrink-0 shadow-md">
-                                    <i class="fas fa-calendar-day text-2xl"></i>
-                                </div>
-                            @endif
-                            <div class="min-w-0">
-                                <div class="bg-white px-2 py-1 rounded-full inline-block mb-2 shadow-sm border border-blue-100">
-                                    <p class="text-xs text-blue-700 font-medium">
-                                        <i class="far fa-clock mr-1"></i>
-                                        <span class="timeago"
-                                              data-time="{{ $event->start_at->toIso8601String() }}">
-                                              {{ $event->start_at->format('d M Y H:i') }}
-                                        </span>
-                                    </p>
-                                </div>
-                                <p class="font-semibold text-gray-800">
-                                    <a href="{{ route('events.show', $event->slug) }}"
-                                       class="hover:text-blue-700 line-clamp-2">{{ $event->title }}</a>
-                                </p>
-                                @if($event->location)
-                                    <p class="text-xs text-gray-600 mt-1 flex items-center">
-                                        <i class="fas fa-map-marker-alt mr-1 text-red-500"></i>
-                                        <span class="truncate">{{ $event->location }}</span>
-                                    </p>
-                                @endif
-                            </div>
-                        </div>
-                    </li>
-                @endforeach
-            </ul>
-            <div class="mt-4 text-center">
-                <a href="{{ route('events.index') }}"
-                   class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium
-                          hover:bg-blue-700 transition-colors duration-300 shadow-md hover:shadow-lg">
-                    <i class="fas fa-calendar-plus mr-1"></i> Lihat Semua Acara
-                </a>
-            </div>
-        @else
-            <div class="text-center py-8 bg-blue-50 rounded-lg border border-blue-100">
-                <div class="text-4xl text-blue-300 mb-2"><i class="far fa-calendar-times"></i></div>
-                <p class="text-gray-600 font-medium">Belum ada acara mendatang.</p>
-                <p class="text-gray-500 text-sm mt-1">Kunjungi kembali halaman ini nanti.</p>
-            </div>
-        @endif
-    </div>
-
     <!-- Comments Section -->
-    <div id="comments" class="bg-white rounded-xl shadow-lg p-6 sticky top-[600px]" style="max-height: calc(100vh - 120px); overflow-y: auto;">
+    <div id="comments" class="bg-white rounded-xl shadow-lg p-6 sticky top-24" style="max-height: calc(100vh - 120px); overflow-y: auto;">
         <h3 class="text-xl font-bold text-gray-900 mb-4">Komentar</h3>
         @auth
             <div class="bg-gray-50 rounded-xl p-4 mb-6">
@@ -180,6 +118,7 @@
             <span class="ml-2 text-gray-600">Memuat komentar...</span>
         </div>
     </div>
+
 </aside>
 
             </div>
