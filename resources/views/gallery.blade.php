@@ -164,9 +164,9 @@
             </script>
             
             @if(!$kategoris->isEmpty())
-                <div class="flex flex-wrap gap-3 justify-center mb-8">
+                <div class="flex flex-wrap gap-2 sm:gap-3 justify-center mb-6 sm:mb-8">
                     <a href="{{ route('gallery') }}" 
-                       class="px-4 py-2 rounded-full {{ !isset($activeCategory) ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100' }} font-medium transition-all duration-200 shadow-sm">
+                       class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-sm sm:text-base {{ !isset($activeCategory) ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100' }} font-medium transition-all duration-200 shadow-sm">
                         Semua Galeri
                     </a>
                     @foreach($kategoris as $kategori)
@@ -175,7 +175,7 @@
                             $isActive = isset($activeCategory) && $activeCategory === $kategori->slug;
                         @endphp
                         <a href="{{ route('gallery.category', $kategori->slug) }}" 
-                           class="px-4 py-2 rounded-full {{ $isActive ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100' }} font-medium transition-all duration-200 shadow-sm">
+                           class="px-2 py-1 sm:px-4 sm:py-2 rounded-full text-xs sm:text-base {{ $isActive ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100' }} font-medium transition-all duration-200 shadow-sm">
                             {{ $kategori->nama }}
                         </a>
                     @endforeach
@@ -194,7 +194,7 @@
                     <p class="text-gray-600">Silakan coba dengan kata kunci lain atau kembali lagi nanti.</p>
                 </div>
             @else
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
                     @foreach($galleries as $gallery)
                         <div class="gallery-item bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100"
                              data-aos="fade-up" data-aos-delay="{{ $loop->index % 4 * 100 }}">
@@ -205,8 +205,8 @@
                                     <img data-src="https://images.unsplash.com/photo-1588072432836-e10032774350?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" loading="lazy" alt="{{ $gallery->title }}">
                                 @endif
                             </a>
-                            <div class="p-4">
-                                <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2">{{ $gallery->title }}</h3>
+                            <div class="p-3 md:p-4">
+                                <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2 text-sm md:text-base">{{ $gallery->title }}</h3>
                                 <div class="flex items-center justify-between text-sm text-gray-500 mb-3">
                                     <span><i class="far fa-calendar-alt mr-1"></i> {{ $gallery->created_at->format('d M Y') }}</span>
                                     @if($gallery->kategori)
@@ -227,7 +227,7 @@
                                         <i class="fas fa-download mr-1"></i> Unduh
                                     </a>
                                 </div>
-                                <div class="mt-3 flex items-center justify-between text-sm text-gray-600">
+                                <div class="mt-3 hidden sm:flex items-center justify-between text-sm text-gray-600">
                                     <div class="flex items-center gap-4">
                                         @auth
                                             @php
@@ -273,7 +273,7 @@
 
                 <!-- Pagination -->
                 @if($galleries->hasPages())
-                    <div class="mt-8 flex items-center justify-between gap-4">
+                    <div class="mt-6 flex items-center justify-between gap-2 sm:gap-4">
                         @php
                             // Preserve active query parameters (search, category, etc.)
                             $p = $galleries->appends(request()->query());
@@ -285,23 +285,23 @@
 
                         <div class="flex-1">
                             <a href="{{ $prevUrl ?: '#' }}"
-                               class="inline-flex items-center px-4 py-2 rounded-md border text-sm font-medium transition-colors
+                               class="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-md border text-xs sm:text-sm font-medium transition-colors
                                       {{ $prevUrl ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' }}"
                                {{ $prevUrl ? '' : 'aria-disabled=true' }}>
-                                <span class="mr-2">&larr;</span> Previous page
+                                <span class="mr-1 sm:mr-2">&larr;</span> <span class="hidden xs:inline">Previous page</span>
                             </a>
                         </div>
 
-                        <div class="text-sm text-gray-600 whitespace-nowrap">
+                        <div class="hidden sm:block text-sm text-gray-600 whitespace-nowrap">
                             Page <span class="font-semibold">{{ $current }}</span> of <span class="font-semibold">{{ $totalPages }}</span>
                         </div>
 
                         <div class="flex-1 flex justify-end">
                             <a href="{{ $nextUrl ?: '#' }}"
-                               class="inline-flex items-center px-4 py-2 rounded-md border text-sm font-medium transition-colors
+                               class="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-md border text-xs sm:text-sm font-medium transition-colors
                                       {{ $nextUrl ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' }}"
                                {{ $nextUrl ? '' : 'aria-disabled=true' }}>
-                                Next page <span class="ml-2">&rarr;</span>
+                                <span class="hidden xs:inline">Next page</span> <span class="ml-1 sm:ml-2">&rarr;</span>
                             </a>
                         </div>
                     </div>

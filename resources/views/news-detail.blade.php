@@ -5,9 +5,6 @@
     <section class="relative overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-700 to-purple-800 text-white py-16">
         <div class="max-w-7xl mx-auto px-4 relative z-10">
             <div class="text-center" data-aos="fade-up" data-aos-duration="1000">
-                <a href="{{ route('news') }}" class="inline-flex items-center text-blue-200 hover:text-white mb-4 transition-colors">
-                    <i class="fas fa-arrow-left mr-2"></i> Kembali ke Berita
-                </a>
                 <h1 class="text-3xl md:text-4xl font-bold mb-4 text-shadow leading-tight max-w-4xl mx-auto">
                     {{ $news->title }}
                 </h1>

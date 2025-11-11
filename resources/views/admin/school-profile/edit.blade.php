@@ -34,26 +34,8 @@
         <div class="bg-gray-50 p-4 rounded-lg mb-6">
             <h3 class="text-lg font-medium text-gray-800 mb-4">Informasi Dasar</h3>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="school_name" class="block text-sm font-medium text-gray-700 mb-1">Nama Sekolah <span class="text-red-600">*</span></label>
-                    <input type="text" name="school_name" id="school_name" value="{{ old('school_name', $profile->school_name) }}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                </div>
-
-                <div>
-                    <label for="school_logo" class="block text-sm font-medium text-gray-700 mb-1">Logo Sekolah</label>
-                    <div class="flex items-start space-x-4">
-                        @if($profile->school_logo)
-                            <div class="flex-shrink-0">
-                                <img src="{{ asset('storage/' . $profile->school_logo) }}" alt="Logo Sekolah" class="h-16 w-auto">
-                            </div>
-                        @endif
-                        <div class="flex-grow">
-                            <input type="file" name="school_logo" id="school_logo" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <p class="text-sm text-gray-500 mt-1">Format: JPG, PNG. Ukuran maksimal: 2MB</p>
-                        </div>
-                    </div>
-                </div>
+            <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
+                <!-- Nama Sekolah dan Logo dikelola lewat kode, tidak melalui form -->
             </div>
 
             <div class="mt-4">

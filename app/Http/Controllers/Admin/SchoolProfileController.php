@@ -18,8 +18,6 @@ class SchoolProfileController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'school_name' => 'required|string|max:255',
-            'school_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'address' => 'required|string',
             'phone' => 'required|string|max:20',
             'email' => 'required|email|max:255',
@@ -36,14 +34,7 @@ class SchoolProfileController extends Controller
 
         $profile = SchoolProfile::first();
         
-        $data = $request->except(['school_logo']);
-
-        if ($request->hasFile('school_logo')) {
-            if ($profile && $profile->school_logo) {
-                Storage::disk('public')->delete($profile->school_logo);
-            }
-            $data['school_logo'] = $request->file('school_logo')->store('school', 'public');
-        }
+        $data = $request->except(['school_logo', 'school_name']);
 
         if ($profile) {
             $profile->update($data);

@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('meta_title', $schoolProfile->school_name ?? 'Galeri Sekolah')</title>
-    <link rel="icon" type="image/png" href="{{ asset('eduspot.png') }}">
+    @php
+        $__logoPath = file_exists(public_path('eduspot.logo.png'))
+            ? 'eduspot.logo.png'
+            : (file_exists(public_path('eduspot.png')) ? 'eduspot.png' : null);
+    @endphp
+    <title>@yield('meta_title', config('app.name', $schoolProfile->school_name ?? 'Galeri Sekolah'))</title>
+    <link rel="icon" type="image/png" href="{{ $__logoPath ? asset($__logoPath) : asset('favicon.png') }}">
     @include('layouts.seo')
     @vite(['resources/css/app.css'])
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -36,10 +41,9 @@
                 <!-- Left: School brand -->
                 <div class="flex items-center flex-1">
                     <a href="{{ route('home') }}" class="flex items-center">
-                        @if($schoolProfile->school_logo)
+                        @if($__logoPath)
                             <picture class="mr-3">
-                                <source srcset="{{ asset('storage/' . preg_replace('/\.(png|jpg|jpeg)$/i', '.webp', $schoolProfile->school_logo)) }}" type="image/webp">
-                                <img data-src="{{ asset('storage/' . $schoolProfile->school_logo) }}" loading="lazy" alt="Logo {{ $schoolProfile->school_name }}" class="h-10 w-auto">
+                                <img src="{{ asset($__logoPath) }}" alt="Logo {{ config('app.name', 'Galeri Sekolah') }}" class="h-12 md:h-14 w-auto">
                             </picture>
                         @else
                             <div class="bg-blue-600 text-white p-2 rounded-lg mr-3">
@@ -47,7 +51,7 @@
                             </div>
                         @endif
                         <div>
-                            <h1 class="text-lg font-bold text-gray-800">{{ $schoolProfile->school_name ?? 'Galeri Sekolah' }}</h1>
+                            <h1 class="text-lg font-bold text-gray-800">{{ config('app.name', 'Galeri Sekolah') }}</h1>
                             <p class="text-xs text-gray-500">Pendidikan Berkualitas</p>
                         </div>
                     </a>

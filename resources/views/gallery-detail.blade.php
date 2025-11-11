@@ -2,18 +2,17 @@
 
 @section('content')
     <!-- Hero Section -->
-    <section class="relative overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-700 to-purple-800 text-white py-16">
+    <section class="relative overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-700 to-purple-800 text-white py-12 md:py-16">
         <div class="max-w-7xl mx-auto px-4 relative z-10">
-            <div class="text-center" data-aos="fade-up" data-aos-duration="1000">
-                <a href="{{ route('gallery') }}" class="inline-flex items-center text-blue-200 hover:text-white mb-4">
-                    <i class="fas fa-arrow-left mr-2"></i> Kembali ke Galeri
-                </a>
-                <h1 class="text-4xl md:text-5xl font-bold mb-6 text-shadow leading-tight">
-                    {{ $gallery->title }}
-                </h1>
-                <p class="text-blue-100">
-                    <i class="far fa-calendar-alt mr-1"></i> {{ $gallery->created_at->format('d M Y') }}
-                </p>
+            <div data-aos="fade-up" data-aos-duration="1000">
+                <div class="text-center">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight mb-3">
+                        {{ $gallery->title }}
+                    </h1>
+                    <p class="inline-flex items-center gap-2 text-blue-100 text-sm md:text-base">
+                        <i class="far fa-calendar-alt"></i> <span>{{ $gallery->created_at->format('d M Y') }}</span>
+                    </p>
+                </div>
             </div>
         </div>
     </section>
@@ -25,11 +24,13 @@
                 <!-- Left/Main: image and details -->
                 <div class="lg:col-span-2">
             <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100 mb-8">
-                <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}" class="w-full h-auto">
+                <div class="w-full" style="aspect-ratio: 16 / 9;">
+                    <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}" class="w-full h-full object-cover">
+                </div>
                 <div class="p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <div></div>
-                        <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0 items-start sm:items-center">
+                    <div class="flex flex-wrap items-center justify-between gap-2 sm:gap-3 mb-4">
+                        <div class="hidden"></div>
+                        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
                             @auth
                             @php
                                 $userLiked = $gallery->likes->where('user_id', auth()->id())->isNotEmpty();
@@ -38,33 +39,33 @@
                             <button id="likeBtn" 
                                     data-gallery-id="{{ $gallery->id }}" 
                                     data-liked="{{ $userLiked ? 'true' : 'false' }}"
-                                    class="inline-flex items-center {{ $userLiked ? 'text-pink-600' : 'text-gray-500' }} hover:text-pink-700 transition-colors px-3 py-2 rounded-lg hover:bg-pink-50">
-                                <i class="{{ $userLiked ? 'fas' : 'far' }} fa-heart mr-2"></i>
+                                    class="inline-flex items-center {{ $userLiked ? 'text-pink-600 border border-pink-200 bg-pink-50' : 'text-gray-700 border border-gray-200 bg-white' }} hover:border-pink-300 hover:bg-pink-50 transition-colors px-3 py-1.5 rounded-full text-sm sm:text-base">
+                                <i class="{{ $userLiked ? 'fas' : 'far' }} fa-heart mr-1.5"></i>
                                 <span id="likeText" class="font-medium">{{ $userLiked ? 'Batalkan' : 'Suka' }}</span>
-                                <span id="likeCount" class="ml-2 text-sm bg-gray-100 px-2 py-1 rounded-full">({{ $gallery->likes->count() }})</span>
+                                <span id="likeCount" class="ml-1 text-[10px] sm:text-xs bg-gray-100 px-1.5 py-0.5 rounded-full">({{ $gallery->likes->count() }})</span>
                                     </button>
                                 <!-- Favorite Button -->
                                 <button id="favBtn"
                                         data-gallery-id="{{ $gallery->id }}"
-                                        class="inline-flex items-center text-gray-500 hover:text-blue-700 transition-colors px-3 py-2 rounded-lg hover:bg-blue-50">
-                                    <i id="favIcon" class="{{ $userFavorited ? 'fas' : 'far' }} fa-bookmark mr-2"></i>
+                                        class="inline-flex items-center text-gray-700 border border-gray-200 bg-white hover:text-blue-700 hover:border-blue-300 hover:bg-blue-50 transition-colors px-3 py-1.5 rounded-full text-sm sm:text-base">
+                                    <i id="favIcon" class="{{ $userFavorited ? 'fas' : 'far' }} fa-bookmark mr-1.5"></i>
                                     <span id="favText" class="font-medium">{{ $userFavorited ? 'Hapus dari Favorit' : 'Simpan' }}</span>
-                                    <span id="favCount" class="ml-2 text-sm bg-gray-100 px-2 py-1 rounded-full">({{ $gallery->favorites->count() }})</span>
+                                    <span id="favCount" class="ml-1 text-[10px] sm:text-xs bg-gray-100 px-1.5 py-0.5 rounded-full">({{ $gallery->favorites->count() }})</span>
                                 </button>
                             @else
-                            <a href="{{ route('guest.login') }}" class="inline-flex items-center text-gray-500 hover:text-pink-700 transition-colors px-3 py-2 rounded-lg hover:bg-pink-50">
-                                <i class="far fa-heart mr-2"></i>
+                            <a href="{{ route('guest.login') }}" class="inline-flex items-center text-gray-700 border border-gray-200 bg-white hover:text-pink-700 hover:border-pink-300 hover:bg-pink-50 transition-colors px-3 py-1.5 rounded-full text-sm sm:text-base">
+                                <i class="far fa-heart mr-1.5"></i>
                                 <span class="font-medium">Suka</span>
-                                <span class="ml-2 text-sm bg-gray-100 px-2 py-1 rounded-full">({{ $gallery->likes->count() }})</span>
+                                <span class="ml-1 text-[10px] sm:text-xs bg-gray-100 px-1.5 py-0.5 rounded-full">({{ $gallery->likes->count() }})</span>
                             </a>
-                            <a href="{{ route('guest.login') }}" class="inline-flex items-center text-gray-500 hover:text-blue-700 transition-colors px-3 py-2 rounded-lg hover:bg-blue-50">
-                                <i class="far fa-bookmark mr-2"></i>
+                            <a href="{{ route('guest.login') }}" class="inline-flex items-center text-gray-700 border border-gray-200 bg-white hover:text-blue-700 hover:border-blue-300 hover:bg-blue-50 transition-colors px-3 py-1.5 rounded-full text-sm sm:text-base">
+                                <i class="far fa-bookmark mr-1.5"></i>
                                 <span class="font-medium">Simpan</span>
                             </a>
                             @endauth
                             <a href="{{ asset('storage/' . $gallery->image) }}" 
-                               class="text-blue-600 hover:text-blue-800" download>
-                                <i class="fas fa-download"></i> Unduh
+                               class="inline-flex items-center text-blue-700 border border-blue-200 bg-white hover:text-blue-800 hover:border-blue-300 hover:bg-blue-50 transition-colors px-3 py-1.5 rounded-full text-sm sm:text-base" download>
+                                <i class="fas fa-download mr-1.5"></i> Unduh
                             </a>
                         </div>
                     </div>

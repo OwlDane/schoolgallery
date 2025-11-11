@@ -4,9 +4,6 @@
     <!-- Hero with image/background -->
     <section class="relative bg-gradient-to-br from-blue-700 via-indigo-700 to-purple-800 text-white py-16">
         <div class="max-w-7xl mx-auto px-4 relative z-10">
-            <a href="{{ route('events') }}" class="inline-flex items-center text-blue-200 hover:text-white mb-6 transition-colors">
-                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Semua Acara
-            </a>
             <div class="text-center">
                 <h1 class="text-3xl md:text-4xl font-bold mb-4 leading-tight max-w-4xl mx-auto">{{ $event->title }}</h1>
                 <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-blue-100">
