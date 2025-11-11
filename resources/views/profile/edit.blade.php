@@ -106,18 +106,22 @@
                                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border rounded-md p-3">
                                         <div class="flex items-center space-x-3">
                                             <div class="w-10 h-10 md:w-12 md:h-12 rounded overflow-hidden bg-gray-100 flex-shrink-0">
-                                                @if($act['gallery'] && $act['gallery']->image)
+                                                @if(!empty($act['gallery']) && $act['gallery']->image)
                                                     <img src="{{ asset('storage/'.$act['gallery']->image) }}" alt="{{ $act['gallery']->title }}" class="w-full h-full object-cover"/>
+                                                @elseif(!empty($act['news']) && $act['news']->image)
+                                                    <img src="{{ asset('storage/'.$act['news']->image) }}" alt="{{ $act['news']->title }}" class="w-full h-full object-cover"/>
                                                 @endif
                                             </div>
                                             <div>
                                                 <div class="text-sm md:text-base text-gray-700">
                                                     @if($act['type']==='like')
                                                         <span class="text-pink-600 font-medium">Menyukai</span>
-                                                    @else
-                                                        <span class="text-blue-600 font-medium">Mengomentari</span>
+                                                    @elseif($act['type']==='gallery_comment')
+                                                        <span class="text-blue-600 font-medium">Mengomentari Galeri</span>
+                                                    @elseif($act['type']==='news_comment')
+                                                        <span class="text-blue-600 font-medium">Mengomentari Berita</span>
                                                     @endif
-                                                    <span class="font-semibold">{{ $act['gallery']->title ?? 'Konten' }}</span>
+                                                    <span class="font-semibold">{{ $act['gallery']->title ?? $act['news']->title ?? 'Konten' }}</span>
                                                 </div>
                                                 @if(!empty($act['excerpt']))
                                                     <div class="text-xs text-gray-500">“{{ $act['excerpt'] }}”</div>
@@ -125,8 +129,10 @@
                                                 <div class="text-[11px] md:text-xs text-gray-400">{{ optional($act['at'])->format('d M Y H:i') }}</div>
                                             </div>
                                         </div>
-                                        @if($act['gallery'])
+                                        @if(!empty($act['gallery']))
                                             <a href="{{ route('gallery.detail', $act['gallery']->id) }}" class="text-xs md:text-sm text-blue-600 hover:underline">Buka</a>
+                                        @elseif(!empty($act['news']))
+                                            <a href="{{ route('news.detail', $act['news']->slug) }}" class="text-xs md:text-sm text-blue-600 hover:underline">Buka</a>
                                         @endif
                                     </div>
                                 @endforeach

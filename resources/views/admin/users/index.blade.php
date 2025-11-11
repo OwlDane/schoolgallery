@@ -10,14 +10,14 @@
                 <span class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-2 rounded-lg mr-2 shadow"><i class="fas fa-users"></i></span>
                 Monitoring Pengguna
             </h1>
-            <p class="text-sm text-gray-500 mt-1">Pantau Super Admin, Admin, dan Pengguna dalam satu halaman</p>
+            <p class="text-sm text-gray-500 mt-1">Pantau Admin, Petugas, dan Pengguna dalam satu halaman</p>
         </div>
         <div class="flex items-center gap-2">
             <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center px-4 py-2 rounded-lg bg-white border shadow-sm text-gray-700 hover:bg-gray-50">
                 <i class="fas fa-arrow-left mr-2"></i> Kembali ke Dashboard
             </a>
             <a href="{{ route('admin.admins.index') }}" class="inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white shadow hover:bg-blue-700">
-                <i class="fas fa-user-shield mr-2"></i> Manajemen Admin
+                <i class="fas fa-user-shield mr-2"></i> Manajemen Petugas
             </a>
         </div>
     </div>
@@ -25,7 +25,7 @@
 
 <!-- Monitoring Ringkasan (khusus pengguna) -->
 <div class="mb-4">
-    <p class="text-xs text-gray-500">Monitoring aktivitas pengguna (role: user). Untuk kelola admin, gunakan menu <a href="{{ route('admin.admins.index') }}" class="text-blue-600 hover:underline">Manajemen Admin</a>.</p>
+    <p class="text-xs text-gray-500">Monitoring aktivitas pengguna (role: user). Untuk kelola petugas, gunakan menu <a href="{{ route('admin.admins.index') }}" class="text-blue-600 hover:underline">Manajemen Petugas</a>.</p>
     </div>
 
 <!-- Stats -->
@@ -47,7 +47,7 @@
 <!-- Super Admin Section (Card Grid) -->
 <div class="mb-6">
     <div class="flex items-center justify-between mb-3">
-        <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wider">Super Admin</h3>
+        <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wider">Admin</h3>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         @forelse(($superAdmins ?? []) as $sa)
@@ -63,14 +63,14 @@
                 <div class="flex-1">
                     <div class="flex items-center gap-2">
                         <p class="font-semibold text-gray-800">{{ $sa->name }}</p>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-red-100 text-red-700">SUPER ADMIN</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-red-100 text-red-700">ADMIN</span>
                     </div>
                     <p class="text-xs text-gray-500">{{ $sa->email }}</p>
                 </div>
             </div>
         </div>
         @empty
-        <div class="text-gray-500">Belum ada super admin.</div>
+        <div class="text-gray-500">Belum ada admin.</div>
         @endforelse
     </div>
     @if(($superAdmins ?? collect())->isEmpty())
@@ -81,8 +81,8 @@
 <!-- Admin Section (Card List with pagination) -->
 <div class="mb-6">
     <div class="flex items-center justify-between mb-3">
-        <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wider">Admin</h3>
-        <a href="{{ route('admin.admins.index') }}" class="text-xs text-blue-600 hover:underline">Kelola Admin</a>
+        <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wider">Petugas</h3>
+        <a href="{{ route('admin.admins.index') }}" class="text-xs text-blue-600 hover:underline">Kelola Petugas</a>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         @forelse(($admins ?? []) as $admin)

@@ -52,7 +52,7 @@
                         </div>
                         <div>
                             <p class="text-sm font-medium">{{ auth('admin')->user()->name }}</p>
-                            <p class="text-xs text-blue-200">Administrator</p>
+                            <p class="text-xs text-blue-200">{{ Auth::guard('admin')->user()->role === 'super_admin' ? 'Admin' : 'Petugas' }}</p>
                         </div>
                     </div>
                 </div>

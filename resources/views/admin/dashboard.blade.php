@@ -373,17 +373,17 @@
         <i class="fas fa-crown text-red-500 mr-2"></i> Super Admin Panel
     </h3>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Admin Management Card -->
+        <!-- Petugas Management Card -->
         <div class="bg-gradient-to-r from-red-50 to-red-100 rounded-xl shadow-md overflow-hidden border border-red-200">
             <div class="p-6">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h3 class="text-lg font-semibold text-red-800">Manajemen Admin</h3>
-                        <p class="text-sm text-red-600 mt-1">Kelola akun admin dan izin akses</p>
+                        <h3 class="text-lg font-semibold text-red-800">Manajemen Petugas</h3>
+                        <p class="text-sm text-red-600 mt-1">Kelola akun petugas dan izin akses</p>
                         <div class="mt-3 flex items-center space-x-4">
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-red-700">{{ $stats['total_admins'] ?? 0 }}</div>
-                                <div class="text-xs text-red-600">Total Admin</div>
+                                <div class="text-xs text-red-600">Total Petugas</div>
                             </div>
                             <div class="text-center">
                                 <div class="text-2xl font-bold text-green-700">{{ $stats['active_admins'] ?? 0 }}</div>
@@ -397,7 +397,7 @@
                 </div>
                 <div class="mt-4 pt-3 border-t border-red-200">
                     <a href="{{ route('admin.admins.index') }}" class="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors">
-                        <i class="fas fa-cog mr-2"></i> Kelola Admin
+                        <i class="fas fa-cog mr-2"></i> Kelola Petugas
                     </a>
                 </div>
             </div>

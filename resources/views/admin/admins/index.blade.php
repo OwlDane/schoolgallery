@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Manajemen Admin')
+@section('title', 'Manajemen Petugas')
 
 @section('content')
 <!-- Header lebih sederhana dan tombol kembali -->
@@ -11,19 +11,16 @@
                 <span class="bg-blue-600 p-2 rounded-lg text-white mr-3">
                     <i class="fas fa-users-cog"></i>
                 </span>
-                Manajemen Admin
+                Manajemen Petugas
             </h1>
             <p class="text-gray-600 mt-2 flex items-center">
                 <i class="fas fa-info-circle mr-2 text-blue-500"></i>
-                Kelola akun admin dan izin akses sistem
+                Kelola akun petugas dan izin akses sistem
             </p>
         </div>
         <div class="flex items-center gap-3">
-            <a href="{{ route('admin.dashboard') }}" class="px-4 py-2 rounded-lg border border-blue-600 text-blue-700 hover:bg-blue-50 transition">
-                <i class="fas fa-arrow-left mr-2"></i> Kembali
-            </a>
             <a href="{{ route('admin.admins.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center transition">
-                <i class="fas fa-plus-circle mr-2"></i> Tambah Admin
+                <i class="fas fa-plus-circle mr-2"></i> Tambah Petugas
             </a>
         </div>
     </div>
@@ -33,14 +30,14 @@
 <div class="bg-white p-4 rounded-xl shadow-sm mb-6 border border-gray-100">
     <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
         <div class="relative w-full md:w-64">
-            <input type="text" id="searchAdmin" placeholder="Cari admin..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+            <input type="text" id="searchAdmin" placeholder="Cari petugas..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
             <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
         </div>
         <div class="flex items-center gap-3 w-full md:w-auto">
             <select id="filterRole" class="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
                 <option value="">Semua Role</option>
-                <option value="super_admin">Super Admin</option>
-                <option value="admin">Admin</option>
+                <option value="super_admin">Admin</option>
+                <option value="admin">Petugas</option>
             </select>
             <select id="filterStatus" class="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
                 <option value="">Semua Status</option>
@@ -119,7 +116,7 @@
             <div class="mb-5">
                 <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
                     <i class="fas {{ $admin->role === 'super_admin' ? 'fa-crown' : 'fa-user-shield' }} mr-2"></i>
-                    {{ $admin->role === 'super_admin' ? 'Super Admin' : 'Admin' }}
+                    {{ $admin->role === 'super_admin' ? 'Admin' : 'Petugas' }}
                 </span>
             </div>
 
@@ -192,33 +189,34 @@
             <div class="bg-blue-50 rounded-full p-8 inline-block mb-6 animate-pulse">
                 <i class="fas fa-users text-5xl text-blue-400"></i>
             </div>
-            <h3 class="text-2xl font-bold text-gray-800 mb-3">Belum Ada Admin</h3>
-            <p class="text-gray-600 mb-8 max-w-md mx-auto">Mulai dengan menambahkan admin pertama untuk mengelola sistem dan mengatur hak akses</p>
+            <h3 class="text-2xl font-bold text-gray-800 mb-3">Belum Ada Petugas</h3>
+            <p class="text-gray-600 mb-8 max-w-md mx-auto">Mulai dengan menambahkan petugas pertama untuk mengelola sistem dan mengatur hak akses</p>
             <a href="{{ route('admin.admins.create') }}" class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white px-8 py-4 rounded-lg inline-flex items-center transition-all duration-300 transform hover:scale-105 shadow-lg">
-                <i class="fas fa-plus-circle mr-2"></i> Tambah Admin Pertama
+                <i class="fas fa-plus-circle mr-2"></i> Tambah Petugas Pertama
             </a>
         </div>
     </div>
     @endforelse
 </div>
 
-<!-- Ringkasan Admin (layout seragam & netral) -->
+<!-- Ringkasan Petugas (layout seragam & netral) -->
 @if($admins->count() > 0)
 <div class="mt-10 bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
     <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
         <h3 class="text-lg font-semibold text-gray-800 flex items-center">
             <i class="fas fa-chart-pie text-blue-600 mr-2"></i>
-            Ringkasan Admin
+            Ringkasan Petugas
         </h3>
     </div>
     <div class="p-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            
             <div class="bg-white rounded-xl p-6 text-center border border-gray-200">
                 <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 mb-3">
                     <i class="fas fa-user-check text-xl"></i>
                 </div>
                 <div class="text-2xl font-semibold text-gray-800 mb-1">{{ $admins->where('is_active', true)->count() }}</div>
-                <div class="text-sm text-gray-600">Admin Aktif</div>
+                <div class="text-sm text-gray-600">Petugas Aktif</div>
             </div>
             
             <div class="bg-white rounded-xl p-6 text-center border border-gray-200">
@@ -226,7 +224,7 @@
                     <i class="fas fa-crown text-xl"></i>
                 </div>
                 <div class="text-2xl font-semibold text-gray-800 mb-1">{{ $admins->where('role', 'super_admin')->count() }}</div>
-                <div class="text-sm text-gray-600">Super Admin</div>
+                <div class="text-sm text-gray-600">Admin</div>
             </div>
             
             <div class="bg-white rounded-xl p-6 text-center border border-gray-200">
@@ -234,7 +232,7 @@
                     <i class="fas fa-user-shield text-xl"></i>
                 </div>
                 <div class="text-2xl font-semibold text-gray-800 mb-1">{{ $admins->where('role', 'admin')->count() }}</div>
-                <div class="text-sm text-gray-600">Admin Biasa</div>
+                <div class="text-sm text-gray-600">Petugas</div>
             </div>
             
             <div class="bg-white rounded-xl p-6 text-center border border-gray-200">
@@ -242,7 +240,7 @@
                     <i class="fas fa-user-slash text-xl"></i>
                 </div>
                 <div class="text-2xl font-semibold text-gray-800 mb-1">{{ $admins->where('is_active', false)->count() }}</div>
-                <div class="text-sm text-gray-600">Admin Nonaktif</div>
+                <div class="text-sm text-gray-600">Petugas Nonaktif</div>
             </div>
         </div>
         <!-- Charts: Distribusi Role & Status -->
@@ -283,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
         new Chart(roleCtx, {
             type: 'pie',
             data: {
-                labels: ['Super Admin', 'Admin'],
+                labels: ['Admin', 'Petugas'],
                 datasets: [{
                     data: [{{ $admins->where('role', 'super_admin')->count() }}, {{ $admins->where('role', 'admin')->count() }}],
                     backgroundColor: ['#3b82f6', '#93c5fd'],

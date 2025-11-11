@@ -16,7 +16,7 @@
                 </h1>
                 <p class="text-gray-600 mt-2 flex items-center">
                     <i class="fas fa-info-circle mr-2 text-blue-500"></i>
-                    Buat akun administrator baru untuk mengelola sistem
+                    Buat akun Admin baru untuk mengelola sistem
                 </p>
             </div>
             <a href="{{ route('admin.admins.index') }}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2 rounded-lg flex items-center transition-all duration-300 shadow-sm">
@@ -126,15 +126,15 @@
                                 <select id="role" name="role" required 
                                     class="pl-10 block w-full rounded-lg border-gray-300 focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50 transition-all">
                                     <option value="" disabled {{ old('role') ? '' : 'selected' }}>Pilih Role</option>
-                                    <option value="super_admin" {{ old('role') === 'super_admin' ? 'selected' : '' }}>Super Admin</option>
-                                    <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Admin</option>
+                                    <option value="super_admin" {{ old('role') === 'super_admin' ? 'selected' : '' }}>Admin</option>
+                                    <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Petugas</option>
                                 </select>
                             </div>
                             @error('role')<p class="text-sm text-red-600 mt-1"><i class="fas fa-exclamation-circle mr-1"></i>{{ $message }}</p>@enderror
                             
                             <div class="mt-3 text-xs text-gray-500">
-                                <p class="mb-1"><i class="fas fa-crown text-amber-500 mr-1"></i> <strong>Super Admin:</strong> Akses penuh ke semua fitur</p>
-                                <p><i class="fas fa-user-shield text-blue-500 mr-1"></i> <strong>Admin:</strong> Akses terbatas sesuai izin</p>
+                                <p class="mb-1"><i class="fas fa-crown text-amber-500 mr-1"></i> <strong>Admin:</strong> Akses penuh ke semua fitur</p>
+                                <p><i class="fas fa-user-shield text-blue-500 mr-1"></i> <strong>Petugas:</strong> Akses terbatas sesuai izin</p>
                             </div>
                         </div>
                         

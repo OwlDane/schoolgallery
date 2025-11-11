@@ -4,12 +4,7 @@
 
 @section('content')
 <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-    <!-- Header Actions -->
-    <div class="bg-gray-50 px-6 py-4 border-b flex justify-between items-center">
-        <a href="{{ route('admin.galleries.index') }}" class="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors">
-            <i class="fas fa-arrow-left mr-2"></i> Kembali
-        </a>
-    </div>
+    <!-- Header Actions intentionally removed to avoid duplicate back button (layout already has it) -->
 
     <!-- Main Image -->
     <div class="bg-gray-900">

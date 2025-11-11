@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\GalleryFavorite;
 use App\Models\GalleryLike;
 use App\Models\GalleryComment;
+use App\Models\NewsComment;
 
 class UserProfileController extends Controller
 {
@@ -42,6 +43,7 @@ class UserProfileController extends Controller
                     'type' => 'like',
                     'at' => $like->created_at,
                     'gallery' => $like->gallery,
+                    'news' => null,
                 ];
             });
 
@@ -54,14 +56,32 @@ class UserProfileController extends Controller
             ->get()
             ->map(function($comment){
                 return [
-                    'type' => 'comment',
+                    'type' => 'gallery_comment',
                     'at' => $comment->created_at,
                     'gallery' => $comment->gallery,
+                    'news' => null,
                     'excerpt' => str($comment->content)->limit(80),
                 ];
             });
 
-            $activities = $likes->merge($comments)->sortByDesc('at')->values();
+            // News comments by user (identified by name)
+            $newsComments = NewsComment::with(['news' => function($q){
+                $q->select('id','title','slug','image','created_at');
+            }])
+            ->where('name', $user->name)
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(function($comment){
+                return [
+                    'type' => 'news_comment',
+                    'at' => $comment->created_at,
+                    'gallery' => null,
+                    'news' => $comment->news,
+                    'excerpt' => str($comment->content)->limit(80),
+                ];
+            });
+
+            $activities = $likes->merge($comments)->merge($newsComments)->sortByDesc('at')->values();
         }
 
         return view('profile.edit', [
