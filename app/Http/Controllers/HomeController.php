@@ -117,7 +117,7 @@ class HomeController extends Controller
                 'likes',
                 'favorites',
                 'comments' => function($q){ 
-                    $q->where('is_approved', true)->mainComments()->with(['replies', 'user']); 
+                    $q->where('is_approved', true)->mainComments()->with(['replies']); 
                 }
             ])
             ->withCount(['likes', 'comments', 'favorites'])
