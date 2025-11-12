@@ -567,43 +567,116 @@ class ReportController extends Controller
      */
     private function exportContentStatsExcel($data, $schoolProfile, $startDate, $endDate)
     {
-        // Build detailed CSV: Type, ID, Title, Category, CreatedAt, Status, Views, Likes, Comments, Favorites
+        // Mirror PDF layout with structured CSV sections
         $csvData = [];
-        $csvData[] = ['Type','ID','Title','Category','CreatedAt','Status','Views','Likes','Comments','Favorites'];
 
-        // News items
-        foreach (($data['news']['items'] ?? collect()) as $item) {
+        // Header
+        $csvData[] = ['Laporan Statistik Konten'];
+        $csvData[] = ['Sekolah', $schoolProfile->school_name ?? 'Sekolah'];
+        $csvData[] = ['Periode', $startDate . ' s/d ' . $endDate];
+        $csvData[] = ['Generated At', now()->format('Y-m-d H:i:s')];
+        $csvData[] = [];
+
+        // 1) Summary Statistics
+        $totalContent = (int) (($data['news']['total'] ?? 0) + ($data['galleries']['total'] ?? 0));
+        $totalPublished = (int) (($data['news']['published'] ?? 0) + ($data['galleries']['published'] ?? 0));
+        $totalDraft = (int) (($data['news']['draft'] ?? 0) + ($data['galleries']['draft'] ?? 0));
+        $pubPct = $totalContent > 0 ? round(($totalPublished / $totalContent) * 100, 2) : 0;
+        $csvData[] = ['Ringkasan Statistik Konten'];
+        $csvData[] = ['Total Konten', $totalContent];
+        $csvData[] = ['Berita', (int) ($data['news']['total'] ?? 0)];
+        $csvData[] = ['Galeri', (int) ($data['galleries']['total'] ?? 0)];
+        $csvData[] = ['Dipublikasikan (Total)', $totalPublished];
+        $csvData[] = ['Draft (Total)', $totalDraft];
+        $csvData[] = ['Persentase Publikasi Keseluruhan (%)', $pubPct];
+        $csvData[] = [];
+
+        // 2) News Statistics (grid + items)
+        $csvData[] = ['Statistik Berita'];
+        $csvData[] = ['Total Berita', 'Dipublikasikan', 'Draft', 'Persentase Publikasi (%)'];
+        $newsTotal = (int) ($data['news']['total'] ?? 0);
+        $newsPub = (int) ($data['news']['published'] ?? 0);
+        $newsDraft = (int) ($data['news']['draft'] ?? 0);
+        $newsPct = $newsTotal > 0 ? round(($newsPub / $newsTotal) * 100, 2) : 0;
+        $csvData[] = [$newsTotal, $newsPub, $newsDraft, $newsPct];
+
+        // News items table
+        $csvData[] = [];
+        $csvData[] = ['Daftar Berita'];
+        $csvData[] = ['No','Judul','Kategori','Status','Tanggal Publish','Jumlah Pembaca','Jumlah Komentar'];
+        foreach (($data['news']['items'] ?? collect()) as $i => $item) {
             $csvData[] = [
-                'news',
-                $item['id'],
+                $i + 1,
                 $item['title'],
                 $item['category'],
-                optional($item['created_at'])->toDateTimeString(),
                 $item['status'],
-                $item['views'] ?? 0,
-                0,
-                $item['comments'] ?? 0,
-                0,
+                optional($item['created_at'])->format('Y-m-d'),
+                (int) ($item['views'] ?? 0),
+                (int) ($item['comments'] ?? 0),
             ];
         }
+        $csvData[] = [];
 
-        // Gallery items
-        foreach (($data['galleries']['items'] ?? collect()) as $item) {
-            $csvData[] = [
-                'gallery',
-                $item['id'],
-                $item['title'],
-                $item['category'],
-                optional($item['created_at'])->toDateTimeString(),
-                $item['status'],
-                $item['views'] ?? 0,
-                $item['likes'] ?? 0,
-                $item['comments'] ?? 0,
-                $item['favorites'] ?? 0,
-            ];
+        // 3) Gallery Statistics (grid)
+        $csvData[] = ['Statistik Galeri'];
+        $csvData[] = ['Total Galeri', 'Dipublikasikan', 'Draft', 'Persentase Publikasi (%)'];
+        $galTotal = (int) ($data['galleries']['total'] ?? 0);
+        $galPub = (int) ($data['galleries']['published'] ?? 0);
+        $galDraft = (int) ($data['galleries']['draft'] ?? 0);
+        $galPct = $galTotal > 0 ? round(($galPub / $galTotal) * 100, 2) : 0;
+        $csvData[] = [$galTotal, $galPub, $galDraft, $galPct];
+        $csvData[] = [];
+
+        // 4) Galleries by Category aggregate
+        if (($data['galleries']['by_category_agg'] ?? collect())->count() > 0) {
+            $csvData[] = ['Galeri per Kategori'];
+            $csvData[] = ['Kategori','Jumlah Galeri','Total Views','Total Like','Total Komentar','Total Disimpan','Persentase dari Total Galeri (%)'];
+            foreach ($data['galleries']['by_category_agg'] as $row) {
+                $pct = $galTotal > 0 ? round((($row['total'] ?? 0) / $galTotal) * 100, 2) : 0;
+                $csvData[] = [
+                    $row['category'] ?? '-',
+                    (int) ($row['total'] ?? 0),
+                    (int) ($row['total_views'] ?? 0),
+                    (int) ($row['total_likes'] ?? 0),
+                    (int) ($row['total_comments'] ?? 0),
+                    (int) ($row['total_favorites'] ?? 0),
+                    $pct,
+                ];
+            }
+            $csvData[] = [];
         }
 
-        $filename = 'laporan-statistik-konten-detail-' . $startDate . '-to-' . $endDate . '.csv';
+        // 5) Popular Content (Top 5)
+        if (($data['popular'] ?? collect())->count() > 0) {
+            $csvData[] = ['Konten Terpopuler (Top 5)'];
+            $csvData[] = ['Peringkat','Jenis','Judul','Views','Like','Komentar'];
+            foreach ($data['popular'] as $i => $p) {
+                $csvData[] = [
+                    $i + 1,
+                    $p['type'] === 'news' ? 'Berita' : 'Galeri',
+                    $p['title'],
+                    (int) ($p['views'] ?? 0),
+                    (int) ($p['likes'] ?? 0),
+                    (int) ($p['comments'] ?? 0),
+                ];
+            }
+            $csvData[] = [];
+        }
+
+        // 6) Admin Activity on Content
+        if (($data['admin_activity'] ?? collect())->count() > 0) {
+            $csvData[] = ['Aktivitas Admin pada Konten'];
+            $csvData[] = ['Admin','Aksi','Jumlah'];
+            foreach ($data['admin_activity'] as $act) {
+                $csvData[] = [
+                    $act->name,
+                    ucfirst($act->action),
+                    (int) $act->total,
+                ];
+            }
+        }
+
+        $filename = 'laporan-statistik-konten-' . $startDate . '-to-' . $endDate . '.csv';
 
         $callback = function() use ($csvData) {
             $file = fopen('php://output', 'w');
@@ -642,11 +715,66 @@ class ReportController extends Controller
      */
     private function exportAdminActivityExcel($data, $schoolProfile, $startDate, $endDate)
     {
+        // Mirror PDF layout with structured CSV
         $csvData = [];
-        $csvData[] = ['Admin', 'Total Aktivitas'];
-        
-        foreach ($data['admin_performance'] as $admin) {
-            $csvData[] = [$admin->name, $admin->total_activities];
+
+        // Header
+        $csvData[] = ['Laporan Aktivitas Admin'];
+        $csvData[] = ['Sekolah', $schoolProfile->school_name ?? 'Sekolah'];
+        $csvData[] = ['Periode', $startDate . ' s/d ' . $endDate];
+        $csvData[] = ['Generated At', now()->format('Y-m-d H:i:s')];
+        $csvData[] = [];
+
+        // Summary
+        $periodDays = \Carbon\Carbon::parse($startDate)->diffInDays(\Carbon\Carbon::parse($endDate)) + 1;
+        $avgPerDay = $periodDays > 0 ? round(($data['total_activities'] ?? 0) / $periodDays, 2) : 0;
+        $csvData[] = ['Ringkasan Aktivitas'];
+        $csvData[] = ['Total Aktivitas', (int) ($data['total_activities'] ?? 0)];
+        $csvData[] = ['Periode (hari)', $periodDays];
+        $csvData[] = ['Rata-rata per Hari', $avgPerDay];
+        $csvData[] = [];
+
+        // Login Statistics
+        if (($data['login_stats'] ?? collect())->count() > 0) {
+            $csvData[] = ['Statistik Login Admin'];
+            $csvData[] = ['Nama Admin','Jumlah Login','Persentase (%)'];
+            foreach ($data['login_stats'] as $login) {
+                $pct = ($data['total_activities'] ?? 0) > 0 ? round(($login->total / $data['total_activities']) * 100, 2) : 0;
+                $csvData[] = [$login->name, (int) $login->total, $pct];
+            }
+            $csvData[] = [];
+        }
+
+        // Activity Breakdown
+        if (($data['activity_breakdown'] ?? collect())->count() > 0) {
+            $csvData[] = ['Jenis Aktivitas'];
+            $csvData[] = ['Jenis','Jumlah','Persentase (%)'];
+            foreach ($data['activity_breakdown'] as $ab) {
+                $pct = ($data['total_activities'] ?? 0) > 0 ? round(($ab->total / $data['total_activities']) * 100, 2) : 0;
+                $csvData[] = [ucfirst($ab->action), (int) $ab->total, $pct];
+            }
+            $csvData[] = [];
+        }
+
+        // Daily Activity
+        if (($data['daily_activity'] ?? collect())->count() > 0) {
+            $csvData[] = ['Aktivitas Harian'];
+            $csvData[] = ['Tanggal','Jumlah Aktivitas','Persentase (%)'];
+            foreach ($data['daily_activity'] as $day) {
+                $pct = ($data['total_activities'] ?? 0) > 0 ? round(($day->total / $data['total_activities']) * 100, 2) : 0;
+                $csvData[] = [optional(\Carbon\Carbon::parse($day->date))->format('Y-m-d'), (int) $day->total, $pct];
+            }
+            $csvData[] = [];
+        }
+
+        // Admin Performance
+        if (($data['admin_performance'] ?? collect())->count() > 0) {
+            $csvData[] = ['Performa Admin'];
+            $csvData[] = ['Nama Admin','Total Aktivitas','Persentase (%)','Ranking'];
+            foreach ($data['admin_performance'] as $idx => $admin) {
+                $pct = ($data['total_activities'] ?? 0) > 0 ? round(($admin->total_activities / $data['total_activities']) * 100, 2) : 0;
+                $csvData[] = [$admin->name, (int) $admin->total_activities, $pct, $idx + 1];
+            }
         }
 
         $filename = 'laporan-aktivitas-admin-' . $startDate . '-to-' . $endDate . '.csv';
