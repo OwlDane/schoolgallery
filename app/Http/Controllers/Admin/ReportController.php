@@ -468,10 +468,64 @@ class ReportController extends Controller
         // This would require Laravel Excel package
         // For now, return a simple CSV
         $csvData = [];
-        $csvData[] = ['Tanggal', 'Jumlah Pengunjung'];
-        
+        // Header Info
+        $csvData[] = ['Laporan Statistik Kunjungan Website'];
+        $csvData[] = ['Sekolah', $schoolProfile->school_name ?? 'Sekolah'];
+        $csvData[] = ['Periode', $startDate . ' s/d ' . $endDate];
+        $csvData[] = ['Generated At', now()->format('Y-m-d H:i:s')];
+        $csvData[] = [];
+
+        // Summary
+        $periodDays = \Carbon\Carbon::parse($startDate)->diffInDays(\Carbon\Carbon::parse($endDate)) + 1;
+        $csvData[] = ['Ringkasan'];
+        $csvData[] = ['Total Kunjungan', (int) ($data['total_visitors'] ?? 0)];
+        $csvData[] = ['Rata-rata per Hari', (float) ($data['average_daily'] ?? 0)];
+        $csvData[] = ['Periode (hari)', $periodDays];
+        $csvData[] = [];
+
+        // Monthly Comparison
+        $csvData[] = ['Perbandingan Bulanan'];
+        $csvData[] = ['Bulan Ini', 'Bulan Lalu', 'Perubahan %'];
+        $csvData[] = [
+            (int) ($data['monthly_comparison']['current'] ?? 0),
+            (int) ($data['monthly_comparison']['last'] ?? 0),
+            (float) ($data['monthly_comparison']['percentage_change'] ?? 0),
+        ];
+        $csvData[] = [];
+
+        // Daily Visitors Table
+        $csvData[] = ['Data Kunjungan Harian'];
+        $csvData[] = ['Tanggal', 'Jumlah Pengunjung', 'Persentase'];
         foreach ($data['daily'] as $day) {
-            $csvData[] = [$day->date, $day->total];
+            $percentage = ($data['total_visitors'] ?? 0) > 0 ? round(($day->total / $data['total_visitors']) * 100, 2) : 0;
+            $csvData[] = [$day->date, $day->total, $percentage];
+        }
+        $csvData[] = [];
+
+        // Weekly Summary Table
+        if (($data['weekly'] ?? collect())->count() > 0) {
+            $csvData[] = ['Ringkasan Mingguan'];
+            $csvData[] = ['Minggu', 'Rentang Tanggal', 'Jumlah Pengunjung', 'Rata-rata per Hari'];
+            foreach ($data['weekly'] as $week) {
+                $avg = ($week->days ?? 0) > 0 ? round($week->total / $week->days, 2) : 0;
+                $csvData[] = [
+                    $week->week_index ?? $week->week ?? '-',
+                    (isset($week->week_start) && isset($week->week_end)) ? ($week->week_start . ' - ' . $week->week_end) : '-',
+                    $week->total,
+                    $avg,
+                ];
+            }
+            $csvData[] = [];
+        }
+
+        // Hourly Distribution Table (WIB)
+        if (($data['hourly'] ?? collect())->count() > 0) {
+            $csvData[] = ['Distribusi per Jam (WIB)'];
+            $csvData[] = ['Jam', 'Jumlah Pengunjung', 'Rata-rata per Hari', 'Persentase dari Total'];
+            foreach ($data['hourly'] as $hour) {
+                $percentage = ($data['total_visitors'] ?? 0) > 0 ? round(($hour->total / $data['total_visitors']) * 100, 2) : 0;
+                $csvData[] = [sprintf('%02d:00-%02d:59', $hour->hour, $hour->hour), $hour->total, $hour->avg_per_day, $percentage];
+            }
         }
 
         $filename = 'laporan-statistik-kunjungan-' . $startDate . '-to-' . $endDate . '.csv';
