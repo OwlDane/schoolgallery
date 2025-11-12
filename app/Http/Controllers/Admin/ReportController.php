@@ -149,19 +149,48 @@ class ReportController extends Controller
 
         // Weekly breakdown
         $weeklyVisitors = DB::table('visits')
-            ->selectRaw('WEEK(created_at) as week, COUNT(*) as total')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->groupBy('week')
-            ->orderBy('week')
-            ->get();
+            ->selectRaw('TIMESTAMPDIFF(WEEK, ?, created_at) + 1 as week_index, COUNT(*) as total', [$startDate])
+            ->groupBy('week_index')
+            ->orderBy('week_index')
+            ->get()
+            ->map(function($row) use ($startDate, $endDate) {
+                $start = \Carbon\Carbon::parse($startDate);
+                $periodEnd = \Carbon\Carbon::parse($endDate);
+                $weekStart = $start->copy()->addWeeks(($row->week_index ?? 1) - 1);
+                $weekEnd = $weekStart->copy()->addDays(6);
+                if ($weekEnd->greaterThan($periodEnd)) {
+                    $weekEnd = $periodEnd->copy();
+                }
+                $days = $weekStart->diffInDays($weekEnd) + 1;
+                return (object) [
+                    'week_index' => $row->week_index,
+                    'total' => $row->total,
+                    'week_start' => $weekStart->toDateString(),
+                    'week_end' => $weekEnd->toDateString(),
+                    'days' => $days,
+                ];
+            });
 
         // Hourly distribution
-        $hourlyVisitors = DB::table('visits')
+        $periodDays = \Carbon\Carbon::parse($startDate)->diffInDays(\Carbon\Carbon::parse($endDate)) + 1;
+        $hourlyRaw = DB::table('visits')
             ->selectRaw('HOUR(created_at) as hour, COUNT(*) as total')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->groupBy('hour')
             ->orderBy('hour')
-            ->get();
+            ->get()
+            ->pluck('total', 'hour')
+            ->toArray();
+
+        $hourlyVisitors = collect(range(0, 23))->map(function($h) use ($hourlyRaw, $periodDays) {
+            $total = (int) ($hourlyRaw[$h] ?? 0);
+            return (object) [
+                'hour' => $h,
+                'total' => $total,
+                'avg_per_day' => $periodDays > 0 ? round($total / $periodDays, 2) : 0,
+            ];
+        });
 
         return [
             'daily' => $dailyVisitors,

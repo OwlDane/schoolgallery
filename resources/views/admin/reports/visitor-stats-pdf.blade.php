@@ -208,7 +208,8 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Minggu ke-</th>
+                    <th>Minggu</th>
+                    <th>Rentang Tanggal</th>
                     <th>Jumlah Pengunjung</th>
                     <th>Rata-rata per Hari</th>
                 </tr>
@@ -216,9 +217,10 @@
             <tbody>
                 @foreach($data['weekly'] as $week)
                 <tr>
-                    <td>{{ $week->week }}</td>
+                    <td>{{ $week->week_index }}</td>
+                    <td>{{ \Carbon\Carbon::parse($week->week_start)->format('d M Y') }} - {{ \Carbon\Carbon::parse($week->week_end)->format('d M Y') }}</td>
                     <td>{{ number_format($week->total) }}</td>
-                    <td>{{ number_format($week->total / 7, 2) }}</td>
+                    <td>{{ $week->days > 0 ? number_format($week->total / $week->days, 2) : '0.00' }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -229,12 +231,13 @@
     <!-- Hourly Distribution -->
     @if($data['hourly']->count() > 0)
     <div class="section">
-        <div class="section-title">Distribusi Kunjungan per Jam</div>
+        <div class="section-title">Distribusi Kunjungan per Jam (WIB)</div>
         <table class="table">
             <thead>
                 <tr>
                     <th>Jam</th>
                     <th>Jumlah Pengunjung</th>
+                    <th>Rata-rata per Hari</th>
                     <th>Persentase</th>
                 </tr>
             </thead>
@@ -243,6 +246,7 @@
                 <tr>
                     <td>{{ $hour->hour }}:00 - {{ $hour->hour }}:59</td>
                     <td>{{ number_format($hour->total) }}</td>
+                    <td>{{ number_format($hour->avg_per_day, 2) }}</td>
                     <td>{{ $data['total_visitors'] > 0 ? number_format(($hour->total / $data['total_visitors']) * 100, 2) : 0 }}%</td>
                 </tr>
                 @endforeach
