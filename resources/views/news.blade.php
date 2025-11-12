@@ -37,25 +37,15 @@
 
     <!-- Search Section -->
     <section class="py-8 bg-gray-50">
-        <div class="max-w-4xl mx-auto px-4">
-            <form action="{{ route('news') }}" method="GET" class="relative">
-                <div class="relative">
-                    <input 
-                        type="text" 
-                        name="search" 
-                        value="{{ request('search') }}" 
-                        placeholder="Cari berita..." 
-                        class="w-full px-4 sm:px-5 py-3 sm:py-4 pr-12 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-12 sm:pl-14 shadow-sm hover:shadow-md text-sm sm:text-base"
-                    >
-                    <div class="absolute left-4 sm:left-5 top-1/2 transform -translate-y-1/2 text-gray-400">
-                        <i class="fas fa-search"></i>
+        <div class="max-w-7xl mx-auto px-4">
+            <form action="{{ route('news') }}" method="GET" class="mb-0" id="newsSearchForm">
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <div class="flex-1">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari berita..." class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                     </div>
-                    <button 
-                        type="submit" 
-                        class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 rounded-lg font-medium transition-colors duration-300 flex items-center text-sm sm:text-base"
-                    >
-                        <span class="hidden sm:inline">Cari</span>
-                        <i class="fas fa-search sm:ml-2"></i>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2">
+                        <span>Cari</span>
+                        <i class="fas fa-search"></i>
                     </button>
                 </div>
             </form>

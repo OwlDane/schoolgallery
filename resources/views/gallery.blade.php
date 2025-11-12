@@ -139,20 +139,21 @@
             @endphp
             
             <div class="mb-6 sm:mb-8">
-                <form action="{{ route('gallery') }}" method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2 sm:gap-4">
-                    <div class="relative w-full sm:flex-1 md:w-1/2">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari galeri..." 
-                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 pl-12">
-                        <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <form action="{{ route('gallery') }}" method="GET" class="mb-0" id="gallerySearchForm">
+                    <div class="flex items-center gap-3">
+                        <div class="flex-1">
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari galeri..." class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2">
+                            <i class="fas fa-search"></i>
+                            <span class="ml-1">Cari</span>
+                        </button>
                     </div>
-                    <button type="submit" class="w-full sm:w-auto btn-hover bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-semibold flex items-center justify-center">
-                        <i class="fas fa-search mr-2"></i> Cari
-                    </button>
                 </form>
             </div>
             <script>
                 (function(){
-                    const form = document.querySelector('form[action="{{ route('gallery') }}"]');
+                    const form = document.getElementById('gallerySearchForm');
                     if (!form) return;
                     const input = form.querySelector('input[name="search"]');
                     let t;
@@ -164,21 +165,19 @@
             </script>
             
             @if(!$kategoris->isEmpty())
-                <div class="flex flex-wrap gap-2 sm:gap-3 justify-center mb-6 sm:mb-8">
-                    <a href="{{ route('gallery') }}" 
-                       class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-sm sm:text-base {{ !isset($activeCategory) ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100' }} font-medium transition-all duration-200 shadow-sm">
-                        Semua Galeri
-                    </a>
-                    @foreach($kategoris as $kategori)
-                        @php
-                            $style = $categoryStyles[$kategori->slug] ?? $categoryStyles['default'];
-                            $isActive = isset($activeCategory) && $activeCategory === $kategori->slug;
-                        @endphp
-                        <a href="{{ route('gallery.category', $kategori->slug) }}" 
-                           class="px-2 py-1 sm:px-4 sm:py-2 rounded-full text-xs sm:text-base {{ $isActive ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100' }} font-medium transition-all duration-200 shadow-sm">
-                            {{ $kategori->nama }}
-                        </a>
-                    @endforeach
+                <div class="mb-6 sm:mb-8">
+                    <div class="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+                        <div class="inline-flex gap-2 sm:gap-3 w-max sm:w-auto sm:flex sm:flex-wrap sm:justify-center">
+                            <a href="{{ route('gallery') }}" 
+                               class="inline-block px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-sm sm:text-base {{ !isset($activeCategory) ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100' }} font-medium transition-all duration-200 shadow-sm">Semua Galeri</a>
+                            @foreach($kategoris as $kategori)
+                                <a href="{{ route('gallery', ['search' => request('search'), 'category' => $kategori->slug]) }}" 
+                                   class="inline-block px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-sm sm:text-base {{ isset($activeCategory) && $activeCategory->id === $kategori->id ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100' }} font-medium transition-all duration-200 shadow-sm">
+                                    {{ $kategori->nama }}
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
             @endif
         </div>

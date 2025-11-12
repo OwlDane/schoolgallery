@@ -191,16 +191,16 @@
                 <p class="text-gray-600 max-w-2xl mx-auto">Tenaga pendidik profesional yang berdedikasi untuk mengembangkan potensi siswa</p>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 @forelse($teachers->take(4) as $index => $teacher)
                 <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group" data-aos="fade-up" data-aos-delay="{{ $index * 50 }}">
-                    <div class="relative overflow-hidden">
+                    <div class="relative overflow-hidden aspect-square">
                         @if($teacher->image)
                             <img src="{{ asset('storage/' . $teacher->image) }}" 
                                  alt="{{ $teacher->name }}" 
-                                 class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110">
+                                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                         @else
-                            <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
+                            <div class="w-full h-full bg-gray-200 flex items-center justify-center">
                                 <i class="fas fa-user text-6xl text-gray-400"></i>
                             </div>
                         @endif
@@ -236,12 +236,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="p-6 text-center">
-                        <h3 class="text-xl font-bold mb-1 text-gray-800">{{ $teacher->name }}</h3>
-                        <p class="text-blue-600 font-medium mb-3">{{ $teacher->position }}</p>
-                        @if($teacher->description)
-                            <p class="text-gray-600 text-sm">{{ Str::limit($teacher->description, 100) }}</p>
-                        @endif
+                    <div class="p-3 text-center">
+                        <h3 class="text-sm font-semibold text-gray-800 overflow-hidden text-ellipsis whitespace-nowrap">{{ $teacher->name }}</h3>
                     </div>
                 </div>
                 @empty
@@ -269,17 +265,16 @@
                 <p class="text-gray-600 max-w-2xl mx-auto">Kami menyediakan berbagai fasilitas modern untuk mendukung proses belajar mengajar</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 @forelse($facilities as $index => $facility)
                 <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group" data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
-                    <div class="relative overflow-hidden h-48">
+                    <div class="relative overflow-hidden aspect-square">
                         <img src="{{ asset('storage/' . $facility->image) }}" 
                              alt="{{ $facility->title }}" 
                              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                     </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold mb-2 text-gray-800">{{ $facility->title }}</h3>
-                        <p class="text-gray-600">{{ $facility->description ?: 'Fasilitas modern untuk mendukung kegiatan belajar mengajar' }}</p>
+                    <div class="p-3 text-center">
+                        <h3 class="text-sm font-semibold text-gray-800 overflow-hidden text-ellipsis whitespace-nowrap">{{ $facility->title }}</h3>
                     </div>
                 </div>
                 @empty

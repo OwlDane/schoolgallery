@@ -9,7 +9,7 @@
                     <i class="fas fa-users mr-2"></i> DAFTAR GURU
                 </span>
                 <h1 class="text-4xl md:text-5xl font-bold mb-6 text-shadow leading-tight">
-                    Tim Pengajar {{ $schoolProfile->school_name ?? 'Sekolah Kami' }}
+                    Tim Pengajar
                 </h1>
                 <p class="text-blue-100 text-lg">Tenaga pendidik profesional yang berdedikasi</p>
             </div>
@@ -45,16 +45,16 @@
             @if($teachers->isEmpty())
                 <div class="text-center text-gray-500">Belum ada data guru yang tersedia.</div>
             @else
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                     @foreach($teachers as $index => $teacher)
                     <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group">
-                        <div class="relative overflow-hidden">
+                        <div class="relative overflow-hidden aspect-square">
                             @if($teacher->image)
                                 <img src="{{ asset('storage/' . $teacher->image) }}" 
                                      alt="{{ $teacher->name }}" 
-                                     class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110">
+                                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                             @else
-                                <div class="w-full h-64 bg-gray-200 flex items-center justify-center">
+                                <div class="w-full h-full bg-gray-200 flex items-center justify-center">
                                     <i class="fas fa-user text-6xl text-gray-400"></i>
                                 </div>
                             @endif
@@ -89,12 +89,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="p-6 text-center">
-                            <h3 class="text-xl font-bold mb-1 text-gray-800">{{ $teacher->name }}</h3>
-                            <p class="text-blue-600 font-medium mb-3">{{ $teacher->position }}</p>
-                            @if($teacher->description)
-                                <p class="text-gray-600 text-sm">{{ Str::limit($teacher->description, 100) }}</p>
-                            @endif
+                        <div class="p-3 text-center">
+                            <h3 class="text-sm font-semibold text-gray-800 overflow-hidden text-ellipsis whitespace-nowrap">{{ $teacher->name }}</h3>
                         </div>
                     </div>
                     @endforeach
