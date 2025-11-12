@@ -56,7 +56,7 @@
                             <a href="{{ route('guest.login') }}" class="inline-flex items-center text-gray-700 border border-gray-200 bg-white hover:text-pink-700 hover:border-pink-300 hover:bg-pink-50 transition-colors px-3 py-1.5 rounded-full text-sm sm:text-base">
                                 <i class="far fa-heart mr-1.5"></i>
                                 <span class="font-medium">Suka</span>
-                                <span class="ml-1 text-[10px] sm:text-xs bg-gray-100 px-1.5 py-0.5 rounded-full">({{ $gallery->likes->count() }})</span>
+                                <span id="likeCount" class="ml-1 text-[10px] sm:text-xs bg-gray-100 px-1.5 py-0.5 rounded-full">({{ $gallery->likes->count() }})</span>
                             </a>
                             <a href="{{ route('guest.login') }}" class="inline-flex items-center text-gray-700 border border-gray-200 bg-white hover:text-blue-700 hover:border-blue-300 hover:bg-blue-50 transition-colors px-3 py-1.5 rounded-full text-sm sm:text-base">
                                 <i class="far fa-bookmark mr-1.5"></i>
@@ -159,24 +159,20 @@
                         <div class="flex gap-4 snap-x snap-mandatory min-w-max pr-4">
                             @php
                                 $count = $relatedGalleries->count();
-                                // Tampilkan berulang agar selalu ada konten yang bisa discroll jika item sedikit
-                                $repeat = $count > 0 ? max(1, (int) ceil(8 / $count)) : 1;
                             @endphp
-                            @for ($r = 0; $r < $repeat; $r++)
-                                @foreach($relatedGalleries as $related)
-                                    <a href="{{ route('gallery.detail', $related->id) }}" class="group block snap-start shrink-0 w-72">
-                                        <div class="relative overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-all">
-                                            <div class="w-full" style="aspect-ratio: 16 / 9;">
-                                                <img src="{{ asset('storage/' . $related->image) }}" alt="{{ $related->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                                            </div>
-                                            <div class="p-3">
-                                                <h4 class="text-gray-800 font-semibold text-sm line-clamp-2">{{ $related->title }}</h4>
-                                                <p class="text-gray-500 text-xs mt-1">{{ $related->created_at->format('d M Y') }}</p>
-                                            </div>
+                            @foreach($relatedGalleries as $related)
+                                <a href="{{ route('gallery.detail', $related->id) }}" class="group block snap-start shrink-0 w-72">
+                                    <div class="relative overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-all">
+                                        <div class="w-full" style="aspect-ratio: 16 / 9;">
+                                            <img src="{{ asset('storage/' . $related->image) }}" alt="{{ $related->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                         </div>
-                                    </a>
-                                @endforeach
-                            @endfor
+                                        <div class="p-3">
+                                            <h4 class="text-gray-800 font-semibold text-sm line-clamp-2">{{ $related->title }}</h4>
+                                            <p class="text-gray-500 text-xs mt-1">{{ $related->created_at->format('d M Y') }}</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            @endforeach
                             </div>
                         </div>
                     </div>
@@ -241,10 +237,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Initialize like count/status for everyone (guest sees count only)
+    checkLikeStatus();
+
     // Only initialize interactive features for authenticated users
     if (isAuthenticated) {
-        // Initialize like status
-        checkLikeStatus();
         
         // Like button handler
         const likeBtn = document.getElementById('likeBtn');
@@ -392,24 +389,26 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Update like button
+    // Update like button (safe for guests)
     function updateLikeButton(liked, likeCount) {
         const likeBtn = document.getElementById('likeBtn');
+        const likeCountSpan = document.getElementById('likeCount');
+        if (likeCountSpan) likeCountSpan.textContent = `(${likeCount})`;
+
+        if (!likeBtn) return; // guest: no interactive like button
+
         const likeIcon = likeBtn.querySelector('i');
         const likeText = document.getElementById('likeText');
-        const likeCountSpan = document.getElementById('likeCount');
-        
+
         if (liked) {
-            likeIcon.className = 'fas fa-heart mr-1';
+            if (likeIcon) likeIcon.className = 'fas fa-heart mr-1';
             likeBtn.className = 'inline-flex items-center text-pink-600 hover:text-pink-700 transition-colors';
-            likeText.textContent = 'Batalkan';
+            if (likeText) likeText.textContent = 'Batalkan';
         } else {
-            likeIcon.className = 'far fa-heart mr-1';
+            if (likeIcon) likeIcon.className = 'far fa-heart mr-1';
             likeBtn.className = 'inline-flex items-center text-gray-500 hover:text-pink-700 transition-colors';
-            likeText.textContent = 'Suka';
+            if (likeText) likeText.textContent = 'Suka';
         }
-        
-        likeCountSpan.textContent = `(${likeCount})`;
     }
     
     // Comments state (use var to avoid TDZ issues if referenced earlier)

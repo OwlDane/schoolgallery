@@ -40,4 +40,7 @@ return [
         ],
     ],
 
+    // Contact email for notifications
+    'contact_email' => env('CONTACT_EMAIL', config('mail.from.address')),
+
 ];

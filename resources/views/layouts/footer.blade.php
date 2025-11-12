@@ -39,39 +39,7 @@
                     @endif
                 </div>
             </div>
-            <div class="mb-10 md:mb-0 md:w-1/4" data-aos="fade-up" data-aos-duration="800" data-aos-delay="100">
-                <h4 class="text-lg font-bold mb-6 text-white relative inline-block">
-                    <span class="relative z-10">Menu Navigasi</span>
-                    <span class="absolute bottom-0 left-0 w-full h-1 bg-blue-600"></span>
-                </h4>
-                <ul class="space-y-3">
-                    <li>
-                        <a href="{{ route('home') }}" class="text-gray-300 hover:text-white flex items-center transition-colors duration-300">
-                            <i class="fas fa-home text-indigo-400 mr-2"></i> Beranda
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('news') }}" class="text-gray-300 hover:text-white flex items-center transition-colors duration-300">
-                            <i class="fas fa-newspaper text-indigo-400 mr-2"></i> Berita
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('gallery') }}" class="text-gray-300 hover:text-white flex items-center transition-colors duration-300">
-                            <i class="fas fa-images text-indigo-400 mr-2"></i> Galeri
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('about') }}" class="text-gray-300 hover:text-white flex items-center transition-colors duration-300">
-                            <i class="fas fa-info-circle text-indigo-400 mr-2"></i> Tentang
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('contact') }}" class="text-gray-300 hover:text-white flex items-center transition-colors duration-300">
-                            <i class="fas fa-envelope text-indigo-400 mr-2"></i> Kontak
-                        </a>
-                    </li>
-                </ul>
-            </div>
+            
             <div class="md:w-1/3" data-aos="fade-left" data-aos-duration="800" data-aos-delay="200">
                 <h4 class="text-lg font-bold mb-6 text-white relative inline-block">
                     <span class="relative z-10">Ikuti Kami</span>
@@ -82,6 +50,11 @@
                     @if($schoolProfile->facebook_url)
                         <a href="{{ $schoolProfile->facebook_url }}" class="bg-gradient-to-br from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 text-white p-3 rounded-lg transition-all duration-300 shadow-lg hover:scale-110" target="_blank" rel="noopener">
                             <i class="fab fa-facebook-f text-lg"></i>
+                        </a>
+                    @endif
+                    @if(data_get($schoolProfile, 'tiktok_url'))
+                        <a href="{{ $schoolProfile->tiktok_url }}" class="bg-black hover:bg-gray-800 text-white p-3 rounded-lg transition-all duration-300 shadow-lg hover:scale-110" target="_blank" rel="noopener">
+                            <i class="fab fa-tiktok text-lg"></i>
                         </a>
                     @endif
                     @if($schoolProfile->instagram_url)

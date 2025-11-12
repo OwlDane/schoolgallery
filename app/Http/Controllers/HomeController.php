@@ -127,6 +127,8 @@ class HomeController extends Controller
         $relatedGalleries = Gallery::with(['kategori'])
             ->withCount(['likes', 'comments'])
             ->published()
+            ->whereNotNull('image')
+            ->where('image', '<>', '')
             ->where('id', '!=', $gallery->id)
             ->latest()
             ->take(4)

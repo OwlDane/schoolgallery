@@ -171,8 +171,8 @@
                             <a href="{{ route('gallery') }}" 
                                class="inline-block px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-sm sm:text-base {{ !isset($activeCategory) ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100' }} font-medium transition-all duration-200 shadow-sm">Semua Galeri</a>
                             @foreach($kategoris as $kategori)
-                                <a href="{{ route('gallery', ['search' => request('search'), 'category' => $kategori->slug]) }}" 
-                                   class="inline-block px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-sm sm:text-base {{ isset($activeCategory) && $activeCategory->id === $kategori->id ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100' }} font-medium transition-all duration-200 shadow-sm">
+                                <a href="{{ route('gallery.category', ['category' => $kategori->slug]) }}" 
+                                   class="inline-block px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-sm sm:text-base {{ isset($activeCategory) && $activeCategory === $kategori->slug ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100' }} font-medium transition-all duration-200 shadow-sm">
                                     {{ $kategori->nama }}
                                 </a>
                             @endforeach
@@ -199,9 +199,9 @@
                              data-aos="fade-up" data-aos-delay="{{ $loop->index % 4 * 100 }}">
                             <a href="{{ route('gallery.detail', $gallery->id) }}" class="block image-container focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-none">
                                 @if($gallery->image)
-                                    <img data-src="{{ asset('storage/' . $gallery->image) }}" loading="lazy" alt="{{ $gallery->title }}">
+                                    <img src="{{ asset('storage/' . $gallery->image) }}" loading="lazy" alt="{{ $gallery->title }}">
                                 @else
-                                    <img data-src="https://images.unsplash.com/photo-1588072432836-e10032774350?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" loading="lazy" alt="{{ $gallery->title }}">
+                                    <img src="https://images.unsplash.com/photo-1588072432836-e10032774350?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" loading="lazy" alt="{{ $gallery->title }}">
                                 @endif
                             </a>
                             <div class="p-3 md:p-4">
@@ -252,11 +252,11 @@
                                         @else
                                             <div class="inline-flex items-center text-gray-400">
                                                 <i class="far fa-heart mr-1"></i>
-                                                <span>{{ $gallery->likes_count ?? 0 }}</span>
+                                                <span class="like-count" data-gallery-id="{{ $gallery->id }}">{{ $gallery->likes_count ?? 0 }}</span>
                                             </div>
                                             <div class="inline-flex items-center text-gray-400">
                                                 <i class="far fa-bookmark mr-1"></i>
-                                                <span>{{ $gallery->favorites_count ?? 0 }}</span>
+                                                <span class="fav-count" data-gallery-id="{{ $gallery->id }}">{{ $gallery->favorites_count ?? 0 }}</span>
                                             </div>
                                         @endauth
                                     </div>
@@ -365,7 +365,7 @@
     // Like functionality
     async function toggleLike(galleryId) {
         try {
-            const likeBtn = document.querySelector(`[data-gallery-id="${galleryId}"]`);
+            const likeBtn = document.querySelector(`.like-btn[data-gallery-id="${galleryId}"]`);
             if (!likeBtn) return;
             likeBtn.disabled = true;
 
@@ -399,13 +399,15 @@
                     likeBtn.dataset.liked = 'false';
                 }
                 
-                likeCount.textContent = data.likes_count;
+                if (likeCount && typeof data.like_count !== 'undefined') {
+                    likeCount.textContent = data.like_count;
+                }
             }
         } catch (error) {
             console.error('Error toggling like:', error);
             showNotification('Terjadi kesalahan saat like/unlike', 'error');
         } finally {
-            const likeBtn = document.querySelector(`[data-gallery-id="${galleryId}"]`);
+            const likeBtn = document.querySelector(`.like-btn[data-gallery-id="${galleryId}"]`);
             if (likeBtn) likeBtn.disabled = false;
         }
     }
@@ -450,27 +452,32 @@
         }
     }
 
-    // On load, for guests we still want latest favorite counts
+    // On load, fetch latest like and favorite status/counts per card
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.fav-btn, .fav-count').forEach(async (node) => {
             const card = node.closest('[data-aos]');
             const idBtn = document.querySelector('.fav-btn', card);
         });
         // Fetch counts for all cards (works for auth or guest)
-        document.querySelectorAll('[data-gallery-id]').forEach(async (btn) => {
-            const id = btn.getAttribute('data-gallery-id');
-            if (!id) return;
+        const ids = new Set();
+        document.querySelectorAll('.like-btn[data-gallery-id], .like-count[data-gallery-id], .fav-btn[data-gallery-id], .fav-count[data-gallery-id]').forEach(el => {
+            const id = el.getAttribute('data-gallery-id');
+            if (id) ids.add(id);
+        });
+
+        ids.forEach(async (id) => {
+            // Favorite status/count
             try {
-                const res = await fetch(`/gallery/${id}/favorite-status`);
-                const data = await res.json();
+                const resFav = await fetch(`/gallery/${id}/favorite-status`);
+                const dataFav = await resFav.json();
                 const favBtn = document.querySelector(`.fav-btn[data-gallery-id="${id}"]`);
-                const countEl = favBtn ? favBtn.querySelector('.fav-count') : document.querySelector(`.fav-count[data-gallery-id="${id}"]`);
-                if (countEl && typeof data.favorite_count !== 'undefined') {
-                    countEl.textContent = data.favorite_count;
+                const favCountEl = favBtn ? favBtn.querySelector('.fav-count') : document.querySelector(`.fav-count[data-gallery-id="${id}"]`);
+                if (favCountEl && typeof dataFav.favorite_count !== 'undefined') {
+                    favCountEl.textContent = dataFav.favorite_count;
                 }
-                if (favBtn && data.success && typeof data.favorited !== 'undefined') {
+                if (favBtn && dataFav.success && typeof dataFav.favorited !== 'undefined') {
                     const icon = favBtn.querySelector('i');
-                    if (data.favorited) {
+                    if (dataFav.favorited) {
                         favBtn.className = 'fav-btn inline-flex items-center text-blue-700';
                         icon.className = 'fas fa-bookmark mr-1';
                         favBtn.dataset.favorited = 'true';
@@ -478,6 +485,29 @@
                         favBtn.className = 'fav-btn inline-flex items-center text-gray-500 hover:text-blue-700';
                         icon.className = 'far fa-bookmark mr-1';
                         favBtn.dataset.favorited = 'false';
+                    }
+                }
+            } catch (e) {}
+
+            // Like status/count
+            try {
+                const resLike = await fetch(`/gallery/${id}/like-status`);
+                const dataLike = await resLike.json();
+                const likeBtn = document.querySelector(`.like-btn[data-gallery-id="${id}"]`);
+                const likeCountEl = likeBtn ? likeBtn.querySelector('.like-count') : document.querySelector(`.like-count[data-gallery-id="${id}"]`);
+                if (likeCountEl && typeof dataLike.like_count !== 'undefined') {
+                    likeCountEl.textContent = dataLike.like_count;
+                }
+                if (likeBtn && dataLike.success && typeof dataLike.liked !== 'undefined') {
+                    const icon = likeBtn.querySelector('i');
+                    if (dataLike.liked) {
+                        likeBtn.className = 'like-btn inline-flex items-center text-pink-600 hover:text-pink-700';
+                        icon.className = 'fas fa-heart mr-1';
+                        likeBtn.dataset.liked = 'true';
+                    } else {
+                        likeBtn.className = 'like-btn inline-flex items-center text-gray-500 hover:text-pink-700';
+                        icon.className = 'far fa-heart mr-1';
+                        likeBtn.dataset.liked = 'false';
                     }
                 }
             } catch (e) {}

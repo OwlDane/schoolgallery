@@ -27,7 +27,7 @@ class GallerySubmissionController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:2000',
             'images' => 'required|array|max:2',
-            'images.*' => 'file|mimes:jpeg,jpg,png,webp|max:3072', // 3MB
+            'images.*' => 'image|mimes:jpeg,jpg,png,webp|max:3072', // 3MB
         ]);
 
         $user = Auth::user();

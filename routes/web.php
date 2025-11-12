@@ -53,6 +53,8 @@ Route::middleware('track.visits')->group(function () {
 
     // Favorites status can be read by everyone (returns favorited=false for guests)
     Route::get('/gallery/{id}/favorite-status', [FavoriteController::class, 'status'])->name('gallery.favorite-status');
+    // Like status can be read by everyone (returns liked=false for guests)
+    Route::get('/gallery/{id}/like-status', [InteractionController::class, 'checkLikeStatus'])->name('gallery.like-status');
 });
 
 // Authenticated User Interaction Routes (login required + email verified)
@@ -60,7 +62,6 @@ Route::middleware(['auth', 'verified', 'track.visits'])->group(function () {
     // Gallery interactions for authenticated users
     Route::post('/gallery/{id}/like', [InteractionController::class, 'toggleLike'])->name('gallery.like');
     Route::post('/gallery/{id}/comment', [InteractionController::class, 'addComment'])->name('gallery.comment');
-    Route::get('/gallery/{id}/like-status', [InteractionController::class, 'checkLikeStatus'])->name('gallery.like-status');
 
     // Favorites (MVP)
     Route::post('/gallery/{id}/favorite', [FavoriteController::class, 'toggle'])->name('gallery.favorite');

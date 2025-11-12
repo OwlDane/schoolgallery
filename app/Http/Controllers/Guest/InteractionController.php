@@ -218,7 +218,7 @@ class InteractionController extends Controller
 
         // Send email notification to school admin
         try {
-            $recipientEmail = env('CONTACT_EMAIL', config('mail.from.address'));
+            $recipientEmail = config('services.contact_email');
             
             Notification::route('mail', $recipientEmail)
                 ->notify(new ContactMessageNotification($contactData));
@@ -297,26 +297,25 @@ class InteractionController extends Controller
      */
     public function checkLikeStatus(Request $request, $galleryId)
     {
-        // Check if user is authenticated
+        $likeCount = GalleryLike::where('gallery_id', $galleryId)->count();
+
         if (!auth()->check()) {
             return response()->json([
-                'success' => false,
-                'message' => 'Anda harus login terlebih dahulu'
-            ], 401);
+                'success' => true,
+                'liked' => false,
+                'like_count' => $likeCount,
+            ]);
         }
 
         $userId = auth()->id();
-        
         $liked = GalleryLike::where('gallery_id', $galleryId)
             ->where('user_id', $userId)
             ->exists();
 
-        $likeCount = GalleryLike::where('gallery_id', $galleryId)->count();
-
         return response()->json([
             'success' => true,
             'liked' => $liked,
-            'like_count' => $likeCount
+            'like_count' => $likeCount,
         ]);
     }
 
