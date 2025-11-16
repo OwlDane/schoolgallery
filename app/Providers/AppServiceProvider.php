@@ -22,12 +22,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Share schoolProfile to all views with error handling
+        // Share schoolProfile to all views with comprehensive error handling
         View::composer('*', function ($view) {
             try {
-                $view->with('schoolProfile', SchoolProfile::getProfile());
-            } catch (\Exception $e) {
-                // Fallback to empty model if database query fails
+                $schoolProfile = SchoolProfile::getProfile();
+                $view->with('schoolProfile', $schoolProfile);
+            } catch (\Throwable $e) {
+                // Fallback to empty model if any error occurs
                 $view->with('schoolProfile', new SchoolProfile());
             }
         });

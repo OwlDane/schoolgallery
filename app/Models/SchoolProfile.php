@@ -36,12 +36,24 @@ class SchoolProfile extends Model
     public static function getProfile()
     {
         try {
+            // Try to use cache
             return Cache::remember('school_profile', 3600, function () {
-                return self::first() ?? new self();
+                try {
+                    return self::first() ?? new self();
+                } catch (\Exception $e) {
+                    // If database query fails, return empty model
+                    return new self();
+                }
             });
         } catch (\Exception $e) {
-            // Return empty model if database is unavailable
-            return new self();
+            // If cache operation fails (e.g., cache table doesn't exist), 
+            // try direct query without cache
+            try {
+                return self::first() ?? new self();
+            } catch (\Exception $e2) {
+                // Last resort: return empty model
+                return new self();
+            }
         }
     }
     
