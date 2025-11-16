@@ -31,12 +31,18 @@ class SchoolProfile extends Model
     /**
      * Get school profile with caching (1 hour cache)
      * Response time: 200ms → 5ms (40x faster!)
+     * Includes error handling for database connection issues
      */
     public static function getProfile()
     {
-        return Cache::remember('school_profile', 3600, function () {
-            return self::first() ?? new self();
-        });
+        try {
+            return Cache::remember('school_profile', 3600, function () {
+                return self::first() ?? new self();
+            });
+        } catch (\Exception $e) {
+            // Return empty model if database is unavailable
+            return new self();
+        }
     }
     
     /**
