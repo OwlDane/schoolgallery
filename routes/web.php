@@ -82,7 +82,7 @@ Route::middleware(['auth', 'verified', 'track.visits'])->group(function () {
 // Protected Routes (require login + email verified)
 Route::middleware(['auth', 'verified', 'track.visits'])->group(function () {
     // News interactions
-    Route::post('/news/{slug}/comment', [HomeController::class, 'commentNews'])->name('news.comment');
+    Route::post('/news/{slug}/comment', [HomeController::class, 'commentNews'])->name('news.comment.slug');
 
     // User profile
     Route::get('/profile', [UserProfileController::class, 'edit'])->name('profile.edit');
