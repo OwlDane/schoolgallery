@@ -32,23 +32,26 @@ class GallerySubmissionController extends Controller
         $submission->load('kategori');
         
         DB::transaction(function () use ($submission, $image) {
-            // Source path: now stored under public/images/{path}
+            // Source path: stored on public disk (storage/app/public)
             $normalized = str_replace('\\', '/', $image->path);
-            $srcPath = public_path('images/' . ltrim($normalized, '/'));
-            if (!file_exists($srcPath)) {
+            $srcPath = ltrim($normalized, '/'); // relative path on public disk
+
+            if (!Storage::disk('public')->exists($srcPath)) {
                 abort(404, 'File gambar pengajuan tidak ditemukan.');
             }
+
             $kategoriSlug = $submission->kategori->slug ?? 'lainnya';
-            $targetPath = 'galleries/'.$kategoriSlug;
+            $targetDir = 'galleries/'.$kategoriSlug;
             $fileName = uniqid().'_'.basename($image->path);
-            // Ensure directory and copy
-            File::ensureDirectoryExists(public_path('images/'.$targetPath));
-            copy($srcPath, public_path('images/'.$targetPath.'/'.$fileName));
+            $targetPath = $targetDir.'/'.$fileName;
+
+            // Copy within public disk
+            Storage::disk('public')->copy($srcPath, $targetPath);
 
             Gallery::create([
                 'title' => $submission->title,
                 'description' => $submission->description,
-                'image' => $targetPath.'/'.$fileName,
+                'image' => $targetPath,
                 'is_published' => true,
                 'admin_id' => auth('admin')->id(),
                 'kategori_id' => $submission->kategori_id,
@@ -88,23 +91,25 @@ class GallerySubmissionController extends Controller
 
         DB::transaction(function () use ($submission) {
             foreach ($submission->images as $img) {
-                // copy to final galleries folder by category
+                // Copy to final galleries folder by category on public disk
                 $kategori = $submission->kategori; // assumes exists
-                $targetPath = 'galleries/'.($kategori?->slug ?? 'umum');
+                $baseDir = 'galleries/'.($kategori?->slug ?? 'umum');
                 $fileName = basename(str_replace('\\', '/', $img->path));
-                // source in public/images submissions
-                $srcPath = public_path('images/' . ltrim(str_replace('\\', '/', $img->path), '/'));
-                if (!file_exists($srcPath)) {
+
+                // Source in public disk submissions
+                $srcPath = ltrim(str_replace('\\', '/', $img->path), '/');
+                if (!Storage::disk('public')->exists($srcPath)) {
                     abort(404, 'File gambar pengajuan tidak ditemukan.');
                 }
-                File::ensureDirectoryExists(public_path('images/'.$targetPath));
-                copy($srcPath, public_path('images/'.$targetPath.'/'.$fileName));
 
-                // create Gallery item per image
+                $targetPath = $baseDir.'/'.$fileName;
+                Storage::disk('public')->copy($srcPath, $targetPath);
+
+                // create Gallery item per image, storing relative path for StorageHelper
                 Gallery::create([
                     'title' => $submission->title,
                     'description' => $submission->description,
-                    'image' => $targetPath.'/'.$fileName,
+                    'image' => $targetPath,
                     'is_published' => true,
                     'admin_id' => auth('admin')->id(),
                     'kategori_id' => $submission->kategori_id,
