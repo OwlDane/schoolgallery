@@ -59,6 +59,10 @@ class User extends Authenticatable implements MustVerifyEmail
             // Normalize path and build URL via StorageHelper so we can
             // serve from public images (e.g. /images/...) in production
             $path = str_replace('\\', '/', $this->avatar);
+            // If only a filename is stored (no directory), assume avatars/
+            if (strpos($path, '/') === false) {
+                $path = 'avatars/' . ltrim($path, '/');
+            }
             return StorageHelper::getStorageUrl($path);
         }
         return null;

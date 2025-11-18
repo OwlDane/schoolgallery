@@ -132,6 +132,17 @@ class InteractionController extends Controller
             'is_approved' => true, // Auto approve untuk user yang login
         ]);
 
+        // Build avatar URL using user model accessor or gravatar fallback
+        $avatarUrl = null;
+        if ($user) {
+            if (!empty($user->avatar_url)) {
+                $avatarUrl = $user->avatar_url;
+            } elseif (!empty($user->email)) {
+                $email = strtolower(trim($user->email));
+                $avatarUrl = 'https://www.gravatar.com/avatar/' . md5($email) . '?s=80&d=mp';
+            }
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Komentar berhasil ditambahkan!',
@@ -143,7 +154,7 @@ class InteractionController extends Controller
                 'created_at' => $comment->created_at->format('d M Y H:i'),
                 'created_at_iso' => $comment->created_at->toIso8601String(),
                 'is_reply' => $comment->parent_id ? true : false,
-                'avatar_url' => $user->avatar ? asset('storage/'.$user->avatar) : null,
+                'avatar_url' => $avatarUrl,
             ]
         ]);
     }
@@ -157,6 +168,15 @@ class InteractionController extends Controller
         
         $comments = $gallery->comments()->with('replies')->get()->map(function ($comment) {
             $commentUser = $comment->email ? User::where('email', $comment->email)->first() : null;
+
+            // Determine avatar URL: prefer user avatar_url, then gravatar based on email
+            $avatarUrl = null;
+            if ($commentUser && !empty($commentUser->avatar_url)) {
+                $avatarUrl = $commentUser->avatar_url;
+            } elseif (!empty($comment->email)) {
+                $email = strtolower(trim($comment->email));
+                $avatarUrl = 'https://www.gravatar.com/avatar/' . md5($email) . '?s=80&d=mp';
+            }
             return [
                 'id' => $comment->id,
                 'name' => $comment->name,
@@ -164,9 +184,17 @@ class InteractionController extends Controller
                 'depth' => $comment->depth,
                 'created_at' => $comment->created_at->format('d M Y H:i'),
                 'created_at_iso' => $comment->created_at->toIso8601String(),
-                'avatar_url' => $commentUser && $commentUser->avatar_url ? $commentUser->avatar_url : null,
+                'avatar_url' => $avatarUrl,
                 'replies' => $comment->replies->map(function ($reply) {
                     $replyUser = $reply->email ? User::where('email', $reply->email)->first() : null;
+
+                    $replyAvatarUrl = null;
+                    if ($replyUser && !empty($replyUser->avatar_url)) {
+                        $replyAvatarUrl = $replyUser->avatar_url;
+                    } elseif (!empty($reply->email)) {
+                        $email = strtolower(trim($reply->email));
+                        $replyAvatarUrl = 'https://www.gravatar.com/avatar/' . md5($email) . '?s=80&d=mp';
+                    }
                     return [
                         'id' => $reply->id,
                         'name' => $reply->name,
@@ -174,7 +202,7 @@ class InteractionController extends Controller
                         'depth' => $reply->depth,
                         'created_at' => $reply->created_at->format('d M Y H:i'),
                         'created_at_iso' => $reply->created_at->toIso8601String(),
-                        'avatar_url' => $replyUser && $replyUser->avatar_url ? $replyUser->avatar_url : null,
+                        'avatar_url' => $replyAvatarUrl,
                     ];
                 })
             ];
