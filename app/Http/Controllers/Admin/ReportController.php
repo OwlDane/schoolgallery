@@ -564,17 +564,33 @@ class ReportController extends Controller
      */
     private function exportContentStatsPDF($data, $schoolProfile, $startDate, $endDate)
     {
-        $pdf = Pdf::loadView('admin.reports.content-stats-pdf', [
-            'data' => $data,
-            'schoolProfile' => $schoolProfile,
-            'startDate' => $startDate,
-            'endDate' => $endDate,
-            'generatedAt' => now()
-        ]);
+        try {
+            $pdf = Pdf::setOptions([
+                    'isRemoteEnabled' => true,
+                    'isHtml5ParserEnabled' => true,
+                    'dpi' => 96,
+                    'defaultFont' => 'DejaVu Sans',
+                    'chroot' => public_path(),
+                ])
+                ->loadView('admin.reports.content-stats-pdf', [
+                    'data' => $data,
+                    'schoolProfile' => $schoolProfile,
+                    'startDate' => $startDate,
+                    'endDate' => $endDate,
+                    'generatedAt' => now()
+                ]);
 
-        $filename = 'laporan-statistik-konten-' . $startDate . '-to-' . $endDate . '.pdf';
-        
-        return $pdf->download($filename);
+            $filename = 'laporan-statistik-konten-' . $startDate . '-to-' . $endDate . '.pdf';
+            return $pdf->download($filename);
+        } catch (\Throwable $e) {
+            \Log::error('Export content stats PDF failed', [
+                'error' => $e->getMessage(),
+                'start' => $startDate,
+                'end' => $endDate,
+            ]);
+            return redirect()->route('admin.reports.index')
+                ->with('error', 'Gagal membuat PDF di server. Coba format Excel (CSV) atau coba lagi nanti.');
+        }
     }
 
     /**
