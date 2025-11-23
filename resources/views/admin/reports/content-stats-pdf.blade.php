@@ -135,13 +135,7 @@
 <body>
     <!-- Header -->
     <div class="header">
-        <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:8px;">
-            @php $__logoPath = public_path('images/2.png'); @endphp
-            @if(file_exists($__logoPath))
-                <img src="{{ $__logoPath }}" alt="SpotEdu" style="height:40px;">
-            @endif
-            <div class="school-name">SpotEdu</div>
-        </div>
+        <div class="school-name">{{ $schoolProfile->school_name ?? 'SpotEdu' }}</div>
         <div class="report-title">Laporan Statistik Konten</div>
         <div class="report-period">
             Periode: {{ \Carbon\Carbon::parse($startDate)->format('d F Y') }} - {{ \Carbon\Carbon::parse($endDate)->format('d F Y') }}
@@ -155,13 +149,16 @@
     <div class="section">
         <div class="section-title">Ringkasan Statistik Konten</div>
         <div class="summary-box">
-            <div class="summary-title">Total Konten: {{ number_format($data['news']['total'] + $data['galleries']['total']) }}</div>
-            <div>Berita: {{ number_format($data['news']['total']) }} | Galeri: {{ number_format($data['galleries']['total']) }}</div>
-            <div>Dipublikasikan: {{ number_format($data['news']['published'] + $data['galleries']['published']) }} | Draft: {{ number_format($data['news']['draft'] + $data['galleries']['draft']) }}</div>
+            <div class="summary-title">Total Konten: {{ number_format(($data['news']['total'] ?? 0) + ($data['galleries']['total'] ?? 0)) }}</div>
+            <div>Berita: {{ number_format($data['news']['total'] ?? 0) }} | Galeri: {{ number_format($data['galleries']['total'] ?? 0) }}</div>
+            <div>Dipublikasikan: {{ number_format(($data['news']['published'] ?? 0) + ($data['galleries']['published'] ?? 0)) }} | Draft: {{ number_format(($data['news']['draft'] ?? 0) + ($data['galleries']['draft'] ?? 0)) }}</div>
             <div>Persentase Publikasi Keseluruhan: 
-                {{ ($data['news']['total'] + $data['galleries']['total']) > 0 
-                    ? number_format((($data['news']['published'] + $data['galleries']['published']) / ($data['news']['total'] + $data['galleries']['total'])) * 100, 2) 
-                    : 0 }}%
+                @php
+                    $totalContent = ($data['news']['total'] ?? 0) + ($data['galleries']['total'] ?? 0);
+                    $totalPublished = ($data['news']['published'] ?? 0) + ($data['galleries']['published'] ?? 0);
+                    $pubPercentage = $totalContent > 0 ? number_format(($totalPublished / $totalContent) * 100, 2) : 0;
+                @endphp
+                {{ $pubPercentage }}%
             </div>
             <div style="margin-top:6px; font-size:11px; color:#6b7280;">
                 Catatan: Laporan ini mencakup seluruh konten aktif (berita dan galeri) yang diunggah oleh pihak sekolah selama periode yang dipilih.
@@ -180,11 +177,16 @@
                 <div class="stats-cell header">Persentase Publikasi</div>
             </div>
             <div class="stats-row">
-                <div class="stats-cell data highlight">{{ number_format($data['news']['total']) }}</div>
-                <div class="stats-cell data">{{ number_format($data['news']['published']) }}</div>
-                <div class="stats-cell data">{{ number_format($data['news']['draft']) }}</div>
+                <div class="stats-cell data highlight">{{ number_format($data['news']['total'] ?? 0) }}</div>
+                <div class="stats-cell data">{{ number_format($data['news']['published'] ?? 0) }}</div>
+                <div class="stats-cell data">{{ number_format($data['news']['draft'] ?? 0) }}</div>
                 <div class="stats-cell data">
-                    {{ $data['news']['total'] > 0 ? number_format(($data['news']['published'] / $data['news']['total']) * 100, 2) : 0 }}%
+                    @php
+                        $newsTotal = $data['news']['total'] ?? 0;
+                        $newsPub = $data['news']['published'] ?? 0;
+                        $newsPct = $newsTotal > 0 ? number_format(($newsPub / $newsTotal) * 100, 2) : 0;
+                    @endphp
+                    {{ $newsPct }}%
                 </div>
             </div>
         </div>
@@ -201,17 +203,21 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($data['news']['items']->take(50) as $i => $item)
-                <tr>
-                    <td>{{ $i+1 }}</td>
-                    <td>{{ $item['title'] }}</td>
-                    <td>{{ $item['category'] }}</td>
-                    <td>{{ $item['status'] }}</td>
-                    <td>{{ \Carbon\Carbon::parse($item['created_at'])->format('d M Y') }}</td>
-                    <td>{{ number_format($item['views']) }}</td>
-                    <td>{{ number_format($item['comments']) }}</td>
-                </tr>
-                @endforeach
+                @if(isset($data['news']['items']) && $data['news']['items']->count() > 0)
+                    @foreach($data['news']['items']->take(50) as $i => $item)
+                    <tr>
+                        <td>{{ $i+1 }}</td>
+                        <td>{{ $item['title'] ?? '-' }}</td>
+                        <td>{{ $item['category'] ?? '-' }}</td>
+                        <td>{{ $item['status'] ?? '-' }}</td>
+                        <td>{{ isset($item['created_at']) ? \Carbon\Carbon::parse($item['created_at'])->format('d M Y') : '-' }}</td>
+                        <td>{{ number_format($item['views'] ?? 0) }}</td>
+                        <td>{{ number_format($item['comments'] ?? 0) }}</td>
+                    </tr>
+                    @endforeach
+                @else
+                    <tr><td colspan="7" style="text-align:center;">Tidak ada data berita</td></tr>
+                @endif
             </tbody>
         </table>
         <div class="summary-box">
@@ -231,11 +237,16 @@
                 <div class="stats-cell header">Persentase Publikasi</div>
             </div>
             <div class="stats-row">
-                <div class="stats-cell data highlight">{{ number_format($data['galleries']['total']) }}</div>
-                <div class="stats-cell data">{{ number_format($data['galleries']['published']) }}</div>
-                <div class="stats-cell data">{{ number_format($data['galleries']['draft']) }}</div>
+                <div class="stats-cell data highlight">{{ number_format($data['galleries']['total'] ?? 0) }}</div>
+                <div class="stats-cell data">{{ number_format($data['galleries']['published'] ?? 0) }}</div>
+                <div class="stats-cell data">{{ number_format($data['galleries']['draft'] ?? 0) }}</div>
                 <div class="stats-cell data">
-                    {{ $data['galleries']['total'] > 0 ? number_format(($data['galleries']['published'] / $data['galleries']['total']) * 100, 2) : 0 }}%
+                    @php
+                        $galTotal = $data['galleries']['total'] ?? 0;
+                        $galPub = $data['galleries']['published'] ?? 0;
+                        $galPct = $galTotal > 0 ? number_format(($galPub / $galTotal) * 100, 2) : 0;
+                    @endphp
+                    {{ $galPct }}%
                 </div>
             </div>
         </div>
@@ -259,17 +270,28 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($data['galleries']['by_category_agg'] as $row)
-                <tr>
-                    <td>{{ $row['category'] }}</td>
-                    <td>{{ number_format($row['total']) }}</td>
-                    <td>{{ number_format($row['total_views']) }}</td>
-                    <td>{{ number_format($row['total_likes']) }}</td>
-                    <td>{{ number_format($row['total_comments']) }}</td>
-                    <td>{{ number_format($row['total_favorites']) }}</td>
-                    <td>{{ $data['galleries']['total'] > 0 ? number_format(($row['total'] / $data['galleries']['total']) * 100, 2) : 0 }}%</td>
-                </tr>
-                @endforeach
+                @if(isset($data['galleries']['by_category_agg']) && count($data['galleries']['by_category_agg']) > 0)
+                    @foreach($data['galleries']['by_category_agg'] as $row)
+                    <tr>
+                        <td>{{ $row['category'] ?? '-' }}</td>
+                        <td>{{ number_format($row['total'] ?? 0) }}</td>
+                        <td>{{ number_format($row['total_views'] ?? 0) }}</td>
+                        <td>{{ number_format($row['total_likes'] ?? 0) }}</td>
+                        <td>{{ number_format($row['total_comments'] ?? 0) }}</td>
+                        <td>{{ number_format($row['total_favorites'] ?? 0) }}</td>
+                        <td>
+                            @php
+                                $galT = $data['galleries']['total'] ?? 0;
+                                $rowT = $row['total'] ?? 0;
+                                $pct = $galT > 0 ? number_format(($rowT / $galT) * 100, 2) : 0;
+                            @endphp
+                            {{ $pct }}%
+                        </td>
+                    </tr>
+                    @endforeach
+                @else
+                    <tr><td colspan="7" style="text-align:center;">Tidak ada data galeri per kategori</td></tr>
+                @endif
             </tbody>
         </table>
     </div>
@@ -290,16 +312,20 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($data['popular'] as $i => $p)
-                <tr>
-                    <td>{{ $i+1 }}</td>
-                    <td>{{ $p['type']==='news' ? 'Berita' : 'Galeri' }}</td>
-                    <td>{{ $p['title'] }}</td>
-                    <td>{{ number_format($p['views']) }}</td>
-                    <td>{{ number_format($p['likes']) }}</td>
-                    <td>{{ number_format($p['comments']) }}</td>
-                </tr>
-                @endforeach
+                @if(isset($data['popular']) && count($data['popular']) > 0)
+                    @foreach($data['popular'] as $i => $p)
+                    <tr>
+                        <td>{{ $i+1 }}</td>
+                        <td>{{ ($p['type'] ?? '') === 'news' ? 'Berita' : 'Galeri' }}</td>
+                        <td>{{ $p['title'] ?? '-' }}</td>
+                        <td>{{ number_format($p['views'] ?? 0) }}</td>
+                        <td>{{ number_format($p['likes'] ?? 0) }}</td>
+                        <td>{{ number_format($p['comments'] ?? 0) }}</td>
+                    </tr>
+                    @endforeach
+                @else
+                    <tr><td colspan="6" style="text-align:center;">Tidak ada data konten populer</td></tr>
+                @endif
             </tbody>
         </table>
     </div>
@@ -311,11 +337,14 @@
             <div class="summary-title">Ringkasan</div>
             <div>Berdasarkan hasil analisis periode ini, konten berbasis visual (galeri) memiliki tingkat keterlibatan yang tinggi.</div>
             <div>Berita tetap menjadi elemen penting dalam publikasi, namun dapat dioptimalkan dalam promosi dan tampilan untuk meningkatkan keterbacaan.</div>
-            <div>Tingkat publikasi konten mencapai {{
-                ($data['news']['total'] + $data['galleries']['total']) > 0
-                ? number_format((($data['news']['published'] + $data['galleries']['published']) / ($data['news']['total'] + $data['galleries']['total'])) * 100, 2)
-                : 0
-            }}% pada periode ini.</div>
+            <div>Tingkat publikasi konten mencapai 
+                @php
+                    $totC = ($data['news']['total'] ?? 0) + ($data['galleries']['total'] ?? 0);
+                    $totP = ($data['news']['published'] ?? 0) + ($data['galleries']['published'] ?? 0);
+                    $pubRate = $totC > 0 ? number_format(($totP / $totC) * 100, 2) : 0;
+                @endphp
+                {{ $pubRate }}% pada periode ini.
+            </div>
         </div>
     </div>
 
@@ -327,7 +356,7 @@
         </div>
     </div>
     <!-- Admin Activity for Content -->
-    @if($data['admin_activity']->count() > 0)
+    @if(isset($data['admin_activity']) && $data['admin_activity']->count() > 0)
     <div class="section">
         <div class="section-title">Aktivitas Admin pada Konten</div>
         <table class="table">
@@ -341,9 +370,9 @@
             <tbody>
                 @foreach($data['admin_activity'] as $activity)
                 <tr>
-                    <td>{{ $activity->name }}</td>
-                    <td>{{ ucfirst($activity->action) }}</td>
-                    <td>{{ number_format($activity->total) }}</td>
+                    <td>{{ $activity->name ?? '-' }}</td>
+                    <td>{{ ucfirst($activity->action ?? '-') }}</td>
+                    <td>{{ number_format($activity->total ?? 0) }}</td>
                 </tr>
                 @endforeach
             </tbody>

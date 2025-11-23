@@ -26,7 +26,7 @@ class ReportController extends Controller
     public function index()
     {
         $admin = auth('admin')->user();
-        
+
         // Basic stats for overview
         $stats = [
             'total_visitors' => DB::table('visits')->count(),
@@ -46,7 +46,7 @@ class ReportController extends Controller
     public function exportVisitorStats(Request $request)
     {
         $admin = auth('admin')->user();
-        
+
         // Validate date range
         $request->validate([
             'start_date' => 'required|date',
@@ -64,7 +64,7 @@ class ReportController extends Controller
 
         // Get visitor statistics
         $visitorStats = $this->getVisitorStatistics($startDateTime, $endDateTime);
-        
+
         // Get school profile for branding
         $schoolProfile = \App\Models\SchoolProfile::first();
 
@@ -81,7 +81,7 @@ class ReportController extends Controller
     public function exportContentStats(Request $request)
     {
         $admin = auth('admin')->user();
-        
+
         $request->validate([
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
@@ -113,7 +113,7 @@ class ReportController extends Controller
     public function exportAdminActivity(Request $request)
     {
         $admin = auth('admin')->user();
-        
+
         $request->validate([
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
@@ -472,7 +472,7 @@ class ReportController extends Controller
         ]);
 
         $filename = 'laporan-statistik-kunjungan-' . $startDate . '-to-' . $endDate . '.pdf';
-        
+
         return $pdf->download($filename);
     }
 
@@ -545,7 +545,7 @@ class ReportController extends Controller
         }
 
         $filename = 'laporan-statistik-kunjungan-' . $startDate . '-to-' . $endDate . '.csv';
-        
+
         $callback = function() use ($csvData) {
             $file = fopen('php://output', 'w');
             foreach ($csvData as $row) {
@@ -566,17 +566,42 @@ class ReportController extends Controller
     private function exportContentStatsPDF($data, $schoolProfile, $startDate, $endDate)
     {
         try {
-            File::ensureDirectoryExists(storage_path('app/dompdf'));
+            // Increase memory limit for PDF generation
+            ini_set('memory_limit', '512M');
+            ini_set('max_execution_time', '300');
+
+            // Ensure temp directory exists
+            $tempDir = storage_path('app/dompdf');
+            if (!File::exists($tempDir)) {
+                File::makeDirectory($tempDir, 0755, true);
+            }
+
+            // Simplify data to reduce memory usage
+            $simplifiedData = $data;
+            if (isset($simplifiedData['news']['items'])) {
+                $simplifiedData['news']['items'] = $simplifiedData['news']['items']->take(50);
+            }
+            if (isset($simplifiedData['galleries']['items'])) {
+                $simplifiedData['galleries']['items'] = $simplifiedData['galleries']['items']->take(50);
+            }
+
             $pdf = Pdf::setOptions([
-                    'isRemoteEnabled' => true,
+                    'isRemoteEnabled' => false,
                     'isHtml5ParserEnabled' => true,
                     'dpi' => 96,
                     'defaultFont' => 'DejaVu Sans',
-                    'chroot' => public_path(),
-                    'tempDir' => storage_path('app/dompdf'),
+                    'tempDir' => $tempDir,
+                    'debugPng' => false,
+                    'debugKeepTemp' => false,
+                    'debugCss' => false,
+                    'debugLayout' => false,
+                    'debugLayoutLines' => false,
+                    'debugLayoutBlocks' => false,
+                    'debugLayoutInline' => false,
+                    'debugLayoutPaddingBox' => false,
                 ])
                 ->loadView('admin.reports.content-stats-pdf', [
-                    'data' => $data,
+                    'data' => $simplifiedData,
                     'schoolProfile' => $schoolProfile,
                     'startDate' => $startDate,
                     'endDate' => $endDate,
@@ -589,11 +614,14 @@ class ReportController extends Controller
         } catch (\Throwable $e) {
             \Log::error('Export content stats PDF failed', [
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
                 'start' => $startDate,
                 'end' => $endDate,
             ]);
             return redirect()->route('admin.reports.index')
-                ->with('error', 'Gagal membuat PDF di server. Coba format Excel (CSV) atau coba lagi nanti.');
+                ->with('error', 'Gagal membuat PDF di server. Error: ' . $e->getMessage() . '. Coba format Excel (CSV) atau coba lagi nanti.');
         }
     }
 
@@ -741,7 +769,7 @@ class ReportController extends Controller
         ]);
 
         $filename = 'laporan-aktivitas-admin-' . $startDate . '-to-' . $endDate . '.pdf';
-        
+
         return $pdf->download($filename);
     }
 
@@ -813,7 +841,7 @@ class ReportController extends Controller
         }
 
         $filename = 'laporan-aktivitas-admin-' . $startDate . '-to-' . $endDate . '.csv';
-        
+
         $callback = function() use ($csvData) {
             $file = fopen('php://output', 'w');
             foreach ($csvData as $row) {
