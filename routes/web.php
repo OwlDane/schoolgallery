@@ -154,8 +154,8 @@ Route::get('/login', function () {
 Route::get('/reset-password/{token}', [GuestAuthController::class, 'showResetPasswordForm'])->name('password.reset');
 
 // Admin Routes
-Route::prefix('admin')->name('admin.')->group(function () {
-    // Redirect /admin to /admin/login when unauthenticated
+Route::prefix('manage-eduspot')->name('admin.')->group(function () {
+    // Redirect /manage-eduspot to /manage-eduspot/login when unauthenticated
     Route::get('/', function(){
         return redirect()->route('admin.login');
     })->name('root');

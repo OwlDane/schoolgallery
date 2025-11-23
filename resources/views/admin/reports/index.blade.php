@@ -164,46 +164,6 @@
         </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Aksi Cepat</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <a href="{{ route('admin.reports.export-visitor-stats.quick') }}?start_date={{ now()->subMonth()->format('Y-m-d') }}&end_date={{ now()->format('Y-m-d') }}&format=pdf" 
-               class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                <i class="fas fa-chart-line text-blue-600 mr-3"></i>
-                <div>
-                    <p class="font-medium text-gray-900">Kunjungan Bulan Ini</p>
-                    <p class="text-sm text-gray-600">PDF</p>
-                </div>
-            </a>
-
-            <a href="{{ route('admin.reports.export-content-stats.quick') }}?start_date={{ now()->subMonth()->format('Y-m-d') }}&end_date={{ now()->format('Y-m-d') }}&format=excel" 
-               class="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                <i class="fas fa-file-excel text-green-600 mr-3"></i>
-                <div>
-                    <p class="font-medium text-gray-900">Konten Bulan Ini</p>
-                    <p class="text-sm text-gray-600">Excel</p>
-                </div>
-            </a>
-
-            <a href="{{ route('admin.reports.export-admin-activity.quick') }}?start_date={{ now()->subWeek()->format('Y-m-d') }}&end_date={{ now()->format('Y-m-d') }}&format=pdf" 
-               class="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                <i class="fas fa-user-cog text-purple-600 mr-3"></i>
-                <div>
-                    <p class="font-medium text-gray-900">Aktivitas Minggu Ini</p>
-                    <p class="text-sm text-gray-600">PDF</p>
-                </div>
-            </a>
-
-            <a href="{{ route('admin.dashboard') }}" 
-               class="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <i class="fas fa-arrow-left text-gray-600 mr-3"></i>
-                <div>
-                    <p class="font-medium text-gray-900">Kembali ke Dashboard</p>
-                    <p class="text-sm text-gray-600">Menu utama</p>
-                </div>
-            </a>
-        </div>
-    </div>
+   
 </div>
 @endsection
