@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 use App\Models\NewsComment;
 use App\Models\GalleryFavorite;
 use App\Models\GalleryLike;
@@ -565,12 +566,14 @@ class ReportController extends Controller
     private function exportContentStatsPDF($data, $schoolProfile, $startDate, $endDate)
     {
         try {
+            File::ensureDirectoryExists(storage_path('app/dompdf'));
             $pdf = Pdf::setOptions([
                     'isRemoteEnabled' => true,
                     'isHtml5ParserEnabled' => true,
                     'dpi' => 96,
                     'defaultFont' => 'DejaVu Sans',
                     'chroot' => public_path(),
+                    'tempDir' => storage_path('app/dompdf'),
                 ])
                 ->loadView('admin.reports.content-stats-pdf', [
                     'data' => $data,
@@ -578,7 +581,8 @@ class ReportController extends Controller
                     'startDate' => $startDate,
                     'endDate' => $endDate,
                     'generatedAt' => now()
-                ]);
+                ])
+                ->setPaper('a4', 'portrait');
 
             $filename = 'laporan-statistik-konten-' . $startDate . '-to-' . $endDate . '.pdf';
             return $pdf->download($filename);
