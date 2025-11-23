@@ -258,6 +258,7 @@
 </div>
 @endif
 
+@push('scripts')
 <!-- JavaScript untuk filter, animasi, dan grafik -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -313,12 +314,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterStatus = document.getElementById('filterStatus');
     const adminCards = document.querySelectorAll('.admin-card');
 
+    // Only proceed if all required elements exist
+    if (!searchInput || !filterRole || !filterStatus || adminCards.length === 0) {
+        return;
+    }
+
     function filterCards() {
         const searchTerm = searchInput.value.toLowerCase();
         const roleFilter = filterRole.value;
         const statusFilter = filterStatus.value;
 
         adminCards.forEach(card => {
+            if (!card) return;
+            
             const cardText = card.textContent.toLowerCase();
             const cardRole = card.dataset.role;
             const cardStatus = card.dataset.status;
@@ -363,6 +371,7 @@ function copyPassword() {
     });
 }
 </script>
+@endpush
 
 <style>
 /* Animasi untuk elemen-elemen UI */
