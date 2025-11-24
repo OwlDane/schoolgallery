@@ -66,7 +66,7 @@ Route::middleware('track.visits')->group(function () {
     Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 });
 
-// Guest Interaction Routes (no login required) harus login jika melakukan interaksi user
+// Guest Interaction Routes (no login required) harus login jika melakukan interaksi user   
 Route::middleware('track.visits')->group(function () {
     // Gallery interactions - comments can be viewed by everyone
     Route::get('/gallery/{id}/comments', [InteractionController::class, 'getComments'])->name('gallery.comments');
